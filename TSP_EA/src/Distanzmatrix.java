@@ -6,7 +6,7 @@ import java.util.Random;
 	// Methode die mich auf jeden Eintrag im Ergebnis genau zurück greifen lässt
 	//um später in getdistance() von Klasse Tour zugreifen zu können
 public class Distanzmatrix {
-	
+	All_Cities liste = new All_Cities();
 	public void erzeugeStadt ()
 	{	double max = 180.00;
 		double min = -180.00;
@@ -20,7 +20,7 @@ public class Distanzmatrix {
 	}
 	
 	
-	All_Cities liste = new All_Cities();
+	
 	
 
 }
