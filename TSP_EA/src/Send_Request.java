@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 	public Send_Request(All_Cities liste ) {
 			 this.staedteliste=liste;
+			 this.erg= new double[liste.numberOfCities()][liste.numberOfCities()];
 		}
 
 	public double[][] getergebnis()
@@ -33,7 +34,7 @@ import org.json.JSONObject;
 
 	public void call_me() throws Exception {
 		
-		String urlAnfang = "https://api.openrouteservice.org/matrix?api_key=%0958d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=";
+		String urlAnfang = "https://api.openrouteservice.org/matrix?api_key=58d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=";
 		 String zwischenerg="";
 		 for(int i=0; i<staedteliste.numberOfCities();i++)
 		 {
@@ -43,13 +44,22 @@ import org.json.JSONObject;
 				 zwischenerg += Double.toString(x);
 				 zwischenerg+="%2C";
 				 zwischenerg+=Double.toString(y);
+				 if(i==(staedteliste.numberOfCities()-1))
+				 {}
+				 else
+				 {
 				 zwischenerg+="%7C";
+				 }
 			 
 		 }
 		 String gesamt=urlAnfang+zwischenerg;
+		// System.out.print(gesamt);
+		
 		 
-		 String url = "https://api.openrouteservice.org/matrix?api_key=%0958d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=9.330093%2C9.657916%2C48.477473%7C9.970093%2C48.477473%7C9.207916%2C49.153868%7C37.573242%2C55.801281%7C115.663757%2C38.106467";
-	     URL obj = new URL(url);
+		 //PROBLEM: Negative Zahlen in der URL
+		 
+		//String url = "https://api.openrouteservice.org/matrix?api_key=58d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=9.330093%2C9.657916%2C48.477473%7C9.970093%2C48.477473%7C9.207916%2C49.153868%7C37.573242%2C55.801281%7C115.663757%2C38.106467";
+	     URL obj = new URL(gesamt);
 	     HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 	     // optional default is GET
 	     con.setRequestMethod("GET");
@@ -66,38 +76,35 @@ import org.json.JSONObject;
 	     	response.append(inputLine);
 	     }
 	     in.close();
-	    //System.out.println(response.toString());
+	   System.out.println(response.toString());
+	    
+	    //BIS HIER STIMMTS
 	     
-	     JSONObject jobj= new JSONObject(response.toString());
+	    JSONObject jobj= new JSONObject(response.toString());
+	    
 	     JSONArray dura_1 = jobj.getJSONArray("durations");
 	     
-	    for (int t=0; t<dura_1.length();t++)
+	    for (int t=0; t<staedteliste.numberOfCities();t++)
 	    {
 	    	    JSONArray dura_2=dura_1.getJSONArray(t);
-	    	    double matrixs;
-	    	    for (int i = 0; i < dura_2.length(); i++) {
-	    	        matrixs = dura_2.getDouble(i);
+	    	   
+	    	    for (int i = 0; i < staedteliste.numberOfCities(); i++) {
+	    	    	
+	    	    	double matrixs = dura_2.getDouble(i);
 	    	        
-					erg[t][i]= matrixs;
-	    	       // System.out.print(" "+ matrixs);
+					erg[t][i]= matrixs;  //NULLPOINTEREXCEPTION!!!!!!!!!!
+	    	       
+					
+					// System.out.print(" "+ matrixs);
 	    	    }
 	    	//    System.out.println("");}
 	    	    
 		
 	    	
-	    	}}}
-	    
-		
-	
-	/*public static void main (String[]args) {
-	try {
-        Send_Request.call_me();
-       } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-	}*/
-	    
+	    	}
+	    }
+	}
+	  
 
 
 

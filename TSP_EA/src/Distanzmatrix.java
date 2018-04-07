@@ -18,9 +18,11 @@ public class Distanzmatrix {
 	{	double max = 180.00;
 		double min = -180.00;
 		Random generator = new Random();
-		for (int i=0;i<50;i++)
-		{	  double x_2 = min + (generator.nextDouble() * (max - min));
-			  double y_2 = min + (generator.nextDouble() * (max - min));
+		for (int i=0;i<2;i++)
+		{	  double x_2=(double)(Math.random()*0.59+13.14);
+			  double y_2=(double)(Math.random()*0.24+52.41);
+				//double x_2 = min + (generator.nextDouble() * (max - min));
+			  //double y_2 = min + (generator.nextDouble() * (max - min));
 			  double x= round(x_2);
 			  double y= round(y_2);
 			  City neueStaedte = new City(i,x,y);
@@ -65,7 +67,7 @@ public class Distanzmatrix {
 	Distanzmatrix dis= new Distanzmatrix();
 	dis.erzeugeStadt();
 	dis.erzeugeMatrix();
-	dis.spucksaus();
+	
 
 }
 }

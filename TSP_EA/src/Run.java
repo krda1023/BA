@@ -2,14 +2,11 @@
 public class Run {
 	public static void main(String[] args) {
 
-        // Create and add our cities  ....macht später der Simulator
-		for(int i=0; i<(int)Math.ceil(Math.random()*101);i++)
-		{
-		double[] pos = {(int)Math.ceil(Math.random()*200),(int)Math.ceil(Math.random()*200)};
-        City city = new City(i, pos);
-        All_Cities.addCity(city);
-        }
-        //Bastle URL aus Koordinaten, SEND REQUEST AN API .... bearbeite....erhalte Distanzmatrix
+		Distanzmatrix dis= new Distanzmatrix();
+		dis.erzeugeStadt();
+		dis.erzeugeMatrix();
+		dis.spucksaus();
+
         
 
         // Initialize population
