@@ -16,39 +16,39 @@ import org.json.JSONObject;
 	public class Send_Request {
 		
 		
-		 double[][] xundy;
+		All_Cities staedteliste = new All_Cities();
 	     double[][] erg;
 		
 		
 	
 
 
-	public Send_Request(double[][] coordinates) {
-			 this.xundy=coordinates;
+	public Send_Request(All_Cities liste ) {
+			 this.staedteliste=liste;
 		}
 
+	public double[][] getergebnis()
+	{ return erg;}
 
 
-	public double[][] call_me() throws Exception {
+	public void call_me() throws Exception {
 		
-		/*String urlAnfang = "https://api.openrouteservice.org/matrix?api_key=%0958d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=";
+		String urlAnfang = "https://api.openrouteservice.org/matrix?api_key=%0958d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=";
 		 String zwischenerg="";
-		 for(int i=0; i<xundy.length;i++)
+		 for(int i=0; i<staedteliste.numberOfCities();i++)
 		 {
-			 for (int j=0; j<2;j++)
-			 {
-				 zwischenerg += Double.toString(xundy[i][j]);
-				 if (j==0)
-					 zwischenerg+="%2C";
-				 if ((i+1)==xundy.length & j==1)
-				 {}
-				 if (j==1 & (i+1)<xundy.length)
-					 zwischenerg+="%7C";
-			 }
+			 	City intermediate = staedteliste.getCity(i);
+			 	double x = intermediate.getX();
+			 	double y=intermediate.getY();
+				 zwischenerg += Double.toString(x);
+				 zwischenerg+="%2C";
+				 zwischenerg+=Double.toString(y);
+				 zwischenerg+="%7C";
+			 
 		 }
-		 String gesamt=urlAnfang+zwischenerg;*/
+		 String gesamt=urlAnfang+zwischenerg;
 		 
-	 String url = "https://api.openrouteservice.org/matrix?api_key=%0958d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=9.330093%2C9.657916%2C48.477473%7C9.970093%2C48.477473%7C9.207916%2C49.153868%7C37.573242%2C55.801281%7C115.663757%2C38.106467";
+		 String url = "https://api.openrouteservice.org/matrix?api_key=%0958d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=9.330093%2C9.657916%2C48.477473%7C9.970093%2C48.477473%7C9.207916%2C49.153868%7C37.573242%2C55.801281%7C115.663757%2C38.106467";
 	     URL obj = new URL(url);
 	     HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 	     // optional default is GET
@@ -79,22 +79,24 @@ import org.json.JSONObject;
 	    	        matrixs = dura_2.getDouble(i);
 	    	        
 					erg[t][i]= matrixs;
-	    	        System.out.print(" "+ matrixs);
+	    	       // System.out.print(" "+ matrixs);
 	    	    }
-	    	    System.out.println("");}
-	    	return erg;
-	    	}
+	    	//    System.out.println("");}
+	    	    
+		
+	    	
+	    	}}}
 	    
 		
 	
-	public static void main (String[]args) {
+	/*public static void main (String[]args) {
 	try {
         Send_Request.call_me();
        } catch (Exception e) {
         e.printStackTrace();
       }
     }
-	}
+	}*/
 	    
 
 

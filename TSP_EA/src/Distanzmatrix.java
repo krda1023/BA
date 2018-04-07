@@ -7,6 +7,8 @@ import java.util.Random;
 	//um später in getdistance() von Klasse Tour zugreifen zu können
 public class Distanzmatrix {
 	All_Cities liste = new All_Cities();
+	double[][] matrix;
+	
 	static double round(double wert)
 	{
 		double erg=Math.round(wert*Math.pow(10,5))/Math.pow(10, 5);;
@@ -21,17 +23,49 @@ public class Distanzmatrix {
 			  double y_2 = min + (generator.nextDouble() * (max - min));
 			  double x= round(x_2);
 			  double y= round(y_2);
-			  City neueStadt = new City(i,x,y);
-			  liste.addCity(neueStadt);
+			  City neueStaedte = new City(i,x,y);
+			  liste.addCity(neueStaedte);
 			  //System.out.println(x +" "+y);
 		}
 	}
+	//Methode erzeugt Send_Request Object mit erg[][]als Distanzmatrix im zweidim. array
+	public void erzeugeMatrix()
+	{	Send_Request anfrage= new Send_Request(liste);
+	try 
+		{
+        anfrage.call_me();
+        matrix=anfrage.getergebnis();
+		} 
+	catch (Exception e) 
+		{ 
+		e.printStackTrace();
+		}
+	}
 	
-	/*public static void main (String[]args)
+	public void spucksaus()
+	{
+		for(int i=0; i<liste.numberOfCities();i++)
+		{
+			for(int j=0;j<2;j++)
+			{
+				System.out.print(matrix[i][j]+" ");
+			}
+			System.out.println("");
+		}
+	}
+			
+			
+			
+	
+	
+	
+	public static void main (String[]args)
 	{
 	
 	Distanzmatrix dis= new Distanzmatrix();
 	dis.erzeugeStadt();
+	dis.erzeugeMatrix();
+	dis.spucksaus();
 
-}*/
+}
 }
