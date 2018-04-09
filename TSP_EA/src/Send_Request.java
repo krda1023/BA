@@ -76,7 +76,7 @@ import org.json.JSONObject;
 	     	response.append(inputLine);
 	     }
 	     in.close();
-	   System.out.println(response.toString());
+	  // System.out.println(response.toString());
 	    
 	    //BIS HIER STIMMTS
 	     
@@ -90,16 +90,18 @@ import org.json.JSONObject;
 	    	   
 	    	    for (int i = 0; i < staedteliste.numberOfCities(); i++) {
 	    	    	
-	    	    	double matrixs = dura_2.getDouble(i);
+	    	    	 erg[t][i] = dura_2.getDouble(i);
+	    	    	
+
 	    	        
-					erg[t][i]= matrixs;  //NULLPOINTEREXCEPTION!!!!!!!!!!
+				  //NULLPOINTEREXCEPTION!!!!!!!!!!
 	    	       
 					
 					// System.out.print(" "+ matrixs);
 	    	    }
 	    	//    System.out.println("");}
 	    	    
-		
+	    	    
 	    	
 	    	}
 	    }
