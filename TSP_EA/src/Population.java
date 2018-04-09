@@ -2,10 +2,16 @@ public class Population {
 
     // Holds population of tours
     Tour[] tours;
+    static Distanzmatrix dismat;
 
     // Construct a population
-    public Population(int populationSize, boolean initialise) {
+    public Population(int populationSize, int numberCity, boolean initialise) {
         tours = new Tour[populationSize];
+        dismat= new Distanzmatrix(numberCity);
+        dismat.erzeugeStadt();
+        dismat.erzeugeMatrix();
+        
+        
         // If we need to initialise a population of tours do so
         if (initialise) {
             // Loop and create individuals
@@ -19,7 +25,14 @@ public class Population {
     
     // Saves a tour
     public void saveTour(int index, Tour tour) {
-        tours[index] = tour;
+        tours[index] = tour; 
+    }
+    
+    public static double[][] getDistanzmatrix(){
+    	return dismat.getDistanzmatrix();
+    }
+    public static Distanzmatrix getDistanzmatrixalsKlasse(){
+    	return dismat;
     }
     
     // Gets a tour from population
@@ -27,6 +40,8 @@ public class Population {
         return tours[index];
     }
 
+    
+    
     // Gets the best tour in the population
     public Tour getFittest() {
         Tour fittest = tours[0];
@@ -43,4 +58,9 @@ public class Population {
     public int populationSize() {
         return tours.length;
     }
+    static double round(double wert)
+	{
+		double erg=Math.round(wert*Math.pow(10,5))/Math.pow(10, 5);;
+		return erg;
+	}
     }

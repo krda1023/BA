@@ -4,12 +4,14 @@ public class Test_main {
 	public static void main(String[] args) {
 		
 			
-			Distanzmatrix dis= new Distanzmatrix();
-			dis.erzeugeStadt();
-			dis.erzeugeMatrix();
-			dis.spucksaus();
+		double summe = 0;
+		  for (int i=1; i<=100; i++) {
+		    summe = summe + i;
+		  }
+		  System.out.print("Summe = " + summe);
+		}
 			
 
 	}
 
-}
+

@@ -6,23 +6,29 @@ import java.util.Random;
 	// Methode die mich auf jeden Eintrag im Ergebnis genau zurück greifen lässt
 	//um später in getdistance() von Klasse Tour zugreifen zu können
 public class Distanzmatrix {
-	All_Cities liste = new All_Cities();
+	static All_Cities liste = new All_Cities();
 	double[][] matrix;
+	int anzstädte;
 	
+	public Distanzmatrix(int numberstädte){
+		this.anzstädte= numberstädte;
+	}
 	static double round(double wert)
 	{
 		double erg=Math.round(wert*Math.pow(10,5))/Math.pow(10, 5);;
 		return erg;
 	}
+	
+	public static All_Cities getAllCities()
+	{
+		return liste;
+	}
+	
 	public void erzeugeStadt ()
-	{	double max = 180.00;
-		double min = -180.00;
-		Random generator = new Random();
-		for (int i=0;i<10;i++)                                         //HIER ANZAHL STÄDTE BESTIMMEN
+	{	
+		for (int i=0;i<anzstädte;i++)                                         //HIER ANZAHL STÄDTE BESTIMMEN
 		{	  double x_2=(double)(Math.random()*0.59+13.14);
 			  double y_2=(double)(Math.random()*0.24+52.41);
-				//double x_2 = min + (generator.nextDouble() * (max - min));
-			  //double y_2 = min + (generator.nextDouble() * (max - min));
 			  double x= round(x_2);
 			  double y= round(y_2);
 			  City neueStaedte = new City(i,x,y);

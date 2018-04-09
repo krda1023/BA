@@ -7,7 +7,7 @@ public class Tour{
     private ArrayList tour = new ArrayList<City>();
     // Cache
     private double fitness = 0;
-    private int distance = 0;  //time?
+    private double distance = 0;  //time?
     
     // Constructs a blank tour
     public Tour(){
@@ -52,8 +52,42 @@ public class Tour{
     }
     
     // Gets the total distance of the tour
-    public int getDistance(){
-        if (distance == 0) {
+    public double getDistance(){
+        
+    	if (distance ==0) {
+    		double tourdistance =0;
+    		double[][] matrix = Population.getDistanzmatrix();				//Distanzmatrix aus DIstanzmatrixKlasse holen
+    		 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++)
+    		 {
+    			 City fromCity = getCity(cityIndex);
+    			 City destinationCity;	  // Check we're not on our tour's last city, if we are set our 
+                 							// tour's final destination city to our starting city
+    			 if(cityIndex+1 < tourSize()){
+                    
+    				 destinationCity = getCity(cityIndex+1);
+                 }
+    		 
+    			 
+                 else{
+                	 
+                     destinationCity = getCity(0);
+                 }
+    			 
+    			 int a = fromCity.getId();
+    			 int b = destinationCity.getId();
+    			 
+    			 tourdistance+=matrix[a][b];
+    		 }
+    		 distance=tourdistance;
+    		 
+         	 
+    	}
+    	distance= round(distance);    //Runden
+    	return distance; 
+    		
+    }
+    	
+    	/*if (distance == 0) {
             int tourDistance = 0;
             // Loop through our tour's cities
             for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) {
@@ -74,8 +108,10 @@ public class Tour{
             }
             distance = tourDistance;
         }
-        return distance;
-    }
+        return distance;*/
+    	
+		 
+    
 
     // Get number of cities on our tour
     public int tourSize() {
@@ -95,4 +131,8 @@ public class Tour{
         }
         return geneString;
     }
+    static double round(double wert)
+	{
+		double erg=Math.round(wert*Math.pow(10,5))/Math.pow(10, 5);;
+		return erg;}
 }

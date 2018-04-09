@@ -4,10 +4,11 @@ public class GA {
     private static final double mutationRate = 0.015;
     private static final int tournamentSize = 5;
     private static final boolean elitism = true;
+    private static final int anzstädte= 20;
 
     // Evolves a population over one generation
     public static Population evolvePopulation(Population pop) {
-        Population newPopulation = new Population(pop.populationSize(), false);
+        Population newPopulation = new Population(pop.populationSize(),anzstädte, false);
 
         // Keep our best individual if elitism is enabled
         int elitismOffset = 0;
@@ -99,7 +100,7 @@ public class GA {
     // Selects candidate tour for crossover
     private static Tour tournamentSelection(Population pop) {
         // Create a tournament population
-        Population tournament = new Population(tournamentSize, false);
+        Population tournament = new Population(tournamentSize,anzstädte, false);
         // For each place in the tournament get a random candidate tour and
         // add it
         for (int i = 0; i < tournamentSize; i++) {
