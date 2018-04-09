@@ -5,7 +5,7 @@ public class Run {
 		Distanzmatrix dis= new Distanzmatrix();
 		dis.erzeugeStadt();
 		dis.erzeugeMatrix();
-		dis.spucksaus();
+		//dis.spucksaus();
 
         
 
