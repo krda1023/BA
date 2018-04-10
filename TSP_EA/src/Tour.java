@@ -56,7 +56,7 @@ public class Tour{
         
     	if (distance ==0) {
     		double tourdistance =0;
-    		double[][] matrix = Population.getDistanzmatrix();				//Distanzmatrix aus DIstanzmatrixKlasse holen
+    		double[][] matrix = Run.getArrayMatrix();				//Distanzmatrix aus DIstanzmatrixKlasse holen
     		 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++)
     		 {
     			 City fromCity = getCity(cityIndex);

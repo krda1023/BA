@@ -5,12 +5,11 @@ public class Population {
     static Distanzmatrix dismat;
 
     // Construct a population
-    public Population(int populationSize, int numberCity, boolean initialise) {
+    public Population(int populationSize, boolean initialise) {
+    	{
         tours = new Tour[populationSize];
-        dismat= new Distanzmatrix(numberCity);
-        dismat.erzeugeStadt();
-        dismat.erzeugeMatrix();
-        
+        this.dismat=Run.getFirstMatrix();
+    	}
         
         // If we need to initialise a population of tours do so
         if (initialise) {
@@ -28,12 +27,12 @@ public class Population {
         tours[index] = tour; 
     }
     
-    public static double[][] getDistanzmatrix(){
+  /*  public static double[][] getDistanzmatrix(){
     	return dismat.getDistanzmatrix();
     }
     public static Distanzmatrix getDistanzmatrixalsKlasse(){
     	return dismat;
-    }
+    } */
     
     // Gets a tour from population
     public Tour getTour(int index) {
@@ -56,7 +55,7 @@ public class Population {
 
     // Gets population size
     public int populationSize() {
-        return tours.length;
+    	return tours.length;
     }
     static double round(double wert)
 	{

@@ -4,11 +4,11 @@ public class GA {
     private static final double mutationRate = 0.015;
     private static final int tournamentSize = 5;
     private static final boolean elitism = true;
-    private static final int anzstädte= 20;
+    
 
     // Evolves a population over one generation
     public static Population evolvePopulation(Population pop) {
-        Population newPopulation = new Population(pop.populationSize(),anzstädte, false);
+        Population newPopulation = new Population(pop.populationSize(), false);
 
         // Keep our best individual if elitism is enabled
         int elitismOffset = 0;
@@ -17,7 +17,7 @@ public class GA {
             elitismOffset = 1;
         }
 
-        // Crossover population
+        // Crossover population  ORDERED CROSSOVER
         // Loop over the new population's size and create individuals from
         // Current population
         for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {
@@ -30,7 +30,7 @@ public class GA {
             newPopulation.saveTour(i, child);
         }
 
-        // Mutate the new population a bit to add some new genetic material
+        // Mutate the new population a bit to add some new genetic material 
         for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {
             mutate(newPopulation.getTour(i));
         }
@@ -38,7 +38,7 @@ public class GA {
         return newPopulation;
     }
 
-    // Applies crossover to a set of parents and creates offspring
+    // Applies crossover to a set of parents and creates offspring  ORDERED CROSSOVER
     public static Tour crossover(Tour parent1, Tour parent2) {
         // Create new child tour
         Tour child = new Tour();
@@ -77,7 +77,7 @@ public class GA {
         return child;
     }
 
-    // Mutate a tour using swap mutation
+    // Mutate a tour using SWAP MUTATION
     private static void mutate(Tour tour) {
         // Loop through tour cities
         for(int tourPos1=0; tourPos1 < tour.tourSize(); tourPos1++){
@@ -100,7 +100,7 @@ public class GA {
     // Selects candidate tour for crossover
     private static Tour tournamentSelection(Population pop) {
         // Create a tournament population
-        Population tournament = new Population(tournamentSize,anzstädte, false);
+        Population tournament = new Population(tournamentSize, false);
         // For each place in the tournament get a random candidate tour and
         // add it
         for (int i = 0; i < tournamentSize; i++) {
