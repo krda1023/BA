@@ -92,16 +92,8 @@ import org.json.JSONObject;
 	    	    	
 	    	    	 erg[t][i] = dura_2.getDouble(i);
 	    	    	
-
-	    	        
-				  //NULLPOINTEREXCEPTION!!!!!!!!!!
-	    	       
-					
-					// System.out.print(" "+ matrixs);
+				
 	    	    }
-	    	//    System.out.println("");}
-	    	    
-	    	    
 	    	
 	    	}
 	    }

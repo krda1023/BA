@@ -67,20 +67,4 @@ public class Distanzmatrix {
 			System.out.println("");
 		}
 	}
-			
-			
-			
-	
-	
-	
-	/*public static void main (String[]args)
-	{
-	
-	Distanzmatrix dis= new Distanzmatrix();
-	dis.erzeugeStadt();
-	dis.erzeugeMatrix();
-	dis.spucksaus();
-	
-
-}*/
 }
