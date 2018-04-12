@@ -3,13 +3,19 @@ public class GA {
     /* GA parameters */
     private static final double mutationRate = 0.015;
     private static final int tournamentSize = 5;
-    private static final boolean elitism = true;
+    private static final boolean elitism = false;
     
 
     // Evolves a population over one generation
     public static Population evolvePopulation(Population pop) {
+    
         Population newPopulation = new Population(pop.populationSize(), false);
-
+        System.out.println(pop.populationSize());
+        System.out.println(newPopulation.populationSize());
+       /* for (int a=0; a<pop.populationSize();a++)
+        {
+        	System.out.println(pop.getTour(a));
+        }*/
         // Keep our best individual if elitism is enabled
         int elitismOffset = 0;
         if (elitism) {
@@ -20,25 +26,48 @@ public class GA {
         // Crossover population  ORDERED CROSSOVER
         // Loop over the new population's size and create individuals from
         // Current population
-        for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {
-            // Select parents
+        for (int z = 0; z < newPopulation.populationSize(); z++) {
+        	if ((z+1)<newPopulation.populationSize())
+        	{
+        		
             Tour parent1 = tournamentSelection(pop);
             Tour parent2 = tournamentSelection(pop);
             // Crossover parents
             Tour child = OrderCrossover(parent1, parent2);
             //Ox1 Crossover
-          //  Tour childs[]= Ox1Crossover(parent1,parent2);
-            //Tour child1=childs[0];
-           // Tour child2=childs[1];
-            // Add child to new population
-            newPopulation.saveTour(i, child);
+           Tour childs[]= Ox2Crossover(parent1,parent2);
+            Tour child1=childs[0];
+           Tour child2=childs[1];
+            //Add child to new population
+            newPopulation.saveTour(z, child1);
+           // System.out.println(child1);
+            newPopulation.saveTour((z+1),child2);
+          //  System.out.println(child2);
+            //System.out.println("");System.out.println("");
+            
+            z=z+1;
+            System.out.println("Zähler: "+z);
         }
-
+        	
+        	else 
+        	{
+        		Tour parent1 = tournamentSelection(pop);
+                Tour parent2 = tournamentSelection(pop);
+               // Tour child = Ox2Crossover(parent1, parent2);
+                Tour child= OrderCrossover(parent1,parent2);
+                newPopulation.saveTour(z, child);
+                System.out.println("Zähler: "+z);
+               
+        	
+        }}
         // Mutate the new population a bit to add some new genetic material 
         for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {
-            swapmutate(newPopulation.getTour(i));
+            InsertMutation(newPopulation.getTour(i));
         }
-
+     /*   for (int a=0; a<pop.populationSize();a++)
+        {
+        	System.out.println(newPopulation.getTour(a));
+        }*/
         return newPopulation;
     }
 
@@ -79,7 +108,7 @@ public class GA {
     
  // Applies One-Point crossover to a set of parents and creates 2 offsprings
     
-    public static Tour[] Ox1Crossover(Tour parent1, Tour parent2)
+   /* public static Tour[] Ox1Crossover(Tour parent1, Tour parent2)
     {
     	Tour[] children = new Tour[2];
     	Tour interparent1= new Tour();
@@ -147,37 +176,126 @@ public class GA {
         children[0]= child1;
         children[1]=child2;
     	return children;
-    }
+    }*/
     public static Tour[] Ox2Crossover(Tour parent1, Tour parent2)
-    {	Tour []childs= new Tour[2];
+    {	Tour childs[]= new Tour[2];
     	Tour interparent1= parent1;
     	Tour interparent2= parent2;
+    	System.out.println(interparent1);
+    	System.out.println(interparent2);
     	Tour child1 = new Tour();
     	Tour child2 = new Tour();
     	int number1 = (int) (Math.random() * parent1.tourSize());
     	int number2 = (int) (Math.random() * parent1.tourSize());
     	int startPos= Math.min(number1, number2);
     	int endPos= Math.max(number1, number2);
-    
-    	for (int i = 0; i < child1.tourSize(); i++) {
+    	for(int p=0;p<100;p++)
+    	{
+    		if(startPos==endPos)
+    		{
+    		number1 = (int) (Math.random() * parent1.tourSize());
+        	number2 = (int) (Math.random() * parent1.tourSize());
+        	startPos= Math.min(number1, number2);
+        	endPos= Math.max(number1, number2);	
+    		}
+    		else
+    		{
+    			break;
+    		}
+    	}
+    		
+    	//System.out.println(parent1);
+    //	System.out.println(parent2);
+    	for (int i = 0; i < parent1.tourSize(); i++) {
     		if (i >= startPos && i <= endPos) {
             child1.setCity(i, parent2.getCity(i));
             child2.setCity(i, parent1.getCity(i));
+         // System.out.print(child1.getCity(i));
+        	//System.out.print(child2.getCity(i));
         } 
        }
+    	//System.out.println(startPos);
+    	//System.out.println(endPos);
+    	
     	
     	//Ox2 Crossover
-    	for(int j=0;j<child1.tourSize();j++)
+    	for(int j=0;j<parent1.tourSize();j++)
     		{
-    			
+    		if (child1.containsCity(interparent2.getCity(j)))
+			{ interparent2.setCity(j,null);}
+    		if (child2.containsCity(interparent1.getCity(j)))
+    		{ interparent1.setCity(j,null);}
     		}
-    
+    	System.out.println(interparent1);
+    	System.out.println(interparent2);
+    	for (int k = 0; k < parent2.tourSize(); k++) {
+            // If child doesn't have the city add it
+            if (!child1.containsCity(parent2.getCity(k))) {
+                // Loop to find a spare position in the child's tour
+                for (int ii = 0; ii < child1.tourSize(); ii++) {
+                    // Spare position found, add city
+                    if (child1.getCity(ii) == null) {
+                        	child1.setCity(ii, parent2.getCity(k));
+                        break;
+                        }
+                    }
+                }
+            }
+    	
+          for (int l = 0; l < parent1.tourSize(); l++) {
+                            // If child doesn't have the city add it
+            if (!child2.containsCity(parent1.getCity(l))) {
+                                // Loop to find a spare position in the child's tour
+            	for (int ii = 0; ii < child1.tourSize(); ii++) {
+                                    // Spare position found, add city
+            		if (child2.getCity(ii) == null) {
+            				child2.setCity(ii, parent1.getCity(l));
+                      break;
+            			}
+            		}
+            	}
+            }
+        /*  double zufall= Math.random();
+          if(zufall<0.5)
+          {
+          child=child1;
+          System.out.println("Ich bin child1:"+child);}
+          else {
+          child=child2; System.out.println("Ich bin child2:"+child);
+          }*/
+          
+        childs[0]=child1;
+        childs[1]=child2;
+        System.out.println(child1);
+    	System.out.println(child2);
     	return childs;
     }
     
+    
+    private static void CutMutation(Tour tour) {
+    	int number1 = (int) (Math.random() * Run.getNumberofCities());
+    	int number2 = (int) (Math.random() * Run.getNumberofCities());
+    	
+    	Tour intertour= tour;
+    	int startPos= Math.min(number1, number2);
+    	int endPos= Math.max(number1, number2);
+    	int insertposition= (int)(Math.random()*(Run.getNumberofCities()-1-(endPos-startPos)));
+    	for (int i = 0; i < tour.tourSize(); i++) {
+    		if (i >= startPos && i <= endPos) {
+            intertour.setCity(insertposition, tour.getCity(i));
+            insertposition=insertposition+1;
+            }}
+    	for(int j=0;j<tour.tourSize();j++)
+    	{
+    		
+    	}
+            
+    	
+    	
+    }
 
-    // Mutate a tour using SWAP MUTATION
-    private static void swapmutate(Tour tour) {
+    // Mutate a tour using Insert MUTATION
+    private static void InsertMutation(Tour tour) {
         // Loop through tour cities
         for(int tourPos1=0; tourPos1 < tour.tourSize(); tourPos1++){
             // Apply mutation rate

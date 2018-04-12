@@ -11,7 +11,7 @@ public class Tour{
     
     // Constructs a blank tour
     public Tour(){
-        for (int i = 0; i < All_Cities.numberOfCities(); i++) {
+        for (int i = 0; i < Run.getNumberofCities(); i++) {
             tour.add(null);
         }
     }
