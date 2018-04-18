@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Date;
 
 public class Run {
 		static Distanzmatrix dis;
@@ -17,10 +20,10 @@ public class Run {
 		{
 			return dis.getDistanzmatrix();
 		}
-	public static void main(String[] args) {
-		anzahlstädte= 5;
-		interationen = 10;
-		populationsgröße= 1000;
+	public static void main(String[] args) throws IOException {
+		anzahlstädte= 10;
+		interationen = 50;
+		populationsgröße= 20;
 		
 		dis= new Distanzmatrix(anzahlstädte);
 		dis.erzeugeStadt();
@@ -40,19 +43,23 @@ public class Run {
 
         // Evolve population for xx generations
         pop = GA.evolvePopulation(pop);
-        
+        Logger log = new Logger();
 	for (int i = 0; i < interationen; i++) {
            pop = GA.evolvePopulation(pop);
+           Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+           
+           log.print(new Date().toString()+ " "+ timestamp+ " "+pop.getFittest());
+           
          
         }
-
+	
         // Print final results
       	System.out.println("Finished");
        System.out.println("Final distance: " + pop.getFittest().getDistance());
        System.out.println("Anzahl Städte: "+All_Cities.numberOfCities());
        System.out.println("Solution:");
        System.out.println(pop.getFittest());  
-        
+       log.exit(); 
     }
     
 }

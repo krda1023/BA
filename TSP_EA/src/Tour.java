@@ -4,7 +4,7 @@ import java.util.Collections;
 public class Tour{
 
     // Holds our tour of cities
-    private ArrayList tour = new ArrayList<City>();
+    private ArrayList<City> tour = new ArrayList<City>();
     // Cache
     private double fitness = 0;
     private double distance = 0;  //time?
@@ -42,7 +42,10 @@ public class Tour{
         fitness = 0;
         distance = 0;
     }
-    
+    public ArrayList<City> getArrayList()
+    {
+    	return tour;
+    }
     // Gets the tours fitness
     public double getFitness() {
         if (fitness == 0) {
