@@ -2,82 +2,137 @@ public class GA {
 
     /* GA parameters */
     private static final double mutationRate = 0.2;
-    private static final int tournamentSize = 2;
-    private static final boolean elitism = false;
+    private static final int tournamentSize = 3;
+    private static boolean elitism;
+    private static boolean ox2Crossover;
+    private static boolean orderedCrossover;
+    private static boolean PMXCrossover;
+    private static boolean CycleCrossover;
+    private static boolean displacementM;
+    private static boolean insertionM;
+    private static boolean inversionM;
+    private static boolean exchangeM;
+    private static boolean multiexchangeM;
     
-
+    public GA(boolean ox2C, boolean ordC, boolean pmxC, boolean cycC, boolean disM, boolean insM, boolean invM, boolean excM,boolean mexM, boolean elitism)
+    {	this.elitism=elitism;
+    	this.ox2Crossover=ox2C;
+    	this.orderedCrossover=ordC;
+    	this.PMXCrossover=pmxC;
+    	this.CycleCrossover=cycC;
+    	this.displacementM=disM;
+    	this.insertionM=insM;
+    	this.inversionM=invM;
+    	this.exchangeM=excM;
+    	this.multiexchangeM=mexM;
+    }
     // Evolves a population over one generation
     public static Population evolvePopulation(Population pop) {
     
         Population newPopulation = new Population(pop.populationSize(), false);
-       //System.out.println(pop.populationSize());
-   //   System.out.println(newPopulation.populationSize());
-       /* for (int a=0; a<pop.populationSize();a++)
-        {
-        	System.out.println(pop.getTour(a));
-        }*/
+      
         // Keep our best individual if elitism is enabled
+        
         int elitismOffset = 0;
         if (elitism) {
             newPopulation.saveTour(0, pop.getFittest());
             elitismOffset = 1;
         }
 
-        // Crossover population  ORDERED CROSSOVER
-        // Loop over the new population's size and create individuals from
-        // Current population
-        for (int z = 0; z < newPopulation.populationSize(); z++) {
+        //Crossover Population
+       if(ox2Crossover)
+       {
+        for (int z = 0; z < newPopulation.populationSize(); z++) 
+        {
         	
-        	/*if ((z+1)<newPopulation.populationSize())
+        	if ((z+1)<newPopulation.populationSize())
         	{
         		
             Tour parent1 = tournamentSelection(pop);
             Tour parent2 = tournamentSelection(pop);
-            // Crossover parents
-            Tour child = OrderCrossover(parent1, parent2);
-            //Ox1 Crossover
+          
            Tour childs[]= Ox2Crossover(parent1,parent2);
             Tour child1=childs[0];
-           Tour child2=childs[1];
-            //Add child to new population
-            newPopulation.saveTour(z, child1);
-           // System.out.println(child1);
-            newPopulation.saveTour((z+1),child2);
-          //  System.out.println(child2);
-            //System.out.println("");System.out.println("");
-            
+           Tour child2=childs[1];            
+            newPopulation.saveTour(z, child1);        
+            newPopulation.saveTour((z+1),child2);          
             z=z+1;
-            System.out.println("Zähler: "+z);
-        }
+        	}
         	
         	else 
-        	{*/
+        	{
         		Tour parent1 = tournamentSelection(pop);
                 Tour parent2 = tournamentSelection(pop);
-               // Tour child = Ox2Crossover(parent1, parent2);
+               
                 Tour child= OrderCrossover(parent1,parent2);
                 newPopulation.saveTour(z, child);
-                
                
         	
+        	}
+        	
         }
+       }
+       if(orderedCrossover)
+       {
+    	   for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {
+               // Select parents
+               Tour parent1 = tournamentSelection(pop);
+               Tour parent2 = tournamentSelection(pop);
+               // Crossover parents
+               Tour child = OrderCrossover(parent1, parent2);
+               // Add child to new population
+               newPopulation.saveTour(i, child);
+           }
+       }
+       
+       
         // Mutate the new population a bit to add some new genetic material 
-        for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {
-        	DisplacementMutation(newPopulation.getTour(i));
+       if(displacementM)
+           for (int i = elitismOffset; i < newPopulation.populationSize(); i++)
+           {
+        	   DisplacementMutation(newPopulation.getTour(i));
+
+
+           }
+       if(multiexchangeM)
+           for (int i = elitismOffset; i < newPopulation.populationSize(); i++)
+           {
+        	   MultipleExchangeMutation(newPopulation.getTour(i));
+
+
+           }
+       if(exchangeM)
+           for (int i = elitismOffset; i < newPopulation.populationSize(); i++)
+           {
+           	ExchangeMutation(newPopulation.getTour(i));
+
+
+           }
+       if(insertionM)
+       for (int i = elitismOffset; i < newPopulation.populationSize(); i++)
+       {
+       	InsertionMutation(newPopulation.getTour(i));
+
+
+       }
+       if(inversionM)
+       {
+        for (int i = elitismOffset; i < newPopulation.populationSize(); i++)
+        {
+        	InversionMutation(newPopulation.getTour(i));
 
 
         }
+       }
 
-     /*   for (int a=0; a<pop.populationSize();a++)
-        {
-        	System.out.println(newPopulation.getTour(a));
-        }*/
+    
         return newPopulation;
     }
+    
 
     // Applies crossover to a set of parents and creates offspring  ORDERED CROSSOVER
     public static Tour OrderCrossover(Tour parent1, Tour parent2) {
-        // Create new child tour
+      
         Tour child = new Tour();
         int number1 = (int) (Math.random() * parent1.tourSize());
         int number2 = (int) (Math.random() * parent1.tourSize());
@@ -108,6 +163,79 @@ public class GA {
             }
         }
         return child;
+    }
+    public static Tour[] Ox2Crossover(Tour parent1, Tour parent2)	//FUNKTIONIERT
+    {	
+    	Tour child1=new Tour();
+    	Tour child2=new Tour();
+    	Tour[] kids= new Tour[2];
+    	int number1 = (int) (Math.random() * Run.getNumberofCities());
+    	int number2 = (int) (Math.random() * Run.getNumberofCities());
+    	for(int i=0; i<100;i++)
+    	{	
+    		if(number1==number2)
+    		{
+    			number1 = (int) (Math.random() * parent1.tourSize());
+    			number2 = (int) (Math.random() * parent1.tourSize()); 
+    			continue;
+			}
+			else
+			{
+				break;
+			}
+    	}
+    	int startPos= Math.min(number1, number2);
+    	int endPos= Math.max(number1, number2);
+    	
+    	for(int j=0;j<parent1.tourSize();j++)
+    	{
+    		if(j >= startPos && j <= endPos)
+    		{
+    			City cityP1=parent1.getCity(j);
+    			City cityP2=parent2.getCity(j);
+    			child1.setCity(j, cityP2);
+    			child2.setCity(j, cityP1);
+    		}
+    	}
+    	
+    	for(int k=0;k<parent1.tourSize();k++)
+    	{
+    		if (!child1.containsCity(parent1.getCity(k)))
+    		{
+                // Loop to find a spare position in the child's tour
+                for (int ii = 0; ii < child1.tourSize(); ii++) 
+                {
+                    // Spare position found, add city
+                    if (child1.getCity(ii) == null)
+                    {
+                    	City city1 = parent1.getCity(k);
+                        child1.setCity(ii, city1);
+                        break;
+                    }
+                }
+            }
+    	}
+    	for(int k=0;k<parent2.tourSize();k++)
+    	{
+    		if (!child2.containsCity(parent2.getCity(k)))
+    		{
+                // Loop to find a spare position in the child's tour
+                for (int ii = 0; ii < child2.tourSize(); ii++) 
+                {
+                    // Spare position found, add city
+                    if (child2.getCity(ii) == null)
+                    {
+                    	City city2 = parent2.getCity(k);
+                        child2.setCity(ii, city2);
+                        break;
+                    }
+                }
+            }
+    	}
+    	
+    	kids[0]=child1;
+    	kids[1]=child2;
+    	return kids;
     }
     
  public static Tour PMX (Tour parent1, Tour parent2)
@@ -189,7 +317,7 @@ public class GA {
     
     private static void DisplacementMutation(Tour tour)     //FUNKTIONIERT
     {	Tour child = new Tour();
-    	System.out.println(tour);
+    	
     	int number1 = (int) (Math.random() * Run.getNumberofCities());
     	int number2 = (int) (Math.random() * Run.getNumberofCities());
     	for(int i=0; i<100;i++)
@@ -207,10 +335,9 @@ public class GA {
     	}
     	int startPos= Math.min(number1, number2);
     	int endPos= Math.max(number1, number2);
-    	System.out.println(startPos);
-    	System.out.println(endPos);
+    	
     	int insertPos=(int) (Math.random() * (Run.getNumberofCities()-(endPos-startPos)));
-    	System.out.println(insertPos);
+    	
     	int zähler=0;
     	for(int i=0; i<tour.tourSize();i++)
     	{
@@ -237,8 +364,7 @@ public class GA {
             }
     	}
     	tour=child;
-    	System.out.println(tour);
-    	System.out.println();
+    
     }
     
     private static void InsertionMutation(Tour tour)   //FUNKTIONIERT
@@ -278,8 +404,7 @@ public class GA {
     		}
     	}
     	tour.setCity(newPos, citytaken);
-    	System.out.println(tour);
-    	System.out.println();
+    
     }
 
     private static void MultipleExchangeMutation(Tour tour) {  //FUNKTIONIERT
