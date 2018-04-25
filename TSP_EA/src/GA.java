@@ -72,6 +72,38 @@ public class GA {
         	
         }
        }
+       if(CycleCrossover)
+       {
+        for (int z = 0; z < newPopulation.populationSize(); z++) 
+        {
+        	
+        	if ((z+1)<newPopulation.populationSize())
+        	{
+        		
+            Tour parent1 = tournamentSelection(pop);
+            Tour parent2 = tournamentSelection(pop);
+          
+            Tour childs[]= CycleCrossover(parent1,parent2);
+            Tour child1=childs[0];
+            Tour child2=childs[1];            
+            newPopulation.saveTour(z, child1);        
+            newPopulation.saveTour((z+1),child2);          
+            z=z+1;
+        	}
+        	
+        	else 
+        	{
+        		Tour parent1 = tournamentSelection(pop);
+                Tour parent2 = tournamentSelection(pop);
+               
+                Tour child= OrderCrossover(parent1,parent2);
+                newPopulation.saveTour(z, child);
+               
+        	
+        	}
+        	
+        }
+       }
        if(orderedCrossover)
        {
     	   for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {
@@ -242,7 +274,50 @@ public class GA {
  {	Tour child=null;
 	 return child;
  }
-   
+ 
+ public static Tour[] CycleCrossover (Tour parent1, Tour parent2)
+ {
+	 Tour kids[]=new Tour[2];
+	 Tour child1=new Tour();
+	 Tour child2= new Tour();
+	
+	 int zähler=0;
+	 System.out.println(zähler);
+	 do 
+	 {
+		 do
+		 {	 System.out.println(zähler);
+			 City city1=parent1.getCity(zähler);
+			 System.out.println(city1);
+			 child1.setCity(zähler, city1);
+			 parent1.setCity(zähler, null);
+			 City city2=parent2.getCity(zähler);
+			 System.out.println(city2);
+			 child2.setCity(zähler, city2);
+			 parent2.setCity(zähler, null);
+			 zähler=parent1.positionofCity(city2);
+			 System.out.println(parent1);
+			 System.out.println(child1);
+			 System.out.println(parent2);
+			 System.out.println(child2);
+			 System.out.println();
+		 }
+		 while(zähler!= -1);
+		 
+		 for (int ii = 0; ii < parent1.tourSize(); ii++) 
+	     {
+	         // Spare position found, add city
+	         if (parent1.getCity(ii) != null)
+	         {
+	         	zähler=ii;
+	         }
+	     }
+	 }
+	 while(parent1.isEmpty()==false);
+		kids[0]=child1;
+	 	kids[1]=child2;
+		return kids;
+}
     private static void ExchangeMutation(Tour tour) //FUNKTIONIERT
     {	//Create two positions that should be swapped
     	int tourPos1 = (int) (tour.tourSize() * Math.random());
@@ -523,120 +598,7 @@ public class GA {
      children[1]=child2;
  	return children;
  }*/
-/*public static Tour[] Ox2Crossover(Tour parent1, Tour parent2)
-{	Tour childs[]= new Tour[2];
-	Tour interparent1= parent1;
-	Tour interparent2= parent2;
-	System.out.println(interparent1);
-	System.out.println(interparent2);
-	Tour child1 = new Tour();
-	Tour child2 = new Tour();
-	int number1 = (int) (Math.random() * parent1.tourSize());
-	int number2 = (int) (Math.random() * parent1.tourSize());
-	int startPos= Math.min(number1, number2);
-	int endPos= Math.max(number1, number2);
-	
-	for(int p=0;p<100;p++)
-	{
-		if(startPos==endPos)
-		{
-		number1 = (int) (Math.random() * parent1.tourSize());
-    	number2 = (int) (Math.random() * parent1.tourSize());
-    	startPos= Math.min(number1, number2);
-    	endPos= Math.max(number1, number2);	
-		}
-		else
-		{
-			break;
-		}
-	}
-		
-	System.out.println(parent1.tourSize());
-//	System.out.println(parent2);
-	for (int i = 0; i < parent1.tourSize(); i++) {
-		if (i >= startPos && i <= endPos) {
-        child1.setCity(i, parent2.getCity(i));
-        child2.setCity(i, parent1.getCity(i));
-     // System.out.print(child1.getCity(i));
-    	//System.out.print(child2.getCity(i));
-    } 
-   }
-	//System.out.println(startPos);
-	//System.out.println(endPos);
-	
-	
-	//Ox2 Crossover
-	for(int j=0;j<parent1.tourSize();j++)
-		{
-		if (child1.containsCity(interparent2.getCity(j)))
-		{ interparent2.setCity(j,null);}
-		if (child2.containsCity(interparent1.getCity(j)))
-		{ interparent1.setCity(j,null);}
-		}
-	System.out.println(interparent1);
-	System.out.println(interparent2);
-	for (int k = 0; k < parent2.tourSize(); k++) {
-        // If child doesn't have the city add it
-        if (!child1.containsCity(parent2.getCity(k))) {
-            // Loop to find a spare position in the child's tour
-            for (int ii = 0; ii < child1.tourSize(); ii++) {
-                // Spare position found, add city
-                if (child1.getCity(ii) == null) {
-                    	child1.setCity(ii, parent2.getCity(k));
-                    break;
-                    }
-                }
-            }
-        }
-	
-      for (int l = 0; l < parent1.tourSize(); l++) {
-                        // If child doesn't have the city add it
-        if (!child2.containsCity(parent1.getCity(l))) {
-                            // Loop to find a spare position in the child's tour
-        	for (int ii = 0; ii < child1.tourSize(); ii++) {
-                                // Spare position found, add city
-        		if (child2.getCity(ii) == null) {
-        				child2.setCity(ii, parent1.getCity(l));
-                  break;
-        			}
-        		}
-        	}
-        }
-    /*  double zufall= Math.random();
-      if(zufall<0.5)
-      {
-      child=child1;
-      System.out.println("Ich bin child1:"+child);}
-      else {
-      child=child2; System.out.println("Ich bin child2:"+child);
-      }
-      
-    childs[0]=child1;
-    childs[1]=child2;
-    System.out.println(child1);
-	System.out.println(child2);
-	return childs;
-}
 
 
 
-// Mutate a tour using Insert MUTATION
-private static void MultipleExchangeMutation(Tour tour) {
-    // Loop through tour cities
-    for(int tourPos1=0; tourPos1 < tour.tourSize(); tourPos1++){
-        // Apply mutation rate
-        if(Math.random() < mutationRate){
-            // Get a second random position in the tour
-            int tourPos2 = (int) (tour.tourSize() * Math.random());
 
-            // Get the cities at target position in tour
-            City city1 = tour.getCity(tourPos1);
-            City city2 = tour.getCity(tourPos2);
-
-            // Swap them around
-            tour.setCity(tourPos2, city1);
-            tour.setCity(tourPos1, city2);
-        }
-    }
-}
-*/

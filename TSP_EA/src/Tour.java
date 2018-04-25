@@ -125,6 +125,18 @@ public class Tour{
     public boolean containsCity(City city){
         return tour.contains(city);
     }
+    public int positionofCity(City city)
+    {
+    	int position =tour.indexOf(city);
+    	return position;
+    }
+    public boolean isEmpty()
+    {
+    	if(tour.isEmpty())
+    		return true;
+    	else 
+    		return false;
+    }
     
     @Override
     public String toString() {

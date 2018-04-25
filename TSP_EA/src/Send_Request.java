@@ -34,7 +34,7 @@ import org.json.JSONObject;
 
 	public void call_me() throws Exception {
 		
-		String urlAnfang = "https://api.openrouteservice.org/matrix?api_key=58d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=";
+		String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
 		 String zwischenerg="";
 		 for(int i=0; i<staedteliste.numberOfCities();i++)
 		 {
@@ -42,18 +42,18 @@ import org.json.JSONObject;
 			 	double x = intermediate.getX();
 			 	double y=intermediate.getY();
 				 zwischenerg += Double.toString(x);
-				 zwischenerg+="%2C";
+				 zwischenerg+=",";
 				 zwischenerg+=Double.toString(y);
 				 if(i==(staedteliste.numberOfCities()-1))
 				 {}
 				 else
 				 {
-				 zwischenerg+="%7C";
+				 zwischenerg+=";";
 				 }
 			 
 		 }
 		 String gesamt=urlAnfang+zwischenerg;
-		// System.out.print(gesamt);
+		//System.out.print(gesamt);
 		
 		 
 		 //PROBLEM: Negative Zahlen in der URL

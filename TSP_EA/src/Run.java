@@ -18,6 +18,8 @@ public class Run {
 		static boolean excM=false;
 		static boolean mexM=false;
 		static boolean elitism=false;
+		
+		
 		public static int getNumberofCities()
 		{
 			return anzahlstädte;	
@@ -31,10 +33,15 @@ public class Run {
 		{
 			return dis.getDistanzmatrix();
 		}
-	public static void main(String[] args) throws IOException {
-		anzahlstädte= 50;
+		
+		
+	public static void main(String[] args) throws IOException
+	{
+		anzahlstädte= 100;
 		interationen = 100;
 		populationsgröße= 100;
+		
+		
 		System.out.println("Welchen Crossover-Operator möchtest du verwenden?\n Wähle 1 für Ox2 Crossover\n Wähle 2 für OrderCrossover\n Wähle 3 für PMX-Crossover\n Wähle 4 für Cycle-Crossover");
 		Scanner sc1 = new Scanner(System.in);
 		int i = sc1.nextInt();
@@ -48,7 +55,9 @@ public class Run {
 		
 		int k = sc1.nextInt();
 		sc1.close();
-		
+		System.out.println("Bitte warten.....");
+		System.out.println();
+		System.out.println();
 		switch(i)
 		{
 		case 1: ox2C=true;break;
@@ -65,7 +74,8 @@ public class Run {
 		case 5: mexM=true;break;
 		}
 		if(k==1)
-			elitism=true;
+			{elitism=true;}
+		
 		dis= new Distanzmatrix(anzahlstädte);
 		dis.erzeugeStadt();
 		dis.erzeugeMatrix();
@@ -100,7 +110,7 @@ public class Run {
        System.out.println("Final distance: " + pop.getFittest().getDistance());
        System.out.println("Anzahl Städte: "+All_Cities.numberOfCities());
        System.out.println("Solution:");
-       System.out.println(pop.getFittest());  
+       System.out.println(pop.getFittest()); 
        log.exit(); 
     }
     
