@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Random;
 
 // hol dir ein Array oder Liste aus All Cities mit allen Städten
@@ -38,7 +39,15 @@ public class Distanzmatrix {
 	}
 	//Methode erzeugt Send_Request Object mit erg[][]als Distanzmatrix im zweidim. array
 	public void erzeugeMatrix()
-	{	Send_Request anfrage= new Send_Request(liste);
+	{	/*for(int i=0;i<liste.numberOfCities()/50;i++)
+		{	All_Cities interliste= new All_Cities();
+			for(int j =i*50;j<i*50+49;i++)
+			{
+				interliste.addCity(liste.getCity(j));
+			}
+		}
+		*/
+		Send_Request anfrage= new Send_Request(liste);
 	try 
 		{
         anfrage.call_me();

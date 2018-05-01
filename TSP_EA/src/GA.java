@@ -48,8 +48,8 @@ public class GA {
         	if ((z+1)<newPopulation.populationSize())
         	{
         		
-            Tour parent1 = tournamentSelection(pop);
-            Tour parent2 = tournamentSelection(pop);
+            Tour parent1 = RWS(pop);
+            Tour parent2 = RWS(pop);
           
            Tour childs[]= Ox2Crossover(parent1,parent2);
             Tour child1=childs[0];
@@ -276,44 +276,96 @@ public class GA {
  }
  
  public static Tour[] CycleCrossover (Tour parent1, Tour parent2)
- {
+ {		
+	 int start=0;
+	 
 	 Tour kids[]=new Tour[2];
 	 Tour child1=new Tour();
 	 Tour child2= new Tour();
-	
-	 int zähler=0;
-	 System.out.println(zähler);
-	 do 
+	 Tour hardcopyP1= new Tour();
+	 for(int a=0; a<parent1.tourSize();a++)
 	 {
-		 do
-		 {	 System.out.println(zähler);
+		 City ci= parent1.getCity(a);
+		 hardcopyP1.setCity(a, ci);
+	 }
+	 int zähler=0;
+	 System.out.println(hardcopyP1);
+	// do 
+	// {
+		 for(int a=0; a<hardcopyP1.tourSize();a++)
+		 {	if(parent1.isEmpty())
+		 	{
+			 break;
+		 	}
+		 else if(a%2==0)
+		 {
+			 while(hardcopyP1.getCity(start)!=child2.getCity(zähler));
+			 {
+				 System.out.println(zähler);
+				 City city1=parent1.getCity(zähler);
+				 System.out.println(city1);
+				 child1.setCity(zähler, city1);
+				 parent1.setCity(zähler, null);
+				 City city2=parent2.getCity(zähler);
+				 System.out.println(city2);
+				 child2.setCity(zähler, city2);
+				 parent2.setCity(zähler, null);
+				 zähler=parent2.positionofCity(city2);
+				 System.out.println(parent1);
+				 System.out.println(child1);
+				 System.out.println(parent2);
+				 System.out.println(child2);
+				 System.out.println();
+				 
+			 }
+			
+		 }
+		 else if(a%2==1)
+		 {
+			 while(hardcopyP1.getCity(start)!=child2.getCity(zähler));
+			 {
+			 System.out.println(zähler);
 			 City city1=parent1.getCity(zähler);
 			 System.out.println(city1);
-			 child1.setCity(zähler, city1);
+			 child2.setCity(zähler, city1);
 			 parent1.setCity(zähler, null);
 			 City city2=parent2.getCity(zähler);
 			 System.out.println(city2);
-			 child2.setCity(zähler, city2);
+			 child1.setCity(zähler, city2);
+			 zähler=parent2.positionofCity(city2);
 			 parent2.setCity(zähler, null);
-			 zähler=parent1.positionofCity(city2);
+			 
 			 System.out.println(parent1);
 			 System.out.println(child1);
 			 System.out.println(parent2);
 			 System.out.println(child2);
 			 System.out.println();
+			 
+			 }
+			 
+			 //Abruchbedingung noch falsch 
+		
+		//Finde Position des ersten Elements in parent1 parent2
+		 for(int b=0; b<parent1.tourSize();b++)
+		 {
+			 if(parent1.getCity(b)!=null)
+				{
+				 start=b;
+				 zähler=start;
+				 break;
+				}
+			 else
+			 {}
 		 }
-		 while(zähler!= -1);
 		 
-		 for (int ii = 0; ii < parent1.tourSize(); ii++) 
-	     {
-	         // Spare position found, add city
-	         if (parent1.getCity(ii) != null)
-	         {
-	         	zähler=ii;
-	         }
-	     }
-	 }
-	 while(parent1.isEmpty()==false);
+		 
+		 
+}
+		 
+		
+		 
+	}
+	// while(parent1.isEmpty()==false);
 		kids[0]=child1;
 	 	kids[1]=child2;
 		return kids;
@@ -515,6 +567,31 @@ public class GA {
         // Get the fittest tour
         Tour fittest = tournament.getFittest();
         return fittest;
+    }
+    
+    private static Tour RWS(Population pop)
+    {	Tour chosen=new Tour();
+    	Tour inter=new Tour();
+    	double slotsize1=0;
+    	double slotsize2=0;
+    	for(int i=0;i<pop.populationSize();i++)
+    	{	inter=pop.getTour(i);
+    		slotsize1+=inter.getFitness();
+    	}
+    	
+    	double select=Math.random()*slotsize1;
+    	for(int j=0; j<pop.populationSize();j++)
+    	{
+    		inter=pop.getTour(j);
+    		slotsize2+=inter.getFitness();
+    		if(select<=slotsize2)
+    		{
+    			chosen=inter;
+    			break;
+    		}
+    	}
+    	
+    	return chosen;
     }
 }
 

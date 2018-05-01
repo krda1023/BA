@@ -37,9 +37,9 @@ public class Run {
 		
 	public static void main(String[] args) throws IOException
 	{
-		anzahlstädte= 100;
-		interationen = 100;
-		populationsgröße= 100;
+		anzahlstädte= 25;
+		interationen = 10;
+		populationsgröße= 10;
 		
 		
 		System.out.println("Welchen Crossover-Operator möchtest du verwenden?\n Wähle 1 für Ox2 Crossover\n Wähle 2 für OrderCrossover\n Wähle 3 für PMX-Crossover\n Wähle 4 für Cycle-Crossover");
