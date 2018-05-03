@@ -18,6 +18,7 @@ public class Run {
 		static boolean excM=false;
 		static boolean mexM=false;
 		static boolean elitism=false;
+		static boolean  fileLesen=false;
 		
 		
 		public static int getNumberofCities()
@@ -37,13 +38,14 @@ public class Run {
 		
 	public static void main(String[] args) throws IOException
 	{
-		anzahlstädte= 25;
-		interationen = 10;
-		populationsgröße= 10;
+		int anzahlstädte1= 50;
+		interationen = 1000;
+		populationsgröße= 100;
 		
-		
-		System.out.println("Welchen Crossover-Operator möchtest du verwenden?\n Wähle 1 für Ox2 Crossover\n Wähle 2 für OrderCrossover\n Wähle 3 für PMX-Crossover\n Wähle 4 für Cycle-Crossover");
+		System.out.println("Soll von einer File eingelesen werden, 1 für Ja");
 		Scanner sc1 = new Scanner(System.in);
+		int h=sc1.nextInt();
+		System.out.println("Welchen Crossover-Operator möchtest du verwenden?\n Wähle 1 für Ox2 Crossover\n Wähle 2 für OrderCrossover\n Wähle 3 für PMX-Crossover\n Wähle 4 für Cycle-Crossover");
 		int i = sc1.nextInt();
 		
 		System.out.println("Welchen Mutation-Operator möchtest du verwenden?\n Wähle 1 für Displacement-Mutation\n Wähle 2 für Insertion-Mutation\n Wähle 3 für Inversion-Mutation\n Wähle 4 für Exchange Mutation\n Wähle 5 für MultipleExchange-Mutation");
@@ -75,10 +77,14 @@ public class Run {
 		}
 		if(k==1)
 			{elitism=true;}
+		if(h==1)
+			{fileLesen=true;}
+	
 		
-		dis= new Distanzmatrix(anzahlstädte);
-		dis.erzeugeStadt();
-		dis.erzeugeMatrix();
+		dis= new Distanzmatrix(anzahlstädte1,fileLesen);
+		dis.erzeugeStaedteliste();
+		anzahlstädte=dis.getAnzahlstädte();
+		dis.erzeugeDistanzmatrix();
 		//dis.spucksaus();
 		
 		 

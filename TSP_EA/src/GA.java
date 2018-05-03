@@ -162,7 +162,7 @@ public class GA {
     }
     
 
-    // Applies crossover to a set of parents and creates offspring  ORDERED CROSSOVER
+   
     public static Tour OrderCrossover(Tour parent1, Tour parent2) {
       
         Tour child = new Tour();
@@ -196,6 +196,7 @@ public class GA {
         }
         return child;
     }
+   
     public static Tour[] Ox2Crossover(Tour parent1, Tour parent2)	//FUNKTIONIERT
     {	
     	Tour child1=new Tour();
@@ -270,12 +271,12 @@ public class GA {
     	return kids;
     }
     
- public static Tour PMX (Tour parent1, Tour parent2)
+ public static Tour PMX (Tour parent1, Tour parent2) //Muss noch gemacht werden
  {	Tour child=null;
 	 return child;
  }
  
- public static Tour[] CycleCrossover (Tour parent1, Tour parent2)
+ public static Tour[] CycleCrossover (Tour parent1, Tour parent2)//Funktioniert noch nicht richtig
  {		
 	 int start=0;
 	 
@@ -370,6 +371,7 @@ public class GA {
 	 	kids[1]=child2;
 		return kids;
 }
+ 
     private static void ExchangeMutation(Tour tour) //FUNKTIONIERT
     {	//Create two positions that should be swapped
     	int tourPos1 = (int) (tour.tourSize() * Math.random());
@@ -568,7 +570,7 @@ public class GA {
         Tour fittest = tournament.getFittest();
         return fittest;
     }
-    
+ // Selects candidate tour for crossover
     private static Tour RWS(Population pop)
     {	Tour chosen=new Tour();
     	Tour inter=new Tour();
