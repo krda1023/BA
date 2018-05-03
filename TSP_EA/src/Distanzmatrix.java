@@ -92,9 +92,9 @@ public class Distanzmatrix {
 					double lat2=liste.getCity(j).getLatitude();
 					double distance=distanceInKm(long1,lat1,long2,lat2);
 					matrix[i][j]=distance;
-					System.out.print(matrix[i][j]+" ");
+					//System.out.print(matrix[i][j]+" ");
 				}
-				System.out.println();
+				//System.out.println();
 			}
 			
 		}

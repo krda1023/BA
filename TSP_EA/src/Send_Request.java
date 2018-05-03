@@ -53,7 +53,7 @@ import org.json.JSONObject;
 			 
 		 }
 		 String gesamt=urlAnfang+zwischenerg;
-		System.out.print(gesamt);
+	//	System.out.print(gesamt);
 		
 		 
 		 //PROBLEM: Negative Zahlen in der URL
