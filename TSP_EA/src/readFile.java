@@ -62,7 +62,7 @@ public class readFile {
 		
 		erg= new double[countlines][3];
 		
-		System.out.println(countlines);
+		
 	
 		for(int j=0;j<countlines;j++)
 		{
@@ -73,7 +73,7 @@ public class readFile {
 		erg[(id-1)][0]=(double)id;
 		erg[(id-1)][1]=Double.parseDouble(b);
 		erg[(id-1)][2]=Double.parseDouble(c);
-		System.out.println(id);
+	
 
 
 		}

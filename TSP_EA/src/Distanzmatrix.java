@@ -52,7 +52,7 @@ public class Distanzmatrix {
 			zwischenmatrix=rf.getMatrix();
 			for(int a=0;a<anzstädte;a++)
 			{
-				City neueStaedte = new City(a,zwischenmatrix[a][1],zwischenmatrix[a][2]);
+				City neueStaedte = new City(a,zwischenmatrix[a][2],zwischenmatrix[a][1]);
 				liste.addCity(neueStaedte);
 			}
 
@@ -62,9 +62,9 @@ public class Distanzmatrix {
 			for (int i=0;i<anzstädte;i++)                                         //HIER ANZAHL STÄDTE BESTIMMEN
 			{	double x_2=(double)(Math.random()*0.59+13.14);
 				double y_2=(double)(Math.random()*0.24+52.41);
-				double x= round(x_2);
-				double y= round(y_2);
-				City neueStaedte = new City(i,x,y);
+				double longitude= round(x_2);
+				double latitude= round(y_2);
+				City neueStaedte = new City(i,longitude,latitude);
 				liste.addCity(neueStaedte);
 				//System.out.println(x +" "+y);
 			}
@@ -82,8 +82,21 @@ public class Distanzmatrix {
 		*/
 		if (vonFileeinlesen==true)
 		{
-			// DIstanzmatrixberechnen
-
+			matrix= new double[anzstädte][anzstädte];
+			for(int i=0;i<anzstädte;i++)
+			{
+				for(int j=0;j<anzstädte;j++)
+				{	double long1=liste.getCity(i).getLongitude();
+					double lat1=liste.getCity(i).getLatitude();
+					double long2=liste.getCity(j).getLongitude();
+					double lat2=liste.getCity(j).getLatitude();
+					double distance=distanceInKm(long1,lat1,long2,lat2);
+					matrix[i][j]=distance;
+					System.out.print(matrix[i][j]+" ");
+				}
+				System.out.println();
+			}
+			
 		}
 
 		
@@ -107,6 +120,17 @@ public class Distanzmatrix {
 		return matrix;
 	}
 	
+	public static double distanceInKm( double lon1, double lat1, double lon2, double lat2) {   //Haversine-Formel
+		    int radius = 6371;
+		    double lat = Math.toRadians(lat2 - lat1);
+		    double lon = Math.toRadians(lon2- lon1);
+		    double a = Math.sin(lat / 2) * Math.sin(lat / 2) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(lon / 2) * Math.sin(lon / 2);
+		    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		    double d = radius * c;
+		    
+		    return Math.abs(d);
+		}
+
 	
 	public void spucksaus()
 	{

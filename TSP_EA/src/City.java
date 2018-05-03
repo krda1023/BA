@@ -15,12 +15,12 @@ public class City {
 		return position;}
 	    
 	    // Gets city's x coordinate
-	 public double getX(){
+	 public double getLongitude(){
 	        return position[0];
 	    }
 	    
 	    // Gets city's y coordinate
-	 public double getY(){
+	 public double getLatitude(){
 	        return position[1];
 	    }
 	 //Gets city's id
@@ -30,8 +30,8 @@ public class City {
 	    
 	    // Gets the distance to given city
 	 public double distanceTo(City city){
-	        double xDistance = Math.abs(getX() - city.getX());
-	        double yDistance = Math.abs(getY() - city.getY());
+	        double xDistance = Math.abs(getLongitude() - city.getLongitude());
+	        double yDistance = Math.abs(getLatitude() - city.getLatitude());
 	        double distance = Math.sqrt( (xDistance*xDistance) + (yDistance*yDistance) );
 	        
 	        return distance;
@@ -39,6 +39,6 @@ public class City {
 	    
 	    @Override
 	 public String toString(){
-	        return getX()+", "+getY();
+	        return getLongitude()+", "+getLatitude();
 	    }
 }

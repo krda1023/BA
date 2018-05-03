@@ -39,8 +39,8 @@ import org.json.JSONObject;
 		 for(int i=0; i<staedteliste.numberOfCities();i++)
 		 {
 			 	City intermediate = staedteliste.getCity(i);
-			 	double x = intermediate.getX();
-			 	double y=intermediate.getY();
+			 	double x = intermediate.getLongitude();
+			 	double y=intermediate.getLatitude();
 				 zwischenerg += Double.toString(x);
 				 zwischenerg+=",";
 				 zwischenerg+=Double.toString(y);
@@ -53,7 +53,7 @@ import org.json.JSONObject;
 			 
 		 }
 		 String gesamt=urlAnfang+zwischenerg;
-		//System.out.print(gesamt);
+		System.out.print(gesamt);
 		
 		 
 		 //PROBLEM: Negative Zahlen in der URL
