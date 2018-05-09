@@ -62,4 +62,6 @@ public class Population {
 		double erg=Math.round(wert*Math.pow(10,5))/Math.pow(10, 5);;
 		return erg;
 	}
+    
+    
     }

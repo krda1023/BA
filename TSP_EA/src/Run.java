@@ -38,10 +38,11 @@ public class Run {
 		
 	public static void main(String[] args) throws IOException
 	{
-		int anzahlstädte1=50;
-		int interationen=100;
+		int anzahlstädte1=180;
+		int interationen=10;
 		int populationsgröße=100;
 		
+	/*	
 		System.out.println("Soll von einer File eingelesen werden, 1 für Ja");
 		Scanner sc1 = new Scanner(System.in);
 		int h=sc1.nextInt();
@@ -52,7 +53,7 @@ public class Run {
 		if(fileLesen==false)
 		{
 			System.out.println("Wieviele Städte sollen erzeugt werden? Maximum ist 100, Minimum 3");
-			System.out.println(fileLesen);
+			
 			int g =sc1.nextInt();
 			anzahlstädte1=g;
 		}
@@ -61,8 +62,10 @@ public class Run {
 		interationen=e1;
 		System.out.println("Wie groß soll eine Population sein?");
 		int e2 =sc1.nextInt();
-		populationsgröße=e2;
-		System.out.println("Welchen Crossover-Operator möchtest du verwenden?\n Wähle 1 für Ox2 Crossover\n Wähle 2 für OrderCrossover\n Wähle 3 für PMX-Crossover\n Wähle 4 für Cycle-Crossover");
+		populationsgröße=e2;*/
+		
+		
+	/*	System.out.println("Welchen Crossover-Operator möchtest du verwenden?\n Wähle 1 für Ox2 Crossover\n Wähle 2 für OrderCrossover\n Wähle 3 für PMX-Crossover\n Wähle 4 für Cycle-Crossover");
 		int i = sc1.nextInt();
 		
 		System.out.println("Welchen Mutation-Operator möchtest du verwenden?\n Wähle 1 für Displacement-Mutation\n Wähle 2 für Insertion-Mutation\n Wähle 3 für Inversion-Mutation\n Wähle 4 für Exchange Mutation\n Wähle 5 für MultipleExchange-Mutation");
@@ -74,6 +77,11 @@ public class Run {
 		
 		int k = sc1.nextInt();
 		sc1.close();
+		*/
+		int h=0;
+		int i=2;
+		int j=1;
+		int k=1;
 		System.out.println("Bitte warten.....");
 		System.out.println();
 		System.out.println();
@@ -122,16 +130,35 @@ public class Run {
         // Evolve population for xx generations
         GA Algorithmus= new GA( ox2C, ordC,  pmxC, cycC,  disM, insM,  invM,  excM, mexM,  elitism);
         pop = GA.evolvePopulation(pop);
-        Logger log = new Logger();
-        for (int z = 0; z < interationen; z++) {
+        
+     //   Logger log = new Logger();
+       for (int z = 0; z < interationen; z++) 
+       {
            pop = Algorithmus.evolvePopulation(pop);
-           Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+       //    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
            
-           log.print(new Date().toString()+ " "+ timestamp+ " "+pop.getFittest());
+       //    log.print(new Date().toString()+ " "+ timestamp+ " "+pop.getFittest());
            
          
+      }
+     /*  Tour oldFittest=new Tour();
+        Tour newFittest= new Tour();
+        int counter=0;
+        do {
+        	oldFittest=pop.getFittest();
+            pop = Algorithmus.evolvePopulation(pop);
+            newFittest=pop.getFittest();
+            if(newFittest.getDistance()==oldFittest.getDistance())
+            {
+            	counter++;
+            }
+            else
+            {
+            	counter=0;
+            }
         }
-	
+        while(counter<2);
+*/
         // Print final results
       	System.out.println("Finished");
       	if(fileLesen==true)
@@ -141,9 +168,9 @@ public class Run {
        System.out.println("Anzahl Städte: "+All_Cities.numberOfCities());
        System.out.println("Solution:");
        System.out.println(pop.getFittest()); 
-		System.out.println(fileLesen);
+		
 
-       log.exit(); 
+       //log.exit(); 
     }
     
 }

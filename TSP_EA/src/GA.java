@@ -2,7 +2,7 @@ public class GA {
 
     /* GA parameters */
     private static final double mutationRate = 0.2;
-    private static final int tournamentSize = 3;
+    private static final int tournamentSize = 5;
     private static boolean elitism;
     private static boolean ox2Crossover;
     private static boolean orderedCrossover;
@@ -48,8 +48,8 @@ public class GA {
         	if ((z+1)<newPopulation.populationSize())
         	{
         		
-            Tour parent1 = RWS(pop);
-            Tour parent2 = RWS(pop);
+            Tour parent1 = tournamentSelection(pop);
+            Tour parent2 = tournamentSelection(pop);
           
            Tour childs[]= Ox2Crossover(parent1,parent2);
             Tour child1=childs[0];
@@ -108,8 +108,8 @@ public class GA {
        {
     	   for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {
                // Select parents
-               Tour parent1 = tournamentSelection(pop);
-               Tour parent2 = tournamentSelection(pop);
+               Tour parent1 = RWS(pop);
+               Tour parent2 = RWS(pop);
                // Crossover parents
                Tour child = OrderCrossover(parent1, parent2);
                // Add child to new population
@@ -595,6 +595,7 @@ public class GA {
     	
     	return chosen;
     }
+    
 }
 
 
