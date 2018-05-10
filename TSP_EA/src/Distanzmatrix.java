@@ -8,7 +8,7 @@ import java.util.Random;
 	//um später in getdistance() von Klasse Tour zugreifen zu können
 public class Distanzmatrix {
 	static All_Cities liste = new All_Cities();
-	double[][] matrix;
+	static double[][] matrix;
 	int anzstädte;
 	boolean vonFileeinlesen=false;
 	
@@ -32,6 +32,11 @@ public class Distanzmatrix {
 	public int getAnzahlstädte()
 	{
 		return anzstädte;
+	}
+	
+	public void setMatrixwithIntermediateCity(double[][] asymMatrix)
+	{
+		
 	}
 	
 	public static All_Cities getAllCities()
@@ -72,17 +77,10 @@ public class Distanzmatrix {
 	}
 	//Methode erzeugt Send_Request Object mit erg[][]als Distanzmatrix im zweidim. array
 	public void erzeugeDistanzmatrix()
-	{	/*for(int i=0;i<liste.numberOfCities()/50;i++)
-		{	All_Cities interliste= new All_Cities();
-			for(int j =i*50;j<i*50+49;i++)
-			{
-				interliste.addCity(liste.getCity(j));
-			}
-		}
-		*/
+	{	
 		if (vonFileeinlesen==true)
 		{
-			matrix= new double[anzstädte][anzstädte];
+			matrix= new double[anzstädte+1][anzstädte+1]; 	// +1 erzeugt Zeile und SPalte für zwischensteps
 			for(int i=0;i<anzstädte;i++)
 			{
 				for(int j=0;j<anzstädte;j++)
@@ -103,19 +101,28 @@ public class Distanzmatrix {
 		if(vonFileeinlesen==false)
 		{
 		Send_Request anfrage= new Send_Request(liste);
-	try 
-		{
-        anfrage.call_me();
-        matrix=anfrage.getergebnis();
-		} 
-	catch (Exception e) 
-		{ 
-		e.printStackTrace();
-		}
+			try 
+			{
+				
+		        anfrage.createBasicMatrix();
+		        matrix=anfrage.getergebnis();
+		      /* for(int a=0;a<=anzstädte;a++)
+		        {
+		        	for(int b=0;b<=anzstädte;b++)
+		        	{
+		        		System.out.print(matrix[a][b]+" ");
+		        	}
+		        	System.out.println();
+		        }*/
+			} 
+			catch (Exception e) 
+			{ 
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public double [][] getDistanzmatrix()
+	public static double [][] getDistanzmatrix()
 	{
 		return matrix;
 	}

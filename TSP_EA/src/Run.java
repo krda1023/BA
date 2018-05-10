@@ -38,9 +38,9 @@ public class Run {
 		
 	public static void main(String[] args) throws IOException
 	{
-		int anzahlstädte1=180;
-		int interationen=10;
-		int populationsgröße=100;
+		int anzahlstädte1= 110;
+		int interationen=100;
+		int populationsgröße=50;
 		
 	/*	
 		System.out.println("Soll von einer File eingelesen werden, 1 für Ja");
@@ -111,7 +111,7 @@ public class Run {
 		dis.erzeugeDistanzmatrix();
 		//dis.spucksaus();
 		
-		 
+		 //Event tritt ein? dis.asymMatrix(City nk);
 
         
 
@@ -166,8 +166,10 @@ public class Run {
       	if(fileLesen==false)
       		System.out.println("Final duration: " + pop.getFittest().getDistance());
        System.out.println("Anzahl Städte: "+All_Cities.numberOfCities());
+       System.out.println("Anzahlanfragen"+Send_Request.getAnfragencounter());
        System.out.println("Solution:");
        System.out.println(pop.getFittest()); 
+       
 		
 
        //log.exit(); 
