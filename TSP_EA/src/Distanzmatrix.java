@@ -11,6 +11,7 @@ public class Distanzmatrix {
 	static double[][] matrix;
 	int anzstädte;
 	boolean vonFileeinlesen=false;
+	Send_Request anfrage= new Send_Request(liste);
 	
 	public Distanzmatrix(int numberstädte, boolean filelesen){
 		if(filelesen==false)
@@ -100,7 +101,7 @@ public class Distanzmatrix {
 		
 		if(vonFileeinlesen==false)
 		{
-		Send_Request anfrage= new Send_Request(liste);
+		
 			try 
 			{
 				

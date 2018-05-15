@@ -10,6 +10,13 @@ public class All_Cities {
 	        destinationCities.add(city);
 	    }
 	    
+	public static void deleteCity(City city)
+	{
+		destinationCities.remove(city);
+	}
+	  public boolean containsCity(City city){
+	        return destinationCities.contains(city);
+	    }
 	    // Get a city
 	public static City getCity(int index){
 	        return (City)destinationCities.get(index);

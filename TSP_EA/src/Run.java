@@ -7,6 +7,7 @@ public class Run {
 		static Distanzmatrix dis;
 		static int anzahlstädte;
 		static int populationsgröße;
+		static Date startdate;
 		static int interationen;
 		static boolean ox2C=false;
 		static boolean ordC=false;
@@ -34,13 +35,18 @@ public class Run {
 		{
 			return dis.getDistanzmatrix();
 		}
+		public static Date getDate()
+		{
+			return startdate;
+		}
 		
 		
 	public static void main(String[] args) throws IOException
 	{
-		int anzahlstädte1= 110;
+		int anzahlstädte1= 20;
 		int interationen=100;
 		int populationsgröße=50;
+		Salesman Guy= new Salesman();
 		
 	/*	
 		System.out.println("Soll von einer File eingelesen werden, 1 für Ja");
@@ -78,7 +84,7 @@ public class Run {
 		int k = sc1.nextInt();
 		sc1.close();
 		*/
-		int h=0;
+		int h=1;
 		int i=2;
 		int j=1;
 		int k=1;
@@ -103,13 +109,16 @@ public class Run {
 		if(k==1)
 			{elitism=true;}
 		
-	
+		if(h==1)
+		{
+			fileLesen=true;
+		}
 		
 		dis= new Distanzmatrix(anzahlstädte1,fileLesen);
 		dis.erzeugeStaedteliste();
 		anzahlstädte=dis.getAnzahlstädte();
 		dis.erzeugeDistanzmatrix();
-		//dis.spucksaus();
+		dis.spucksaus();
 		
 		 //Event tritt ein? dis.asymMatrix(City nk);
 
@@ -129,9 +138,20 @@ public class Run {
 
         // Evolve population for xx generations
         GA Algorithmus= new GA( ox2C, ordC,  pmxC, cycC,  disM, insM,  invM,  excM, mexM,  elitism);
+        startdate= new Date();
+        System.out.print(startdate);
         pop = GA.evolvePopulation(pop);
         
-     //   Logger log = new Logger();
+        //Starte SIMULATION
+        
+        myListener Lis= new myEventHandler();
+		Guy.addListener(Lis);
+		
+		
+		
+		
+        
+      // Logger log = new Logger();
        for (int z = 0; z < interationen; z++) 
        {
            pop = Algorithmus.evolvePopulation(pop);
@@ -169,7 +189,9 @@ public class Run {
        System.out.println("Anzahlanfragen"+Send_Request.getAnfragencounter());
        System.out.println("Solution:");
        System.out.println(pop.getFittest()); 
-       
+       Date ende= new Date();
+       System.out.print(ende);
+       System.out.print(startdate.after(ende));
 		
 
        //log.exit(); 
