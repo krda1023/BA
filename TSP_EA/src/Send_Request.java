@@ -21,9 +21,10 @@ import org.json.JSONObject;
 		
 		All_Cities staedteliste = new All_Cities();
 	     double[][] erg;
-	     double[][]asymerg;
+	     JSONObject Way;
+	    
 
- static int anfragencounter=0;
+	     static int anfragencounter=0;
 		
 		
 
@@ -41,10 +42,12 @@ import org.json.JSONObject;
 	public double[][] getergebnis()
 	{ return erg;}
 	
-	public double[][]getAsymErg()
+	public JSONObject getDirection()
 	{
-		return asymerg;
+		return Way;
 	}
+	
+	
 
 	public void setStaedteliste()
 	{
@@ -69,6 +72,29 @@ import org.json.JSONObject;
 	     in.close();
 	     anfragencounter++;
 	     return response;
+	}
+	
+	public void createDirectionRequest(Tour fittest) throws Exception
+	{
+		String gesamt= "http://router.project-osrm.org/table/v1/driving/";
+		
+		City From=fittest.getCity(0);
+		City To=fittest.getCity(1);
+		double x1=From.getLongitude();
+		double y1=From.getLatitude();
+		double x2=To.getLongitude();
+		double y2= To.getLatitude();
+		gesamt += Double.toString(x1);
+		 gesamt+=",";
+		 gesamt+=Double.toString(y1);
+		 gesamt+=";";
+		 gesamt+= Double.toString(x2);
+		 gesamt=",";
+		 gesamt+=Double.toString(y2);
+		 gesamt +="?steps=true";
+		 StringBuffer response = gogo(gesamt);
+		 Way= new JSONObject(response.toString());
+		
 	}
 	
 	public void createAsymMatrix(City stepCity) throws Exception

@@ -20,7 +20,12 @@ public class Run {
 		static boolean mexM=false;
 		static boolean elitism=false;
 		static boolean  fileLesen=false;
+		static Population pop;
 		
+		public static Population getPop()
+		{
+			return pop;
+		}
 		
 		public static int getNumberofCities()
 		{
@@ -40,79 +45,83 @@ public class Run {
 			return startdate;
 		}
 		
+		public static void Formalitäten()
+		{
+			/*	
+			System.out.println("Soll von einer File eingelesen werden, 1 für Ja");
+			Scanner sc1 = new Scanner(System.in);
+			int h=sc1.nextInt();
+			if(h==1)
+			{
+				fileLesen=true;
+			}
+			if(fileLesen==false)
+			{
+				System.out.println("Wieviele Städte sollen erzeugt werden? Maximum ist 100, Minimum 3");
+				
+				int g =sc1.nextInt();
+				anzahlstädte1=g;
+			}
+			System.out.println("Wieviele Iterationen sollen durchgeführt werden?");
+			int e1 =sc1.nextInt();
+			interationen=e1;
+			System.out.println("Wie groß soll eine Population sein?");
+			int e2 =sc1.nextInt();
+			populationsgröße=e2;*/
+			
+			
+		/*	System.out.println("Welchen Crossover-Operator möchtest du verwenden?\n Wähle 1 für Ox2 Crossover\n Wähle 2 für OrderCrossover\n Wähle 3 für PMX-Crossover\n Wähle 4 für Cycle-Crossover");
+			int i = sc1.nextInt();
+			
+			System.out.println("Welchen Mutation-Operator möchtest du verwenden?\n Wähle 1 für Displacement-Mutation\n Wähle 2 für Insertion-Mutation\n Wähle 3 für Inversion-Mutation\n Wähle 4 für Exchange Mutation\n Wähle 5 für MultipleExchange-Mutation");
+			
+			int j = sc1.nextInt();
+			
+			System.out.println("Elitism aktivieren??\n Wähle 1 für Ja\n Wähle 2 Nein");
+			
+			
+			int k = sc1.nextInt();
+			sc1.close();
+			*/
+			int h=1;
+			int i=2;
+			int j=1;
+			int k=1;
+			System.out.println("Bitte warten.....");
+			System.out.println();
+			System.out.println();
+			switch(i)
+			{
+			case 1: ox2C=true;break;
+			case 2: ordC=true;break;
+			case 3: pmxC=true;break;
+			case 4: cycC=true; break;
+			}
+			switch(j)
+			{
+			case 1: disM=true;break;
+			case 2: insM=true;break;
+			case 3: invM=true;break;
+			case 4: excM=true;break;
+			case 5: mexM=true;break;
+			}
+			if(k==1)
+				{elitism=true;}
+			
+			if(h==1)
+			{
+				fileLesen=true;
+			}
+		}
 		
 	public static void main(String[] args) throws IOException
 	{
 		int anzahlstädte1= 20;
 		int interationen=100;
 		int populationsgröße=50;
-		Salesman Guy= new Salesman();
-		
-	/*	
-		System.out.println("Soll von einer File eingelesen werden, 1 für Ja");
-		Scanner sc1 = new Scanner(System.in);
-		int h=sc1.nextInt();
-		if(h==1)
-		{
-			fileLesen=true;
-		}
-		if(fileLesen==false)
-		{
-			System.out.println("Wieviele Städte sollen erzeugt werden? Maximum ist 100, Minimum 3");
-			
-			int g =sc1.nextInt();
-			anzahlstädte1=g;
-		}
-		System.out.println("Wieviele Iterationen sollen durchgeführt werden?");
-		int e1 =sc1.nextInt();
-		interationen=e1;
-		System.out.println("Wie groß soll eine Population sein?");
-		int e2 =sc1.nextInt();
-		populationsgröße=e2;*/
 		
 		
-	/*	System.out.println("Welchen Crossover-Operator möchtest du verwenden?\n Wähle 1 für Ox2 Crossover\n Wähle 2 für OrderCrossover\n Wähle 3 für PMX-Crossover\n Wähle 4 für Cycle-Crossover");
-		int i = sc1.nextInt();
-		
-		System.out.println("Welchen Mutation-Operator möchtest du verwenden?\n Wähle 1 für Displacement-Mutation\n Wähle 2 für Insertion-Mutation\n Wähle 3 für Inversion-Mutation\n Wähle 4 für Exchange Mutation\n Wähle 5 für MultipleExchange-Mutation");
-		
-		int j = sc1.nextInt();
-		
-		System.out.println("Elitism aktivieren??\n Wähle 1 für Ja\n Wähle 2 Nein");
-		
-		
-		int k = sc1.nextInt();
-		sc1.close();
-		*/
-		int h=1;
-		int i=2;
-		int j=1;
-		int k=1;
-		System.out.println("Bitte warten.....");
-		System.out.println();
-		System.out.println();
-		switch(i)
-		{
-		case 1: ox2C=true;break;
-		case 2: ordC=true;break;
-		case 3: pmxC=true;break;
-		case 4: cycC=true; break;
-		}
-		switch(j)
-		{
-		case 1: disM=true;break;
-		case 2: insM=true;break;
-		case 3: invM=true;break;
-		case 4: excM=true;break;
-		case 5: mexM=true;break;
-		}
-		if(k==1)
-			{elitism=true;}
-		
-		if(h==1)
-		{
-			fileLesen=true;
-		}
+		Run.Formalitäten();
 		
 		dis= new Distanzmatrix(anzahlstädte1,fileLesen);
 		dis.erzeugeStaedteliste();
@@ -125,7 +134,7 @@ public class Run {
         
 
         // Initialize population
-        Population pop = new Population(populationsgröße, true);
+        pop = new Population(populationsgröße, true);
         if(fileLesen==true)
         {
         	System.out.println("Initial distance: " + pop.getFittest().getDistance());
@@ -138,19 +147,10 @@ public class Run {
 
         // Evolve population for xx generations
         GA Algorithmus= new GA( ox2C, ordC,  pmxC, cycC,  disM, insM,  invM,  excM, mexM,  elitism);
-        startdate= new Date();
-        System.out.print(startdate);
         pop = GA.evolvePopulation(pop);
-        
-        //Starte SIMULATION
-        
-        myListener Lis= new myEventHandler();
-		Guy.addListener(Lis);
+  
 		
-		
-		
-		
-        
+		//BERECHNE ERSTE LÖSUNG
       // Logger log = new Logger();
        for (int z = 0; z < interationen; z++) 
        {
@@ -161,6 +161,18 @@ public class Run {
            
          
       }
+       
+       // 1 Directions Abfrage
+          
+       
+       
+       
+       //Starte SIMULATION
+       Salesman Guy= new Salesman();
+       myListener Lis= new myEventHandler();   //????
+       Guy.addListener(Lis);
+		
+		
      /*  Tour oldFittest=new Tour();
         Tour newFittest= new Tour();
         int counter=0;
@@ -191,7 +203,7 @@ public class Run {
        System.out.println(pop.getFittest()); 
        Date ende= new Date();
        System.out.print(ende);
-       System.out.print(startdate.after(ende));
+
 		
 
        //log.exit(); 

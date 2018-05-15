@@ -8,7 +8,19 @@ public class Salesman {
 	public myEventHandler mEH= new myEventHandler();
 	private ArrayList<myListener> listenerList= new ArrayList<myListener>();
 	public final Timestamp Startzeit = new Timestamp(System.currentTimeMillis());
-	long startzeit= System.currentTimeMillis();
+	static long startzeit= System.currentTimeMillis();
+	
+	public long getStartzeit()
+	{
+		return startzeit;
+	}
+	
+	public static long getFahrtzeit()
+	{
+		long jetzt=System.currentTimeMillis();
+		long erg= jetzt-startzeit;
+		return erg;
+	}
 	
 	public synchronized void addListener(myListener lis)
 	{
@@ -19,23 +31,29 @@ public class Salesman {
 		 listenerList.remove(lis);
 	 }
 	 
-	public void CreateAtCityEvent(String type, int ID, Date Time)
+	public void CreateAtCityEvent(String type, int ID, long Time)
 	 {
 		 AtEvent ae= new AtEvent(this,type,ID,Time);
+		 upcomingEvents.add(ae);
 		 
 	 }
 	 
-	 public void CreateAtStepCityEvent(String type, int ID, Date Time)
+	 public void CreateAtStepCityEvent(String type, int ID, long Time)
 	 {
 		AtEvent ae= new AtEvent(this, type, ID, Time);
-	
+		upcomingEvents.add(ae);
 	 }
 	
 	public void checkForEvents()
-	{	Date jetzt= new Date(0);
-		if(jetzt.getTime()>((AtEvent) upcomingEvents.get(0)).getEventTime().getTime())
-		{
-			
+	{	long jetzt= System.currentTimeMillis();
+		if(getFahrtzeit()>((AtEvent) upcomingEvents.get(0)).getEventTime())
+		{	//fire
+			for(myListener lis: listenerList)
+			{	AtEvent ae= (AtEvent)upcomingEvents.get(0);
+				lis.arrivedAtCity(ae);
+				lis.arrivedAtWP(ae);
+				// übergib event an listener der daruaf reagiert sobald Fahrtzeit größer eventzeit
+			}
 		}
 	}
 }

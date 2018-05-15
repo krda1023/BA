@@ -4,21 +4,22 @@ import javax.swing.event.EventListenerList;
 
 public class myEventHandler implements myListener {
 	
-	@Override
-	public void startfromfirstCity(AtEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void arrivedAtCity(AtEvent e) {
-		// TODO Auto-generated method stub
+		if(e.getEventType()=="City"&&e.getEventTime()<Salesman.getFahrtzeit())   //Ist das eine Dynamische abfrage oder hängt sich das auf
+		{
+			
+		}
 		
 	}
 
 	@Override
 	public void arrivedAtWP(AtEvent e) {
-		// TODO Auto-generated method stub
+		if(e.getEventType()=="WP"&&e.getEventTime()<Salesman.getFahrtzeit())
+		{
+			
+		}
 		
 	}
 

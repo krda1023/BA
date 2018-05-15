@@ -4,18 +4,22 @@ import java.util.EventObject;
 public class AtEvent extends EventObject {
 	String EventType;
 	int EventID;
-	Date EventTime;
+	long EventTime;
 	
-	public AtEvent(Salesman Guy, String type, int ID, Date Time) 
+	public AtEvent(Salesman Guy, String type, int ID, long Time) 
 	{
 		super(Guy);
 		this.EventType=type;
 		this.EventID=ID;
-		this.EventTime=Time;
+		this.EventTime=Guy.getStartzeit()+Guy.getFahrtzeit()+Time;
 	}
 	
-	public Date getEventTime()
+	public long getEventTime()
 	{
 		return EventTime;
+	}
+	public String getEventType()
+	{
+		return EventType;
 	}
 }

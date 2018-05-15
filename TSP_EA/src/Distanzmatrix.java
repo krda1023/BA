@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.json.JSONObject;
+
 // hol dir ein Array oder Liste aus All Cities mit allen Städten
 	// Erzeuge Send_Request und Übergebe alle Städte damit URL gebildet werden kann
 	//Klassenvariable Ergebnis[][] = request.callme()
@@ -9,6 +11,7 @@ import java.util.Random;
 public class Distanzmatrix {
 	static All_Cities liste = new All_Cities();
 	static double[][] matrix;
+	JSONObject Way;
 	int anzstädte;
 	boolean vonFileeinlesen=false;
 	Send_Request anfrage= new Send_Request(liste);
@@ -122,6 +125,7 @@ public class Distanzmatrix {
 			}
 		}
 	}
+
 	
 	public static double [][] getDistanzmatrix()
 	{
