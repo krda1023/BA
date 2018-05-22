@@ -84,8 +84,8 @@ public class Run {
 			sc1.close();
 			*/
 			int h=1;
-			int i=2;
-			int j=1;
+			int i=3;
+			int j=2;
 			int k=1;
 			System.out.println("Bitte warten.....");
 			System.out.println();
@@ -114,11 +114,11 @@ public class Run {
 			}
 		}
 		
-	public static void main(String[] args) throws IOException
+	public static void main(String[] args) throws Exception
 	{
-		int anzahlstädte1= 20;
+		int anzahlstädte1=50;
 		int interationen=100;
-		int populationsgröße=50;
+		int populationsgröße=100;
 		
 		
 		Run.Formalitäten();
@@ -126,8 +126,9 @@ public class Run {
 		dis= new Distanzmatrix(anzahlstädte1,fileLesen);
 		dis.erzeugeStaedteliste();
 		anzahlstädte=dis.getAnzahlstädte();
+		System.out.println(All_Cities.numberOfCities());
 		dis.erzeugeDistanzmatrix();
-		dis.spucksaus();
+		//dis.spucksaus();
 		
 		 //Event tritt ein? dis.asymMatrix(City nk);
 
@@ -164,16 +165,17 @@ public class Run {
        
        // 1 Directions Abfrage
           
-       
+      // Route route= new Route();
+       //route.WayFromTo();
        
        
        //Starte SIMULATION
-       Salesman Guy= new Salesman();
-       myListener Lis= new myEventHandler();   //????
-       Guy.addListener(Lis);
+     //  Salesman Guy= new Salesman();
+   //    myListener Lis= new myEventHandler();   //????
+     //  Guy.addListener(Lis);
 		
 		
-     /*  Tour oldFittest=new Tour();
+      /* Tour oldFittest=new Tour();
         Tour newFittest= new Tour();
         int counter=0;
         do {
@@ -189,8 +191,8 @@ public class Run {
             	counter=0;
             }
         }
-        while(counter<2);
-*/
+        while(counter<2);*/
+
         // Print final results
       	System.out.println("Finished");
       	if(fileLesen==true)

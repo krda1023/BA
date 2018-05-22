@@ -11,10 +11,10 @@ import org.json.JSONObject;
 public class Distanzmatrix {
 	static All_Cities liste = new All_Cities();
 	static double[][] matrix;
-	JSONObject Way;
+	
 	int anzstädte;
 	boolean vonFileeinlesen=false;
-	Send_Request anfrage= new Send_Request(liste);
+	
 	
 	public Distanzmatrix(int numberstädte, boolean filelesen){
 		if(filelesen==false)
@@ -52,7 +52,7 @@ public class Distanzmatrix {
 	{	
 		if (vonFileeinlesen==true)
 		{	double[][] zwischenmatrix;
-			String s= "C:\\Users\\BADai\\git\\BA\\TSP_EA\\src\\gr96.tsp";
+			String s= "C:\\Users\\BADai\\git\\BA\\TSP_EA\\src\\gr97.tsp";
 			readFile rf= new readFile(s);
 			rf.readingFile();
 			
@@ -81,7 +81,7 @@ public class Distanzmatrix {
 	}
 	//Methode erzeugt Send_Request Object mit erg[][]als Distanzmatrix im zweidim. array
 	public void erzeugeDistanzmatrix()
-	{	
+	{	Send_Request anfrage= new Send_Request(liste);
 		if (vonFileeinlesen==true)
 		{
 			matrix= new double[anzstädte+1][anzstädte+1]; 	// +1 erzeugt Zeile und SPalte für zwischensteps
@@ -108,7 +108,7 @@ public class Distanzmatrix {
 			try 
 			{
 				
-		        anfrage.createBasicMatrix();
+		        anfrage.createsmallMatrix();
 		        matrix=anfrage.getergebnis();
 		      /* for(int a=0;a<=anzstädte;a++)
 		        {

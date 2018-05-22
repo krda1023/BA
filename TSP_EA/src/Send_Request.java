@@ -1,4 +1,14 @@
 
+import javax.xml.parsers.*;
+import java.io.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.Element;
+import org.w3c.dom.Entity;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -31,7 +41,7 @@ import org.json.JSONObject;
 
 	public Send_Request(All_Cities liste ) {
 			 this.staedteliste=liste;
-			 this.erg= new double[liste.numberOfCities()+1][liste.numberOfCities()+1];
+			 this.erg= new double[All_Cities.numberOfCities()+1][All_Cities.numberOfCities()+1];
 		}
 
 	public static int getAnfragencounter()
@@ -60,7 +70,7 @@ import org.json.JSONObject;
 	     HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 	     con.setRequestMethod("GET");
 	     con.setRequestProperty("User-Agent", "Mozilla/5.0");
-	     int responseCode = con.getResponseCode();
+	    // int responseCode = con.getResponseCode();
 	     BufferedReader in = new BufferedReader(
 	     new InputStreamReader(con.getInputStream()));
 	     String inputLine;
@@ -76,25 +86,49 @@ import org.json.JSONObject;
 	
 	public void createDirectionRequest(Tour fittest) throws Exception
 	{
-		String gesamt= "http://router.project-osrm.org/table/v1/driving/";
-		
-		City From=fittest.getCity(0);
-		City To=fittest.getCity(1);
+		String gesamt= "http://router.project-osrm.org/route/v1/driving/";
+		String zwischenerg="";
+		City From=fittest.getCity(1);
+		City To=fittest.getCity(2);
 		double x1=From.getLongitude();
 		double y1=From.getLatitude();
 		double x2=To.getLongitude();
 		double y2= To.getLatitude();
-		gesamt += Double.toString(x1);
-		 gesamt+=",";
-		 gesamt+=Double.toString(y1);
-		 gesamt+=";";
-		 gesamt+= Double.toString(x2);
-		 gesamt=",";
-		 gesamt+=Double.toString(y2);
-		 gesamt +="?steps=true";
+		 gesamt+=Double.toString(x1)+","+Double.toString(y1)+";"+Double.toString(x2)+","+Double.toString(y2)+"?steps=true&annotations=true";
+		 System.out.println(gesamt);
 		 StringBuffer response = gogo(gesamt);
 		 Way= new JSONObject(response.toString());
 		
+	}
+	
+	public All_WP getWP(double[]nodes) throws Exception
+	{	
+		All_WP WP= new All_WP();
+		for(int i=0;i<nodes.length;i++)
+		{
+			String url="http://www.openstreetmap.org/api/0.6/id/";
+			url+=nodes[i];
+			StringBuffer response = gogo(url); 
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document document = builder.parse(response.toString());
+			document.getDocumentElement().normalize();
+			NodeList nList = document.getElementsByTagName("node");
+			Node node= nList.item(0);
+			Element el= (Element) node;
+			String ID =(el.getAttribute("id"));
+			int id = Integer.parseInt(ID);
+			String LONG=(el.getAttribute("lon"));
+			String LAT=(el.getAttribute("lat"));
+			double[]pos=new double[2];
+			pos[0]=Double.parseDouble(LONG);
+			pos[1]=Double.parseDouble(LAT);
+
+
+			City newWP= new City(id,pos);
+			WP.addCity(newWP);
+		}
+		return WP;
 	}
 	
 	public void createAsymMatrix(City stepCity) throws Exception
@@ -311,7 +345,7 @@ import org.json.JSONObject;
 
 			    }	
 			    IFzähler++;
-			    System.out.println("IF 1: "+IFzähler);
+			   // System.out.println("IF 1: "+IFzähler);
 			}
 			}
 			
@@ -333,7 +367,7 @@ import org.json.JSONObject;
 					}
 				}
 				String gesamt=urlAnfang+zwischenerg;
-				System.out.println(gesamt);
+				//System.out.println(gesamt);
 				 StringBuffer response = gogo(gesamt); 
 			     JSONObject jobj= new JSONObject(response.toString());
 			     JSONArray dura_1 = jobj.getJSONArray("durations");
@@ -354,7 +388,7 @@ import org.json.JSONObject;
 
 				    }
 			   IFzähler++;
-			    System.out.println("IF 2: "+IFzähler);
+			 //   System.out.println("IF 2: "+IFzähler);
 				}
 			
 			// Splitted Matrizen
@@ -601,7 +635,7 @@ import org.json.JSONObject;
 								    	 y++;
 
 								     }
-								     System.out.println(gesamt);
+								 //    System.out.println(gesamt);
 								     	//IFzähler++;
 									   // System.out.println("IF 3, Case4: "+IFzähler);
 									    continue;
@@ -1050,7 +1084,8 @@ import org.json.JSONObject;
 
 	public void createsmallMatrix() throws Exception
 	{
-		String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+		String urlAnfang="https://api.openrouteservice.org/matrix?api_key=58d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=";
+		//String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
 		 String zwischenerg="";
 		 for(int i=0; i<All_Cities.numberOfCities();i++)
 		 {
@@ -1058,27 +1093,33 @@ import org.json.JSONObject;
 			 	double x = intermediate.getLongitude();
 			 	double y=intermediate.getLatitude();
 				 zwischenerg += Double.toString(x);
-				 zwischenerg+=",";
+				// zwischenerg+=",";
+				 zwischenerg+="%2C";
 				 zwischenerg+=Double.toString(y);
 				 if(i==(All_Cities.numberOfCities()-1))    //-1
 				 {}
 				 else
 				 {
-				 zwischenerg+=";";
+			//	 zwischenerg+=";";
+				 zwischenerg+="%7C";
 				 }
 			 
 		 }
 		 String gesamt=urlAnfang+zwischenerg;
+		 System.out.println(gesamt);
 		 StringBuffer response = gogo(gesamt); 
+		 //System.out.println(response.toString());
+		 
 	     JSONObject jobj= new JSONObject(response.toString());
 	     JSONArray dura_1 = jobj.getJSONArray("durations");
 	     
 	    for (int t=0; t<All_Cities.numberOfCities();t++)
 	    {
 	    	JSONArray dura_2=dura_1.getJSONArray(t);
+	    	System.out.println(dura_2.toString());
 	    	   
 	        for (int i = 0; i < All_Cities.numberOfCities(); i++) 
-	   	    {    	    	
+	   	    {    System.out.println(erg.length);	    	
 	   	    	 erg[t][i] = dura_2.getDouble(i);	    	    	
 	   	    }
 	    }
