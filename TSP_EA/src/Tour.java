@@ -60,19 +60,17 @@ public class Tour{
     	if (distance ==0) {
     		double tourdistance =0;
     		double[][] matrix = Run.getArrayMatrix();				//Distanzmatrix aus DIstanzmatrixKlasse holen
-    		 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++)
-    		 {
+    		 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) { 		
     			 City fromCity = getCity(cityIndex);
-    			 City destinationCity;	  // Check we're not on our tour's last city, if we are set our 
-                 							// tour's final destination city to our starting city
+    			 City destinationCity;	  							// Check we're not on our tour's last city, if we are set our 
+    			 													// tour's final destination city to our starting city
     			 if(cityIndex+1 < tourSize()){
                     
     				 destinationCity = getCity(cityIndex+1);
                  }
     		 
     			 
-                 else{
-                	 
+                 else{    	 
                      destinationCity = getCity(0);
                  }
     			 
@@ -81,13 +79,10 @@ public class Tour{
     			 
     			 tourdistance+=matrix[a][b];
     		 }
-    		 distance=tourdistance;
-    		 
-         	 
+    		 distance=tourdistance;	        	 
     	}
     	distance= round(distance);    //Runden
-    	return distance; 
-    		
+    	return distance;  		
     }
     	
     	/*if (distance == 0) {
@@ -125,17 +120,17 @@ public class Tour{
     public boolean containsCity(City city){
         return tour.contains(city);
     }
-    public int positionofCity(City city)
-    {
+    public int positionofCity(City city) {    
     	int position =tour.indexOf(city);
     	return position;
     }
-    public boolean isEmpty()
-    {
-    	if(tour.isEmpty())
+    public boolean isEmpty(){
+    	if(tour.isEmpty()) {
     		return true;
-    	else 
+    	}
+    	else {
     		return false;
+    	}
     }
     
     @Override
@@ -146,8 +141,8 @@ public class Tour{
         }
         return geneString;
     }
-    static double round(double wert)
-	{
+    static double round(double wert){
 		double erg=Math.round(wert*Math.pow(10,5))/Math.pow(10, 5);;
-		return erg;}
+		return erg;
+	}
 }

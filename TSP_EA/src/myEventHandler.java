@@ -9,7 +9,9 @@ public class myEventHandler implements myListener {
 	public void arrivedAtCity(AtEvent e) {
 		if(e.getEventType()=="City"&&e.getEventTime()<Salesman.getFahrtzeit())   //Ist das eine Dynamische abfrage oder hängt sich das auf
 		{
-			
+			Tour BestTour=Run.getPop().getFittest();
+			City nextCity=BestTour.getCity(1); // welche Stelle?
+			// Hier muss Population repariert werden		 
 		}
 		
 	}

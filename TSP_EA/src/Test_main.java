@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Test_main {
@@ -21,15 +22,13 @@ public class Test_main {
 		e.printStackTrace();
 	}
 	System.out.println("Ende des Programms");*/
-		ArrayList<String> ab= new ArrayList<String>();
-		ab.add("Position 0");
-		ab.add("Position 1");
-		ab.add("Position 2");
-		ab.add("Position 3");
-		ab.remove(0);
-		System.out.println(ab.get(0)+" aber eigentlich: "+ab.indexOf(ab.get(0)));
-		System.out.println(ab.get(1)+" aber eigentlich: "+ab.indexOf(ab.get(1)));
-		System.out.println(ab.get(2)+" aber eigentlich: "+ab.indexOf(ab.get(2)));
+		Calendar d= Calendar.getInstance();
+		
+		TimeElement t= new TimeElement(d);
+		
+		//int a = t.getHour();
+		System.out.println(d.getTime().getDay());
+		System.out.println(d.getTime().getDate());
 }
 
 }

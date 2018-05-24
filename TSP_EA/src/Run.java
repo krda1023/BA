@@ -22,31 +22,25 @@ public class Run {
 		static boolean  fileLesen=false;
 		static Population pop;
 		
-		public static Population getPop()
-		{
+		public static Population getPop(){
 			return pop;
 		}
 		
-		public static int getNumberofCities()
-		{
+		public static int getNumberofCities(){
 			return anzahlstädte;	
 		}
 		
-		public static Distanzmatrix getFirstMatrix()
-		{
+		public static Distanzmatrix getFirstMatrix(){
 			return dis;
 		}
-		public static double[][] getArrayMatrix()
-		{
+		public static double[][] getArrayMatrix(){
 			return dis.getDistanzmatrix();
 		}
-		public static Date getDate()
-		{
+		public static Date getDate(){
 			return startdate;
 		}
 		
-		public static void Formalitäten()
-		{
+		public static void Formalitäten(){
 			/*	
 			System.out.println("Soll von einer File eingelesen werden, 1 für Ja");
 			Scanner sc1 = new Scanner(System.in);
@@ -90,39 +84,32 @@ public class Run {
 			System.out.println("Bitte warten.....");
 			System.out.println();
 			System.out.println();
-			switch(i)
-			{
-			case 1: ox2C=true;break;
-			case 2: ordC=true;break;
-			case 3: pmxC=true;break;
-			case 4: cycC=true; break;
+			switch(i){
+				case 1: ox2C=true;break;
+				case 2: ordC=true;break;
+				case 3: pmxC=true;break;
+				case 4: cycC=true; break;
 			}
-			switch(j)
-			{
-			case 1: disM=true;break;
-			case 2: insM=true;break;
-			case 3: invM=true;break;
-			case 4: excM=true;break;
-			case 5: mexM=true;break;
+			switch(j){
+				case 1: disM=true;break;
+				case 2: insM=true;break;
+				case 3: invM=true;break;
+				case 4: excM=true;break;
+				case 5: mexM=true;break;
 			}
-			if(k==1)
-				{elitism=true;}
+			if(k==1){
+				elitism=true;
+			}
 			
-			if(h==1)
-			{
+			if(h==1){
 				fileLesen=true;
 			}
-		}
-		
-	public static void main(String[] args) throws Exception
-	{
+		}	
+	public static void main(String[] args) throws Exception{
 		int anzahlstädte1=50;
 		int interationen=100;
-		int populationsgröße=100;
-		
-		
-		Run.Formalitäten();
-		
+		int populationsgröße=100;		
+		Run.Formalitäten();	
 		dis= new Distanzmatrix(anzahlstädte1,fileLesen);
 		dis.erzeugeStaedteliste();
 		anzahlstädte=dis.getAnzahlstädte();
@@ -130,38 +117,30 @@ public class Run {
 		dis.erzeugeDistanzmatrix();
 		//dis.spucksaus();
 		
-		 //Event tritt ein? dis.asymMatrix(City nk);
-
-        
-
+		 //Event tritt ein? dis.asymMatrix(City nk);     
         // Initialize population
         pop = new Population(populationsgröße, true);
-        if(fileLesen==true)
-        {
+        if(fileLesen==true){
         	System.out.println("Initial distance: " + pop.getFittest().getDistance());
         }
-        if(fileLesen==false)
-        {
+        if(fileLesen==false){
         	System.out.println("Initial duration: " + pop.getFittest().getDistance());
-        }
-        
+        }     
 
-        // Evolve population for xx generations
         GA Algorithmus= new GA( ox2C, ordC,  pmxC, cycC,  disM, insM,  invM,  excM, mexM,  elitism);
         pop = GA.evolvePopulation(pop);
   
 		
 		//BERECHNE ERSTE LÖSUNG
       // Logger log = new Logger();
-       for (int z = 0; z < interationen; z++) 
-       {
+       for (int z = 0; z < interationen; z++) {
            pop = Algorithmus.evolvePopulation(pop);
        //    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
            
        //    log.print(new Date().toString()+ " "+ timestamp+ " "+pop.getFittest());
            
          
-      }
+       }
        
        // 1 Directions Abfrage
           
@@ -195,21 +174,19 @@ public class Run {
 
         // Print final results
       	System.out.println("Finished");
-      	if(fileLesen==true)
+      	if(fileLesen==true) {
       		System.out.println("Final distance: " + pop.getFittest().getDistance());
-      	if(fileLesen==false)
+      	}
+      	if(fileLesen==false) {
       		System.out.println("Final duration: " + pop.getFittest().getDistance());
+      	}
        System.out.println("Anzahl Städte: "+All_Cities.numberOfCities());
        System.out.println("Anzahlanfragen"+Send_Request.getAnfragencounter());
        System.out.println("Solution:");
        System.out.println(pop.getFittest()); 
        Date ende= new Date();
-       System.out.print(ende);
-
-		
-
+       System.out.print(ende);		
        //log.exit(); 
-    }
-    
+    }    
 }
 		

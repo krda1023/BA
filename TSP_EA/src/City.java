@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class City {
 	private final double[] position;
@@ -27,7 +28,12 @@ public class City {
 	 public int getId() {
 			return id;
 		}
-	    
+	 public double expectedTravTime(City to,TimeElement startTime,ArrayList<double[][]> Matrix) {
+		 double expTime=0;
+		 int hour= startTime.getHour();
+		 double restTimeOfIntervall=startTime.getTimeToNextHour()/(60*60*1000);			// In Stunden
+		 return expTime;
+	 }
 	    // Gets the distance to given city
 	 public double distanceTo(City city){
 	        double xDistance = Math.abs(getLongitude() - city.getLongitude());
