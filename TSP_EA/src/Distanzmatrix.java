@@ -12,8 +12,11 @@ public class Distanzmatrix {
 	static All_Cities liste = new All_Cities();
 	static double[][] matrix;
 	int anzstädte;
+	Send_Request anfrage= new Send_Request(liste);
 	
-	ArrayList<double[][]> allMatrix= new ArrayList<double[][]>();
+	GammaVerteilung gamma= new GammaVerteilung();
+	static ArrayList<double[][]> allMatrix= new ArrayList<double[][]>();
+	ArrayList<double[][]> allGammaMatrix= new ArrayList<double[][]>();
 	boolean vonFileeinlesen=false;
 	public Distanzmatrix(int numberstädte, boolean filelesen){
 		if(filelesen==false) {	
@@ -37,7 +40,7 @@ public class Distanzmatrix {
 		
 	}
 	
-	public static All_Cities getAllCities() {
+	public All_Cities getAllCities() {
 		return liste;
 	}
 	
@@ -68,7 +71,7 @@ public class Distanzmatrix {
 	}
 																				//Methode erzeugt Send_Request Object mit erg[][]als Distanzmatrix im zweidim. array
 	public void erzeugeDistanzmatrix() {
-		Send_Request anfrage= new Send_Request(liste);
+		
 		if (vonFileeinlesen==true) {	
 			matrix= new double[anzstädte+1][anzstädte+1]; 						// +1 erzeugt Zeile und SPalte für zwischensteps
 			for(int i=0;i<anzstädte;i++) {		
@@ -78,7 +81,9 @@ public class Distanzmatrix {
 					double long2=liste.getCity(j).getLongitude();
 					double lat2=liste.getCity(j).getLatitude();
 					double distance=distanceInKm(long1,lat1,long2,lat2);
+				
 					matrix[i][j]=distance;
+					
 					//System.out.print(matrix[i][j]+" ");
 				}
 				//System.out.println();
@@ -96,13 +101,13 @@ public class Distanzmatrix {
 	}
 
 	public void erzeugeAlleDistanzmatrizen(){
-		Geschwindigkeitsfaktoren f = new Geschwindigkeitsfaktoren();
+		Zeitfaktoren f = new Zeitfaktoren();
 		for(int i=0; i<24;i++) {
 			double faktor= f.getFaktor(i);
-			double newMatrix[][] = matrix;
+			double newMatrix[][] = new double[matrix.length][matrix.length];
 			for(int j=0;j<matrix.length-1;j++) {				//Matrix wird mit +1 Stellen extra erzeugt für Zwischenwerte
 				for(int k=0; k<matrix.length-1;k++) {
-					newMatrix[j][k]=newMatrix[j][k]*faktor;
+					newMatrix[j][k]=matrix[j][k]*faktor;
 				}
 			}
 			allMatrix.add(newMatrix);
@@ -110,12 +115,31 @@ public class Distanzmatrix {
 		allMatrix.add(matrix);
 	}
 	
-	public double [][] getDistanzmatrix(int uhrzeit){
+	public void allGammaMatrix(double k, double theta, double shiftDistance) {
+		for(int i=0;i<24;i++) {
+			double newGammaMatrix[][]= new double[matrix.length][matrix.length];
+			for(int j=0;j<matrix.length-1;j++) {
+				for(int l=0;l<matrix.length-1;l++) {
+				
+					newGammaMatrix[j][l]=gamma.goGamma(allMatrix.get(i)[j][l], k, theta, shiftDistance);
+				}
+			}
+			allGammaMatrix.add(newGammaMatrix);
+		}
+	}
+	public double [][] getGammaMatrixatTime(int uhrzeit){
+		return allGammaMatrix.get(uhrzeit);
+	}
+	public double [][] getDistanzmatrixatTime(int uhrzeit){
 		return allMatrix.get(uhrzeit);
 	}
 	
-	
-	
+	public double [][] getDistanzmatrix(){
+		return matrix;
+	}
+	public ArrayList<double [][]> getAllMatrix(){
+		return allMatrix;
+	}
 	public static double distanceInKm( double lon1, double lat1, double lon2, double lat2) {   //Haversine-Formel
 	    int radius = 6371;
 	    double lat = Math.toRadians(lat2 - lat1);
@@ -134,5 +158,9 @@ public class Distanzmatrix {
 			}
 			System.out.println("");
 		}
+	}
+	
+	public void asymMatrix() {
+		
 	}
 }

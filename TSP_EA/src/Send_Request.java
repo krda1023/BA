@@ -20,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.json.JSONArray;
@@ -27,25 +28,26 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Send_Request {
-	All_Cities staedteliste = new All_Cities();
-	double[][] erg;
-	JSONObject Way;
-	static int anfragencounter=0;
+	All_Cities staedteliste;
+	double[][] erg;																				//2-dim. array for saving table service response
+	JSONObject Way;																				//JSON Object for saving routing service response
+	static int anfragencounter=0;																// request counter
 
 	public Send_Request(All_Cities liste ) {
-			 this.staedteliste=liste;
+			 this.staedteliste=new All_Cities();
 			 this.erg= new double[All_Cities.numberOfCities()+1][All_Cities.numberOfCities()+1];
 	}
-	
+
+
 	public static int getAnfragencounter(){		
 		return anfragencounter;
 	}
 	
-	public double[][] getergebnis(){
+	public double[][] getergebnis(){															//Gets 2 dim array	
 		return erg;
 	}
 	
-	public JSONObject getDirection(){
+	public JSONObject getDirection(){															//Gets JSONObject
 		return Way;
 	}
 	
@@ -53,47 +55,45 @@ public class Send_Request {
 		staedteliste=new All_Cities();
 	}
 	
-	public StringBuffer gogo(String gesamt) throws Exception{
-		URL obj = new URL(gesamt);
-	     HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-	     con.setRequestMethod("GET");
-	     con.setRequestProperty("User-Agent", "Mozilla/5.0");
+	public StringBuffer gogo(String gesamt) throws Exception{									//sends URL and gets response in Stringbuffer
+		URL obj = new URL(gesamt);																//create new URL Object
+	    HttpURLConnection con = (HttpURLConnection) obj.openConnection();						//open a http connection
+	    con.setRequestMethod("GET");															
+	    con.setRequestProperty("User-Agent", "Mozilla/5.0");
 	    // int responseCode = con.getResponseCode();
-	     BufferedReader in = new BufferedReader(
-	     new InputStreamReader(con.getInputStream()));
-	     String inputLine;
-	     StringBuffer response = new StringBuffer();
-	     while ((inputLine = in.readLine()) != null) {
+	    BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));	//Create BufferedReader with an InputstreamReader to read InputStream of URL Connection
+	    String inputLine;
+	    StringBuffer response = new StringBuffer();
+	    while ((inputLine = in.readLine()) != null) {											//while BufferedReader still has a line to read, append line to StringBuffer
 	     	response.append(inputLine);
-	     }
-	     in.close();
-	     anfragencounter++;
-	     return response;
+	    }
+	    in.close();																				//Close BufferedReader
+	    anfragencounter++;																		//Increase request counter
+	    return response;
 	}
 	
-	public void createDirectionRequest(Tour fittest) throws Exception{
-		String gesamt= "http://router.project-osrm.org/route/v1/driving/";
-		String zwischenerg="";
-		City From=fittest.getCity(1);
-		City To=fittest.getCity(2);
-		double x1=From.getLongitude();
-		double y1=From.getLatitude();
-		double x2=To.getLongitude();
-		double y2= To.getLatitude();
-		 gesamt+=Double.toString(x1)+","+Double.toString(y1)+";"+Double.toString(x2)+","+Double.toString(y2)+"?steps=true&annotations=true";
-		 System.out.println(gesamt);
-		 StringBuffer response = gogo(gesamt);
-		 Way= new JSONObject(response.toString());
+	public void createRouteRequest(Tour fittest) throws Exception{							//Creates String with URL, applies gogo and saves response in an JSONObejct
+		String gesamt= "http://router.project-osrm.org/route/v1/driving/";						//Fixed URL Start
+		City From=fittest.getCity(0);	//??? Korrekt???
+		City To=fittest.getCity(1);		//???Korrekt???
+		double x1=From.getLongitude();															//Longitude of departing city
+		double y1=From.getLatitude();															//Latitude of departing city
+		double x2=To.getLongitude();															//Longitude of destination city
+		double y2= To.getLatitude();															//Latitude of destination city
+		gesamt+=Double.toString(x1)+","+Double.toString(y1)+";"+Double.toString(x2)+","+Double.toString(y2)+"?steps=true&annotations=true"; //Add coordinates to url string
+		//System.out.println(gesamt);
+		StringBuffer response = gogo(gesamt);													//Open HTTP Connection and send URL
+		Way= new JSONObject(response.toString());												//Save response in JSONObject
 		
 	}
-	
-	public All_WP getWP(double[]nodes) throws Exception{
-		All_WP WP= new All_WP();
-		for(int i=0;i<nodes.length;i++){
-			String url="http://www.openstreetmap.org/api/0.6/id/";
-			url+=nodes[i];
-			StringBuffer response = gogo(url); 
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	//MUSS NOCH GETESTET WERDEN!!!
+	public ArrayList<City> getNodes(double[]nodes) throws Exception{		//Muss wahrscheinlich String übergeben werden da Zahl zu groß								//Gets geo-coordinates for all received OSM nodes
+		ArrayList<City> Nodes= new ArrayList<City>();																//Contains all nodes that has to be converted
+		for(int i=0;i<nodes.length;i++){												
+			String url="http://www.openstreetmap.org/api/0.6/node/";								//Fixed URL start
+			url+=nodes[i];																		//add node id
+			StringBuffer response = gogo(url); 													//Open HTTP Connection and send URL
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();				
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document document = builder.parse(response.toString());
 			document.getDocumentElement().normalize();
@@ -108,13 +108,13 @@ public class Send_Request {
 			pos[0]=Double.parseDouble(LONG);
 			pos[1]=Double.parseDouble(LAT);
 			City newWP= new City(id,pos);
-			WP.addCity(newWP);
+			Nodes.add(newWP);
 		}
-		return WP;
+		return Nodes;
 	}
 	
-	public void createAsymMatrix(City stepCity) throws Exception{
-		int anzahlstädte=All_Cities.numberOfCities();
+	public void createAsymMatrix(City stepCity) throws Exception{								//Gets all distances from upcoming WP Node to all cities
+		int anzahlstädte=GA.getanzahlstaedte();
 		int numberOfCases;
 		if(anzahlstädte%99==0){
 		 numberOfCases= anzahlstädte/99;	
@@ -128,22 +128,22 @@ public class Send_Request {
 				String zwischenerg="";
 				double x = stepCity.getLongitude();
 			 	double y = stepCity.getLatitude();
-				 zwischenerg += Double.toString(x);
-				 zwischenerg+=",";
-				 zwischenerg+=Double.toString(y);
-				 zwischenerg+=";";
+			 	zwischenerg += Double.toString(x);
+				zwischenerg+=",";
+				zwischenerg+=Double.toString(y);
+				zwischenerg+=";";
 				for(int position=((asym-1)*99);position<anzahlstädte;position++){
 					City intermediate = All_Cities.getCity(position);
 				 	double x1 = intermediate.getLongitude();
 				 	double y1=intermediate.getLatitude();
-					 zwischenerg += Double.toString(x1);
-					 zwischenerg+=",";
-					 zwischenerg+=Double.toString(y1);
-					 if(position==(anzahlstädte-1))    //-1
-					 {}
-					 else{
-					 zwischenerg+=";";
-					 }
+					zwischenerg += Double.toString(x1);
+					zwischenerg+=",";
+					zwischenerg+=Double.toString(y1);
+					if(position==(anzahlstädte-1))    //-1
+					{}
+					else{
+					zwischenerg+=";";
+					}
 				}
 				 String gesamt=urlAnfang+zwischenerg+"?sources=0";
 				// System.out.println(gesamt);

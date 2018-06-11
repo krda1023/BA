@@ -1,29 +1,26 @@
 public class Population {
 
-    // Holds population of tours
-    Tour[] tours;
+    
+    Tour[] tours;														// Holds population of tours
     static Distanzmatrix dismat;
 
     // Construct a population
-    public Population(int populationSize, boolean initialise) {
+    public Population(int populationSize, boolean initialise) {			//Constructor of population
     	{
         tours = new Tour[populationSize];
-        this.dismat=Run.getFirstMatrix();
-    	}
-        
-        // If we need to initialise a population of tours do so
-        if (initialise) {
-            // Loop and create individuals
-            for (int i = 0; i < populationSize(); i++) {
+        this.dismat=GA.getMatrixObject();
+    	}            
+        if (initialise) {												// If we need to initialise a population of tours do so     
+            for (int i = 0; i < populationSize(); i++) {				  // Loop and create individuals
                 Tour newTour = new Tour();
                 newTour.generateIndividual();
-                saveTour(i, newTour);
+                saveTour(i, newTour);									// save individual
             }
         }
     }
     
-    // Saves a tour
-    public void saveTour(int index, Tour tour) {
+    
+    public void saveTour(int index, Tour tour) {						// Saves a tour
         tours[index] = tour; 
     }
     
@@ -34,18 +31,14 @@ public class Population {
     	return dismat;
     } */
     
-    // Gets a tour from population
-    public Tour getTour(int index) {
+    
+    public Tour getTour(int index) {									// Gets a tour from population
         return tours[index];
     }
-
     
-    
-    // Gets the best tour in the population
-    public Tour getFittest() {
+    public Tour getFittest() {											// Gets the best tour in the population
         Tour fittest = tours[0];
-        // Loop through individuals to find fittest
-        for (int i = 1; i < populationSize(); i++) {
+        for (int i = 1; i < populationSize(); i++) {					// Loop through individuals to find fittest
             if (fittest.getFitness() <= getTour(i).getFitness()) {
                 fittest = getTour(i);
             }
@@ -53,11 +46,11 @@ public class Population {
         return fittest;
     }
 
-    // Gets population size
-    public int populationSize() {
+
+    public int populationSize() {									   // Gets population size
     	return tours.length;
     }
-    static double round(double wert)
+    static double round(double wert)									//General method to round values
 	{
 		double erg=Math.round(wert*Math.pow(10,5))/Math.pow(10, 5);;
 		return erg;

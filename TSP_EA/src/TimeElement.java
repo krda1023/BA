@@ -21,7 +21,14 @@ public class TimeElement{
 	public long gibMillis(){
 		return startInMilli;
 	}
-	
+	public void setTimeInMillis(long newtime) {
+		start.setTimeInMillis(newtime);
+	}
+	public void addTimeInMillis(long addtime) {
+		
+		start.setTimeInMillis(startInMilli+addtime);
+		startInMilli=start.getTimeInMillis();
+	}
 	public long getExistTime(){
 		long erg= System.currentTimeMillis()-startInMilli;
 		return erg;
@@ -31,16 +38,24 @@ public class TimeElement{
 	public int getHour(){
 		return start.getTime().getHours();
 	}
-	public double getTimeToNextHour() {
-		int year=start.getTime().getYear();
+	
+	public double getSeconds() {
+		return start.getTimeInMillis()/1000;
+	}
+	public double getTimeToNextHour() { 	
+		int year=start.getTime().getYear()+1900;
 		int month=start.getTime().getMonth();
 		int day= start.getTime().getDate();
 		int hour=start.getTime().getHours()+1;
 		int minute=0;
 		int second=0;
-		Calendar nextHour= Calendar.getInstance();
+		Calendar nextHour= start;
 		nextHour.set(year,month,day,hour,minute,second);
-		double timeToNextHour= nextHour.getTimeInMillis()-startInMilli;
+		System.out.println(nextHour.getTime());//??????
+		System.out.println(nextHour.getTimeInMillis());
+		System.out.println(startInMilli);
+								//??????????????????????????????
+		double timeToNextHour= (nextHour.getTimeInMillis()-startInMilli)/1000;   //In Seconds
 		return timeToNextHour;						
 	}
 	

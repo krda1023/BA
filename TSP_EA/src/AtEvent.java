@@ -5,14 +5,18 @@ import java.util.EventObject;
 
 public class AtEvent extends EventObject {
 	String EventType;
-	int EventID;
-	long EventTime;
 	
-	public AtEvent(Salesman salesman, String type, int ID, long Time) {
+	long EventTime;
+	double longitude;
+	double latitude;
+	
+	public AtEvent(Salesman salesman, String type, long Time, double lon, double lat) {
 		super(salesman);
 		this.EventType=type;
-		this.EventID=ID;
-		this.EventTime=salesman.getStartzeit()+salesman.getFahrtzeit()+Time;
+		this.EventTime=Time;
+		this.longitude=lon;
+		this.latitude=lat;
+		//this.EventTime=salesman.getStartzeit()+salesman.getFahrtzeit()+Time;
 	}
 	
 	public long getEventTime(){

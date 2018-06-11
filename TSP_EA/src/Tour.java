@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 
 public class Tour{
@@ -11,7 +12,7 @@ public class Tour{
     
     // Constructs a blank tour
     public Tour(){
-        for (int i = 0; i < Run.getNumberofCities(); i++) {
+        for (int i = 0; i < GA.getanzahlstaedte(); i++) {
             tour.add(null);
         }
     }
@@ -49,17 +50,39 @@ public class Tour{
     // Gets the tours fitness
     public double getFitness() {
         if (fitness == 0) {
-            fitness = 1/(double)getDistance();
+        //    fitness = 1/(double)getDistance();
+        	fitness = 1/(double)getDistance();
         }
         return fitness;
     }
+    
+  /*  public double getDuration() {
+    	long duration=0;
+    	
+    	for(int i=1; i<tour.size();i++) {
+    		City destinationcity;
+    		if(i+1<tour.size()) {
+    			destinationcity=tour.get(i+1);
+    		}
+    		else {
+    			destinationcity=tour.get(0);					//Nur wenn erste Stadt auch noch an erster Stelle steht, sprich anfang der reise, oder Serste stadt für immer an erster stelle lasssen und abfragen umdesignen
+    		}
+	    		TimeElement traveltime=Salesman.getTimeE();		
+	    		traveltime.addTimeInMillis(Salesman.getTimeE().getExistTime()+duration);
+	    		duration+=(long)1000*tour.get(i).expectedTravTime(destinationcity, traveltime);
+    		
+    	}
+    	double durationInSec= (double)(duration/1000);
+    	return durationInSec;
+    }*/
+    
     
     // Gets the total distance of the tour
     public double getDistance(){
         
     	if (distance ==0) {
     		double tourdistance =0;
-    		double[][] matrix = Run.getArrayMatrix();				//Distanzmatrix aus DIstanzmatrixKlasse holen
+    		double[][] matrix =GA.getMatrixObject().getDistanzmatrix();				//Distanzmatrix aus DIstanzmatrixKlasse holen
     		 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) { 		
     			 City fromCity = getCity(cityIndex);
     			 City destinationCity;	  							// Check we're not on our tour's last city, if we are set our 

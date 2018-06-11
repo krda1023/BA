@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -5,24 +7,27 @@ import org.json.JSONObject;
 public class Route {
 	All_Cities liste;
 	double[]Nodes;
-	All_WP WP;
+	ArrayList<City> Allnodes;
 	double[]Duration;
 	double[]Distance;
+	ArrayList<City> intersections;
+	ArrayList<double[]> allDurations =new ArrayList<double[]>();
 	Send_Request anfrage;
-	Tour fittest;
+	
+	GammaVerteilung gamma= new GammaVerteilung();
 	JSONObject Way;
 	
 	public Route()
 	{
 		this.liste=new All_Cities();
 		this.anfrage=new Send_Request(liste);
-		this.fittest=Run.getPop().getFittest();
+		
 	}
 	
-	public void WayFromTo() throws Exception 
+	public void WayFromTo(Tour best) throws Exception 
 	{
 		try {
-		anfrage.createDirectionRequest(fittest);
+		anfrage.createRouteRequest(best);
 		Way=anfrage.getDirection();
 		}
 		catch(Exception e)
@@ -32,10 +37,27 @@ public class Route {
 		JSONObject routes = Way.getJSONObject("routes");
 		JSONObject legs= routes.getJSONObject("legs");
 		JSONObject annotations= legs.getJSONObject("annotation");
-		JSONObject metadata=annotations.getJSONObject("metadata");
-		JSONArray nodes=metadata.getJSONArray("nodes");
-		JSONArray duration=metadata.getJSONArray("duration");
-		JSONArray distance=metadata.getJSONArray("distance");
+		JSONArray nodes=annotations.getJSONArray("nodes");
+		JSONArray duration=annotations.getJSONArray("duration");
+		JSONArray distance=annotations.getJSONArray("distance");
+		JSONArray steps= legs.getJSONArray("steps");
+		
+		int id=0; //????
+		for( int step=0;step<steps.length();step++) {
+			JSONObject stepObject= steps.getJSONObject(step);
+			JSONArray intersects= stepObject.getJSONArray("intersection");
+			for(int inter=0; inter<intersects.length();inter++) {
+				JSONArray location = intersects.getJSONObject(inter).getJSONArray("location");
+				double [] position= new double[2];
+				position[0]=location.getDouble(0);
+				position[1]=location.getDouble(1);
+				City newCity= new City(id,position);
+				intersections.add(newCity);  //.....nochmal überdneken, nodeabgleich erforderlich
+				id++;
+				
+			}
+			
+		}
 		
 		for(int a=0;a<nodes.length();a++)
 		{
@@ -50,13 +72,15 @@ public class Route {
 			Distance[a]=distance.getDouble(a);
 			}
 		}
-		WP=anfrage.getWP(Nodes);
-		for(int s=0;s<WP.numberOfCities();s++)
+		Allnodes=anfrage.getNodes(Nodes);
+		for(int s=0;s<Allnodes.size();s++)
 		{
-			System.out.println(WP.getCity(0));
+			System.out.println(Allnodes.get(s));
 		}
 		
 	}
+	
+
 	
 	public double[] PositionBetweenNodes(City from, City to, double wert) //Wert zwischen 0-1
 	{
@@ -68,10 +92,10 @@ public class Route {
 		return position;
 	}
 	
-	public All_WP getWP()
+	public ArrayList<City> getallNodes()
 	{
 		//zieh aus JSOn object nodes wenn nodes =null
-		return WP;
+		return Allnodes;
 	}
 	public double[]getDuration()
 	{

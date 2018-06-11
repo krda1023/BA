@@ -1,50 +1,63 @@
 import java.util.ArrayList;
 
 public class City {
-	private final double[] position;
-	private final int id;
+private final double[] position;																	//aray with longiude[0] and latitude[1]
+	private int id;				//String für Node ID?															//City's ID
+	TimeElement departureTime;
 	
-	    
-	    // Constructs a city
-	public City(int id, double... position) {
+	public City(int id, double... position) {														// Constructs a city
 		super();
 		this.id = id;
 		this.position = position;
 	}
-		//Get Position array
-	public double[] getPosition() {
+	public void setID(int i) {
+		id=i;
+	}
+	
+	public void setDepTime() {
+		departureTime=new TimeElement();
+	}
+	
+	public double[] getPosition() {																	//Get Position array
 		return position;}
 	    
-	    // Gets city's x coordinate
-	 public double getLongitude(){
+	  
+	 public double getLongitude(){																	 // Gets city's longitude coordinate
 	        return position[0];
 	    }
 	    
-	    // Gets city's y coordinate
-	 public double getLatitude(){
+	   
+	 public double getLatitude(){																	 // Gets city's latitude coordinate
 	        return position[1];
 	    }
-	 //Gets city's id
-	 public int getId() {
+	
+	 public int getId() {																			 //Gets city's id
 			return id;
 		}
-	 public double expectedTravTime(City to,TimeElement startTime,ArrayList<double[][]> Matrix) {
+	 public double expectedTravTime(City to,TimeElement startTime) {								//Calculates the expcted travel time from one city to another, regarding daytime and velocity factor
 		 double expTime=0;
-		 int hour= startTime.getHour();
-		 double restTimeOfIntervall=startTime.getTimeToNextHour()/(60*60*1000);			// In Stunden
-		 return expTime;
+		 int hour= startTime.getHour();																// hour as int of point of time of city we're travelling from
+		 double restTimeOfIntervall=startTime.getTimeToNextHour()/1000;					 			// unit: seconds   
+		 if(Distanzmatrix.allMatrix.get(hour)[to.getId()][id]<=restTimeOfIntervall) {
+			 expTime=Distanzmatrix.allMatrix.get(hour)[to.getId()][id];
+		 }
+		 else {
+			 double restOf2Intervall=Distanzmatrix.allMatrix.get(hour+1)[to.getId()][id]*(1-(restTimeOfIntervall/Distanzmatrix.allMatrix.get(hour)[to.getId()][id]));
+			 expTime+=restTimeOfIntervall+restOf2Intervall;		 		 
+		 }
+		 return expTime; 
 	 }
-	    // Gets the distance to given city
-	 public double distanceTo(City city){
+	    
+	 public double distanceTo(City city){															// Gets the distance to given city
 	        double xDistance = Math.abs(getLongitude() - city.getLongitude());
 	        double yDistance = Math.abs(getLatitude() - city.getLatitude());
-	        double distance = Math.sqrt( (xDistance*xDistance) + (yDistance*yDistance) );
+	        double distance = Math.sqrt( (xDistance*xDistance) + (yDistance*yDistance) );			//Formular:
 	        
 	        return distance;
 	    } 
 	    
 	    @Override
-	 public String toString(){
+	 public String toString(){																		//Print longitude and latitude
 	        return getLongitude()+", "+getLatitude();
 	    }
 }

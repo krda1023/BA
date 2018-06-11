@@ -1,6 +1,7 @@
 
 public interface myListener {
 
-		public void arrivedAtCity(AtEvent e);
-		public void arrivedAtWP(AtEvent e);
-		}
+		public void atCity(AtEvent e) throws Exception;
+		public void atIntersection(AtEvent e);
+		public void GPS_Signal(AtEvent e) ;
+}
