@@ -5,9 +5,9 @@ import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JRadioButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JButton;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -19,13 +19,13 @@ import javax.swing.event.ChangeListener;
 public class GA implements myListener {
 
     /* GA parameters - Which operators are selected*/
-    private static final double mutationRate = 0.2;   //Mutationrate for Multiple Exchange Mutation
-    private static final int tournamentSize = 2;	//Tournament size for Tournament Selection
-    static Distanzmatrix dis;
-    GUI_Start form;
-	static int anzahlstaedte=50;
-	static int popSize=50;
-	static int iterationen=100;
+    private static double mutationRate = 0.2;   //Mutationrate for Multiple Exchange Mutation
+    private static int tournamentSize = 2;	//Tournament size for Tournament Selection
+    static Distanzmatrix dis;			//Finale Distanzmatrix 
+   
+    static int numOfCities=50;   //FINAL
+	static int popSize=50;			//FINAL
+	static int iterationen=100;		//FINAL
 	static boolean ox2C=false;
 	static boolean ordC=true;
 	static boolean pmxC=false;
@@ -36,21 +36,27 @@ public class GA implements myListener {
 	static boolean excM=false;
 	static boolean mexM=false;
 	static boolean elitism=false;
-	static boolean  fileLesen=true;
+	static boolean  fileLesen=false;
+	static double c=1;
+	static double theta=1;
+	static double shiftDistance=0;
+	
+	GUI_Start form;
+	
 	Tour best;
 	Population pop;
 	Population currrentPop;
-	Zeitfaktoren faktoren= new Zeitfaktoren();
+	
 	ArrayList<City> Nodes;
 	ArrayList<City> Intersections;
 	double[] durations;
 	double toDrivetoIntersection;
 	private ArrayList<RouteServiceListener> listenerList= new ArrayList<RouteServiceListener>();
 	
-	int h=1;
-	int i=2;
-	int j=2;
-	int k=1;
+	int h;
+	int i;
+	int j;
+	int k;
 	All_Cities allCities;   	//ALL_CITIES welches das aktuelle sein soll --- Hier einfügen und Streichen
    
 	public void gui_start() {
@@ -80,23 +86,23 @@ public class GA implements myListener {
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
-		JButton Jox2C;
-		JButton JordC;
-		JButton JcycC;
-		JButton JpmxC;
-		JButton JinsM;
-		JButton JinvM;
-		JButton JdisM;
-		JButton JexcM;
-		JButton JmexM;
+		JRadioButton Jox2C;
+		JRadioButton JordC;
+		JRadioButton JcycC;
+		JRadioButton JpmxC;
+		JRadioButton JinsM;
+		JRadioButton JinvM;
+		JRadioButton JdisM;
+		JRadioButton JexcM;
+		JRadioButton JmexM;
 		JButton close;
 		JSlider city;
 		JSlider iteration;
 		JSlider population;
-		JButton FileJa;
-		JButton FileNo;
-		JButton EliJa;
-		JButton EliNo;
+		JRadioButton FileJa;
+		JRadioButton FileNo;
+		JRadioButton EliJa;
+		JRadioButton EliNo;
 		JLabel CrossText;
 		JLabel MutText;
 		JLabel vonFileText;
@@ -112,7 +118,7 @@ public class GA implements myListener {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				anzahlstaedte=city.getValue();
+				numOfCities=city.getValue();
 				
 				
 			}
@@ -177,6 +183,7 @@ public class GA implements myListener {
 				}
 				if(e.getSource()==JexcM) {
 					j=4;
+					System.out.println("EXCHA");
 				}
 				if(e.getSource()==JmexM) {
 					j=5;
@@ -191,7 +198,6 @@ public class GA implements myListener {
 			public void actionPerformed(ActionEvent e) {
 				if(e.getSource()==Jox2C) {
 					i=1;
-					System.out.print("Fick mich Displacement");
 				}
 				if(e.getSource()==JordC) {
 					i=2;
@@ -213,15 +219,16 @@ public class GA implements myListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(e.getSource()==FileNo) {
-					h=1;
-					city.setEnabled(false);
+					h=2;
+					city.setEnabled(true);
+					System.out.println("nolesen");
 					
 					
 					
 				}
 				if(e.getSource()==FileJa) {
-					h=2;
-					city.setEnabled(true);
+					h=1;
+					city.setEnabled(false);
 				}
 				
 			}
@@ -237,68 +244,70 @@ public class GA implements myListener {
 			setVisible(true);
 			CrossText= new JLabel("Bitte wählen Sie den Crossover-Operator");
 			CrossText.setBounds(0,0, 500, 20);
-			Jox2C= new JButton("Ox2 Crossover");
+			Jox2C= new JRadioButton("Ox2 Crossover");
 			Jox2C.setBounds(0,20,200,50);
 			Jox2C.setBackground(Color.lightGray);
 			Jox2C.addActionListener(new CroListener());
-			JordC= new JButton("Order Crossover");
+			JordC= new JRadioButton("Order Crossover");
 			JordC.addActionListener(new CroListener());
 			JordC.setBounds(250,20,200,50);
+			JordC.setSelected(true);
 			JordC.setBackground(Color.lightGray);
 			
-			JcycC= new JButton("Cycle Crossover");
+			JcycC= new JRadioButton("Cycle Crossover");
 			JcycC.addActionListener(new CroListener());
 			JcycC.setBounds(500,20,200,50);
 			JcycC.setBackground(Color.lightGray);
 
-			JpmxC= new JButton("PMX Crossover");
+			JpmxC= new JRadioButton("PMX Crossover");
 			JpmxC.addActionListener(new CroListener());
 			JpmxC.setBounds(750,20,200,50);
 			JpmxC.setBackground(Color.lightGray);
 			MutText= new JLabel("Bitte wählen sie den Mutations-Operator");
 			MutText.setBounds(0,90,500,20);
-			JinsM= new JButton("Insertion Mutation");
+			JinsM= new JRadioButton("Insertion Mutation");
 			JinsM.addActionListener(new MutListener());
 			JinsM.setBackground(Color.lightGray);
 			JinsM.setBounds(0,110,200,50);
-			
-			JinvM= new JButton("Inversion Mutation");
+			JinsM.setSelected(true);
+			JinvM= new JRadioButton("Inversion Mutation");
 			JinvM.addActionListener(new MutListener());
 			JinvM.setBackground(Color.lightGray);
 			JinvM.setBounds(200,110,200,50);
 
-			JdisM= new JButton("Displacement Mutation");
+			JdisM= new JRadioButton("Displacement Mutation");
 			JdisM.addActionListener(new MutListener());
 			JdisM.setBackground(Color.lightGray);
 			JdisM.setBounds(400,110,200,50);
 
-			JexcM= new JButton("Exchange Mutation");
+			JexcM= new JRadioButton("Exchange Mutation");
 			JexcM.addActionListener(new MutListener());
 			JexcM.setBackground(Color.lightGray);
 			JexcM.setBounds(600,110,200,50);
 
-			JmexM= new JButton("Mult. Exchange Mutation");
+			JmexM= new JRadioButton("Mult. Exchange Mutation");
 			JmexM.addActionListener(new MutListener());
 			JmexM.setBackground(Color.lightGray);
 			JmexM.setBounds(800,110,200,50);
 			ElitismText= new JLabel("Soll Elitism aktiviert werden?");
 			ElitismText.setBounds(0,170,500,20);
-			EliJa= new JButton("Ja");
+			EliJa= new JRadioButton("Ja");
 			EliJa.setBackground(Color.lightGray);
 			EliJa.setBounds(0, 190, 200,50);
 			EliJa.setSelected(true);
 			EliJa.addActionListener(new eliListener());
-			EliNo= new JButton("Nein");
+			EliNo= new JRadioButton("Nein");
 			EliNo.setBackground(Color.lightGray);
 			EliNo.setBounds(200, 180, 200, 50);
 			EliNo.addActionListener(new eliListener());
 			vonFileText= new JLabel("Soll von einer TSP-File eingelesen werden?");
 			vonFileText.setBounds(0,240,500,20);
-			FileJa= new JButton("Ja");
+			FileJa= new JRadioButton("Ja");
 			FileJa.setBackground(Color.lightGray);
 			FileJa.setBounds(0, 260, 200,50);
+			FileJa.setSelected(true);
 			FileJa.addActionListener(new FileListener());
-			FileNo= new JButton("Nein");
+			FileNo= new JRadioButton("Nein");
 			FileNo.setBackground(Color.lightGray);
 			FileNo.setBounds(200, 260, 200, 50);
 			FileNo.addActionListener(new FileListener());
@@ -316,6 +325,7 @@ public class GA implements myListener {
 			 city.setMajorTickSpacing(cityMayor);
 			 city.setMinorTickSpacing(cityMinor);
 			 city.addChangeListener(new cityListener());
+			 city.setEnabled(false);
 			 iterText= new JLabel("Wieviel Iterationen sollen durchgeführt werden?");
 			 iterText.setBounds(0, 410, 1000, 20);
 			 int iterMayor=1000;
@@ -458,15 +468,10 @@ public class GA implements myListener {
 		if(h==1){
 			fileLesen=true;
 		}
-		System.out.println(anzahlstaedte);
-		System.out.println(fileLesen);
-		System.out.println(popSize);
-		System.out.println(iterationen);
-		System.out.println(elitism);
-		System.out.println(insM);
-		dis= new Distanzmatrix(anzahlstaedte,fileLesen);
+		System.out.println("H:  "+h);
+		dis= new Distanzmatrix(numOfCities,fileLesen);
 		dis.erzeugeStaedteliste();
-		anzahlstaedte=dis.getAnzahlstädte();
+		numOfCities=Distanzmatrix.getAnzahlstädte();
 		
 		dis.erzeugeDistanzmatrix();
 		dis.erzeugeAlleDistanzmatrizen();
@@ -477,9 +482,9 @@ public class GA implements myListener {
 	{
 		return fileLesen;
 	}
-	public static  int getanzahlstaedte()
+	public static  int getnumOfCities()
 	{
-		return anzahlstaedte;
+		return numOfCities;
 	}
 	
 	public void addRouteServiceListener(RouteServiceListener toAdd) {
@@ -497,7 +502,7 @@ public class GA implements myListener {
 	
     public void evolvePopulation(boolean initilize) {						// Evolves Population( Usage of all selected operators)
     	if(initilize) {
-    		pop = new Population(anzahlstaedte, true);
+    		pop = new Population(numOfCities, true);
     	}
         Population newPopulation = new Population(pop.populationSize(), false);     //Create new population, no initialisation      
         int elitismOffset = 0;
@@ -1043,13 +1048,13 @@ public class GA implements myListener {
 
 	@Override
 	public void atIntersection(AtEvent e) {
-		// TODO Auto-generated method stub
+
 		
 	}
 
 	@Override
 	public void GPS_Signal(AtEvent e)  {
-		
+		TimeElement now= new TimeElement();
 		for( int i=0; i<Nodes.size()-1;i++) {								//Find nodes I am in between now
 			double maxLat= Math.max(Nodes.get(i).getLatitude(),Nodes.get(i+1).getLatitude());
 			double minLat= Math.min(Nodes.get(i).getLatitude(),Nodes.get(i+1).getLatitude());
@@ -1061,13 +1066,13 @@ public class GA implements myListener {
 				double latratio= (Nodes.get(i+1).getLatitude()-e.getLatitude())/(Nodes.get(i+1).getLatitude()-Nodes.get(i).getLatitude());
 				double lonratio=(Nodes.get(i+1).getLongitude()-e.getLongitude())/(Nodes.get(i+1).getLongitude()-Nodes.get(i).getLongitude());
 				double ratio= (latratio+lonratio)/2;
-				TimeElement now= new TimeElement();
+				
 				int hour= now.getHour();																//current hour
 				double ttnh=now.getTimeToNextHour();
-				if(durations[i]*ratio*faktoren.getFaktor(hour)>ttnh) {							//If the sum of the values + the actual value is bigger than the time to the next hour
-					double tohour=ttnh-durations[i]*ratio*faktoren.getFaktor(hour);		;									//calculate the time from sum to next hour
-					double hourratio= tohour/durations[i]*faktoren.getFaktor(hour)*ratio;				// Calculate ratio of driven way in this section
-					toDrivetoIntersection=hourratio*durations[i]*ratio*faktoren.getFaktor(hour)+(1-hourratio)*durations[i]*ratio*faktoren.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+				if(durations[i]*ratio*Maths.getFaktor(hour)>ttnh) {							//If the sum of the values + the actual value is bigger than the time to the next hour
+					double tohour=ttnh-durations[i]*ratio*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
+					double hourratio= tohour/durations[i]*Maths.getFaktor(hour)*ratio;				// Calculate ratio of driven way in this section
+					toDrivetoIntersection=hourratio*durations[i]*ratio*Maths.getFaktor(hour)+(1-hourratio)*durations[i]*ratio*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
 					ttnh+=3600;																	// add 3600 seconds to timetonexthour
 																								//Update Sum 
 					hour+=1;
@@ -1077,7 +1082,7 @@ public class GA implements myListener {
 				}
 				else
 				{
-					toDrivetoIntersection=durations[i]*ratio*faktoren.getFaktor(hour);
+					toDrivetoIntersection=durations[i]*ratio*Maths.getFaktor(hour);
 				}
 				int nextIntersection=-1;
 				for(int l=0; l<Intersections.size();l++) {
@@ -1096,10 +1101,10 @@ public class GA implements myListener {
 				
 				for(int j=i+1;j<=nextIntersection;j++) { // Nicht bis Node Size, bis nächste Intersection, wie finden?
 					
-					if(toDrivetoIntersection+durations[j]*faktoren.getFaktor(hour)>ttnh) {
-						double tohour=ttnh-durations[j]*faktoren.getFaktor(hour);		;									//calculate the time from sum to next hour
-						double hourratio= tohour/durations[j]*faktoren.getFaktor(hour);									// Calculate ratio of driven way in this section
-						toDrivetoIntersection+=hourratio*durations[j]*faktoren.getFaktor(hour)+(1-hourratio)*durations[i]*faktoren.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+					if(toDrivetoIntersection+durations[j]*Maths.getFaktor(hour)>ttnh) {
+						double tohour=ttnh-durations[j]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
+						double hourratio= tohour/durations[j]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
+						toDrivetoIntersection+=hourratio*durations[j]*Maths.getFaktor(hour)+(1-hourratio)*durations[i]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
 						ttnh+=3600;	
 						hour+=1;
 						if(hour==24) {
@@ -1108,7 +1113,7 @@ public class GA implements myListener {
 					
 					}
 					else {
-						toDrivetoIntersection+=durations[j]*faktoren.getFaktor(hour);
+						toDrivetoIntersection+=durations[j]*Maths.getFaktor(hour);
 					}
 				}
 				break;

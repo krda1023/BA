@@ -1,31 +1,32 @@
-import java.sql.Date;
-import java.sql.Timestamp;
+
 import java.util.ArrayList;
 
 public class Salesman implements RouteServiceListener {
-	private static ArrayList<AtEvent> upcomingEvents = new ArrayList<AtEvent>();
-	private static ArrayList<AtEvent> pastEvents = new ArrayList<AtEvent>();
+	private ArrayList<AtEvent> upcomingEvents = new ArrayList<AtEvent>();
+	private ArrayList<AtEvent> pastEvents = new ArrayList<AtEvent>();
 	ArrayList<City> Nodes;
 	ArrayList<City> Intersection;
 	double[] duration;
 	double[] ZF_GA_duration;
-	GammaVerteilung Gamma = new GammaVerteilung();
 	int GPS_frequency=10;
-	double k=1;
-	double theta=1;
-	double shiftDistance=0;
+	double k;
+	double theta;
+	double shiftDistance;
 	private ArrayList<myListener> listenerList= new ArrayList<myListener>();
-	Zeitfaktoren faktoren= new Zeitfaktoren();
+
 	public void addListener(myListener toAdd) {
 		listenerList.add(toAdd);
 	}
 	
 	
-    static double round(double wert, double stellen){
-		double erg=Math.round(wert*Math.pow(10,stellen))/Math.pow(10, stellen);;
-		return erg;
+
+	public Salesman() {
+		this.k=GA.c;
+		this.theta=GA.theta;
+		this.shiftDistance=GA.shiftDistance;
+		
 	}
-	
+    
 	public void checkForEvents()
 	{	AtEvent currentEvent = null;
 		long jetzt= System.currentTimeMillis();
@@ -90,7 +91,7 @@ public class Salesman implements RouteServiceListener {
 		double[] gammaDuration= new double[duration.length];												//Array for Gamma influenced values
 																	
 		for(int i=0; i<duration.length;i++) {													//Loop through duration values and use gamma function
-			gammaDuration[i]=Gamma.goGamma(duration[i], k, theta, shiftDistance);	
+			gammaDuration[i]=GammaVerteilung.goGamma(duration[i], k, theta, shiftDistance);	
 		}
 		
 		TimeElement now= new TimeElement();
@@ -100,10 +101,10 @@ public class Salesman implements RouteServiceListener {
 		double ttnh=now.getTimeToNextHour();													// Duration to next hour in seconds
 			for(int j=0; j<gammaDuration.length;j++) {											//Loop through Gamma 
 				
-				if(durationSumZFGA+gammaDuration[j]*faktoren.getFaktor(hour)>ttnh) {			//If the sum of the values + the actual value is bigger than the time to the next hour
+				if(durationSumZFGA+gammaDuration[j]*Maths.getFaktor(hour)>ttnh) {			//If the sum of the values + the actual value is bigger than the time to the next hour
 					double tohour=ttnh-durationSumZFGA		;									//calculate the time from sum to next hour
-					double ratio= tohour/gammaDuration[j]*faktoren.getFaktor(hour);				// Calculate ratio of driven way in this section
-					ZF_GA_duration[j]=ratio*gammaDuration[j]*faktoren.getFaktor(hour)+(1-ratio)*gammaDuration[j]*faktoren.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+					double ratio= tohour/gammaDuration[j]*Maths.getFaktor(hour);				// Calculate ratio of driven way in this section
+					ZF_GA_duration[j]=ratio*gammaDuration[j]*Maths.getFaktor(hour)+(1-ratio)*gammaDuration[j]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
 					ttnh+=3600;																	// add 3600 seconds to timetonexthour
 					durationSumZFGA+=ZF_GA_duration[j];											//Update Sum 
 					hour+=1;
@@ -114,7 +115,7 @@ public class Salesman implements RouteServiceListener {
 					
 				}
 				else {																			// If actual step is within the same hour
-					ZF_GA_duration[j]=gammaDuration[j]*faktoren.getFaktor(hour);				//multiply value with time factor
+					ZF_GA_duration[j]=gammaDuration[j]*Maths.getFaktor(hour);				//multiply value with time factor
 					durationSumZFGA+=ZF_GA_duration[j];		
 					System.out.println("Kein WECHSEL"+ ZF_GA_duration[j]);	//Update Sum
 				}

@@ -5,19 +5,19 @@ import java.util.Collections;
 public class Tour{
 
     // Holds our tour of cities
-    private ArrayList<City> tour = new ArrayList<City>();
+    private ArrayList<City> tour= new ArrayList<City>();
     // Cache
     private double fitness = 0;
     private double distance = 0;  //time?
     
     // Constructs a blank tour
     public Tour(){
-        for (int i = 0; i < GA.getanzahlstaedte(); i++) {
+        for (int i = 0; i < GA.numOfCities; i++) {
             tour.add(null);
         }
     }
     
-    public Tour(ArrayList tour){
+    public Tour(ArrayList<City> tour){
         this.tour = tour;
     }
 
@@ -43,10 +43,7 @@ public class Tour{
         fitness = 0;
         distance = 0;
     }
-    public ArrayList<City> getArrayList()
-    {
-    	return tour;
-    }
+
     // Gets the tours fitness
     public double getFitness() {
         if (fitness == 0) {
@@ -104,7 +101,7 @@ public class Tour{
     		 }
     		 distance=tourdistance;	        	 
     	}
-    	distance= round(distance);    //Runden
+    	distance= Maths.round(distance,5);    //Runden
     	return distance;  		
     }
     	
@@ -164,8 +161,5 @@ public class Tour{
         }
         return geneString;
     }
-    static double round(double wert){
-		double erg=Math.round(wert*Math.pow(10,5))/Math.pow(10, 5);;
-		return erg;
-	}
+   
 }

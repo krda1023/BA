@@ -28,14 +28,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Send_Request {
-	All_Cities staedteliste;
+	All_Cities liste = new All_Cities();
 	double[][] erg;																				//2-dim. array for saving table service response
 	JSONObject Way;																				//JSON Object for saving routing service response
 	static int anfragencounter=0;																// request counter
 
 	public Send_Request(All_Cities liste ) {
-			 this.staedteliste=new All_Cities();
-			 this.erg= new double[All_Cities.numberOfCities()+1][All_Cities.numberOfCities()+1];
+			 this.liste=new All_Cities();
+			 this.erg= new double[GA.numOfCities+1][GA.numOfCities+1];
 	}
 
 
@@ -51,9 +51,7 @@ public class Send_Request {
 		return Way;
 	}
 	
-	public void setStaedteliste(){
-		staedteliste=new All_Cities();
-	}
+
 	
 	public StringBuffer gogo(String gesamt) throws Exception{									//sends URL and gets response in Stringbuffer
 		URL obj = new URL(gesamt);																//create new URL Object
@@ -114,16 +112,16 @@ public class Send_Request {
 	}
 	
 	public void createAsymMatrix(City stepCity) throws Exception{								//Gets all distances from upcoming WP Node to all cities
-		int anzahlstädte=GA.getanzahlstaedte();
+		int numOfCities=GA.numOfCities;
 		int numberOfCases;
-		if(anzahlstädte%99==0){
-		 numberOfCases= anzahlstädte/99;	
+		if(numOfCities%99==0){
+		 numberOfCases= numOfCities/99;	
 		}
 		else{
-			numberOfCases=(anzahlstädte/99)+1;
+			numberOfCases=(numOfCities/99)+1;
 		}
 		for(int asym=1;asym<=numberOfCases;asym++){
-			if(anzahlstädte-(asym*99)<0){      //wenn splitted Asymanfrage 
+			if(numOfCities-(asym*99)<0){      //wenn splitted Asymanfrage 
 				String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
 				String zwischenerg="";
 				double x = stepCity.getLongitude();
@@ -132,14 +130,14 @@ public class Send_Request {
 				zwischenerg+=",";
 				zwischenerg+=Double.toString(y);
 				zwischenerg+=";";
-				for(int position=((asym-1)*99);position<anzahlstädte;position++){
+				for(int position=((asym-1)*99);position<numOfCities;position++){
 					City intermediate = All_Cities.getCity(position);
 				 	double x1 = intermediate.getLongitude();
 				 	double y1=intermediate.getLatitude();
 					zwischenerg += Double.toString(x1);
 					zwischenerg+=",";
 					zwischenerg+=Double.toString(y1);
-					if(position==(anzahlstädte-1))    //-1
+					if(position==(numOfCities-1))    //-1
 					{}
 					else{
 					zwischenerg+=";";
@@ -153,7 +151,7 @@ public class Send_Request {
 			     int z=1;
 			     int fromCityID=stepCity.getId();
 			     JSONArray dura_2=dura_1.getJSONArray(0);
-			     for (int positionzeile=((asym-1)*99);positionzeile<anzahlstädte;positionzeile++){
+			     for (int positionzeile=((asym-1)*99);positionzeile<numOfCities;positionzeile++){
 			    	 int toCityID=All_Cities.getCity(positionzeile).getId();				   	   			    	    	
 			    	 erg[fromCityID-1][toCityID-1] = dura_2.getDouble(z);
 			    	 z++;				    	    	
@@ -161,7 +159,7 @@ public class Send_Request {
 			    	z=1;
 			}	
 			
-			if(anzahlstädte-(asym*99)>=0){	//wenn volle 1x99 Anfrage
+			if(numOfCities-(asym*99)>=0){	//wenn volle 1x99 Anfrage
 				String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
 				String zwischenerg="";
 				double x = stepCity.getLongitude();
@@ -204,16 +202,16 @@ public class Send_Request {
 
 	public void createBasicMatrix() throws Exception {
 		// System.out.println("start:"+timestamp1);
-		int anzahlstädte=All_Cities.numberOfCities();
+		int numOfCities=All_Cities.numberOfCities();
 		int numberOfCases;
 		int SplittedtoAdd;
 		int numberSplittedMatrix = 0;
 		int numberSymmMatrix;		
-		if(anzahlstädte%50==0){
-			numberOfCases= anzahlstädte/50;		
+		if(numOfCities%50==0){
+			numberOfCases= numOfCities/50;		
 		}
 		else{
-			numberOfCases=(anzahlstädte/50)+1;
+			numberOfCases=(numOfCities/50)+1;
 		}
 		if(numberOfCases%2==0){
 			SplittedtoAdd=numberOfCases-2;
@@ -238,7 +236,7 @@ public class Send_Request {
 			}
 		}
 		
-		/*System.out.println("Anzahlstädte: "+anzahlstädte);
+		/*System.out.println("numOfCities: "+numOfCities);
 		System.out.println("Anzahl Sym Matrix: "+numberSymmMatrix);
 		System.out.println("Plitt to add: "+SplittedtoAdd);
 		System.out.println("Anzahl Splitt Matrix: "+numberSplittedMatrix);
@@ -247,21 +245,21 @@ public class Send_Request {
 		//Symmetrische Matrizen
 		int IFzähler=0;
 		for(int sym=1;sym<=numberSymmMatrix;sym++){
-			if(anzahlstädte-(sym*100)<0){			 //letzte Symmetrische Matrix <=100
-				if((anzahlstädte-(sym*100))==-99){
-					erg[anzahlstädte-1][anzahlstädte-1]=0;
+			if(numOfCities-(sym*100)<0){			 //letzte Symmetrische Matrix <=100
+				if((numOfCities-(sym*100))==-99){
+					erg[numOfCities-1][numOfCities-1]=0;
 				}
 				else{
 					String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
 					String zwischenerg="";
-					for(int position=((sym-1)*100);position<anzahlstädte;position++){
+					for(int position=((sym-1)*100);position<numOfCities;position++){
 						City intermediate = All_Cities.getCity(position);
 					 	double x = intermediate.getLongitude();
 					 	double y=intermediate.getLatitude();
 						 zwischenerg += Double.toString(x);
 						 zwischenerg+=",";
 						 zwischenerg+=Double.toString(y);
-						 if(position==(anzahlstädte-1))    //-1
+						 if(position==(numOfCities-1))    //-1
 						 {}
 						 else{
 						 zwischenerg+=";";
@@ -274,9 +272,9 @@ public class Send_Request {
 				     JSONArray dura_1 = jobj.getJSONArray("durations");
 				     int z=0;
 				     int s=0;
-				     for (int positionzeile=((sym-1)*100);positionzeile<anzahlstädte;positionzeile++){
+				     for (int positionzeile=((sym-1)*100);positionzeile<numOfCities;positionzeile++){
 				    	 JSONArray dura_2=dura_1.getJSONArray(s);	    	   
-				    	 for (int positionspalte=((sym-1)*100);positionspalte<anzahlstädte;positionspalte++) {
+				    	 for (int positionspalte=((sym-1)*100);positionspalte<numOfCities;positionspalte++) {
 					    	erg[positionzeile][positionspalte] = dura_2.getDouble(z);
 					    	// System.out.print(s+" "+z+"    ");
 				    	    z++;				    	    	
@@ -288,7 +286,7 @@ public class Send_Request {
 			    IFzähler++;
 				}
 			}		
-			if(anzahlstädte-(sym*100)>=0)  { //100x100 volle
+			if(numOfCities-(sym*100)>=0)  { //100x100 volle
 				String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
 				String zwischenerg="";
 				for(int position=(sym-1)*100;position<sym*100;position++){
@@ -330,7 +328,7 @@ public class Send_Request {
 			// Splitted Matrizen
 			
 			if(sym>1){
-				if(anzahlstädte-(sym*100)>=0){
+				if(numOfCities-(sym*100)>=0){
 					for(int zeile=1;zeile<=sym-1;zeile++){ //4 volle 50x50	
 						for(int caseNR=1;caseNR<=4;caseNR++){	
 							switch (caseNR){
@@ -552,7 +550,7 @@ public class Send_Request {
 						}						
 					}
 				}
-				if(anzahlstädte-(sym*100)<0&&anzahlstädte-(sym*100)>=-49) {// 2 volle 50x50 2xsplitted
+				if(numOfCities-(sym*100)<0&&numOfCities-(sym*100)>=-49) {// 2 volle 50x50 2xsplitted
 					for(int zeile=1;zeile<=sym-1;zeile++){ //??? Zeilen gehen 100 schritte
 						for(int caseNR=1;caseNR<=4;caseNR++){
 							switch (caseNR){
@@ -674,14 +672,14 @@ public class Send_Request {
 										zwischenerg+=Double.toString(y);
 										zwischenerg+=";";
 									}
-									for(int b=(sym-1)*100+50;b<anzahlstädte;b++){
+									for(int b=(sym-1)*100+50;b<numOfCities;b++){
 										City intermediate = All_Cities.getCity(b);
 									 	double x = intermediate.getLongitude();
 									 	double y=intermediate.getLatitude();
 										zwischenerg += Double.toString(x);
 										zwischenerg+=",";
 										zwischenerg+=Double.toString(y);
-										if(b==anzahlstädte-1)
+										if(b==numOfCities-1)
 										{}
 										else{
 											zwischenerg+=";";
@@ -697,7 +695,7 @@ public class Send_Request {
 								     int y=50;
 								     for(int c=(zeile-1)*100;c<(zeile-1)*100+50;c++){
 								    	 JSONArray dura_2=dura_1.getJSONArray(t);
-								    	 for(int d=(sym-1)*100+50;d<anzahlstädte;d++){
+								    	 for(int d=(sym-1)*100+50;d<numOfCities;d++){
 								    		 erg[c][d] = dura_2.getDouble(s);								    		 								    	
 									    		s++;
 								    	 }
@@ -705,7 +703,7 @@ public class Send_Request {
 								    	 t++;
 								     }
 								     
-								    for(int e=(sym-1)*100+50;e<anzahlstädte;e++){
+								    for(int e=(sym-1)*100+50;e<numOfCities;e++){
 								    	 JSONArray dura_3=dura_1.getJSONArray(y);
 								    	 for(int f=(zeile-1)*100;f<(zeile-1)*100+50;f++){
 								    	 	erg[e][f] = dura_3.getDouble(x);		
@@ -731,14 +729,14 @@ public class Send_Request {
 										zwischenerg+=Double.toString(y);
 										zwischenerg+=";";
 									}
-									for(int b=(sym-1)*100+50;b<anzahlstädte;b++){
+									for(int b=(sym-1)*100+50;b<numOfCities;b++){
 										City intermediate = All_Cities.getCity(b);
 									 	double x = intermediate.getLongitude();
 									 	double y=intermediate.getLatitude();
 										zwischenerg += Double.toString(x);
 										zwischenerg+=",";
 										zwischenerg+=Double.toString(y);
-										if(b==anzahlstädte-1)
+										if(b==numOfCities-1)
 										{}
 										else{
 											zwischenerg+=";";
@@ -754,7 +752,7 @@ public class Send_Request {
 								     int y=50;
 								     for(int c=(zeile-1)*100+50;c<(zeile-1)*100+100;c++){
 								    	 JSONArray dura_2=dura_1.getJSONArray(t);
-								    	 for(int d=(sym-1)*100+50;d<anzahlstädte;d++){
+								    	 for(int d=(sym-1)*100+50;d<numOfCities;d++){
 								    		 erg[c][d] = dura_2.getDouble(s);								    		 								    	
 									    		s++;
 								    	 }
@@ -762,7 +760,7 @@ public class Send_Request {
 								    	 t++;
 								     }
 								     
-								    for(int e=(sym-1)*100+50;e<anzahlstädte;e++){
+								    for(int e=(sym-1)*100+50;e<numOfCities;e++){
 								    	 JSONArray dura_3=dura_1.getJSONArray(y);
 								    	 for(int f=(zeile-1)*100+50;f<(zeile-1)*100+100;f++){
 								    	 	erg[e][f] = dura_3.getDouble(x);		
@@ -780,7 +778,7 @@ public class Send_Request {
 					}
 				}
 				
-				if(anzahlstädte-(sym*100)<-49){
+				if(numOfCities-(sym*100)<-49){
 					for(int zeile=1;zeile<=sym-1;zeile++){ //??? 2x splitted
 						for(int caseNR=1;caseNR<=2;caseNR++){
 							switch (caseNR){
@@ -796,14 +794,14 @@ public class Send_Request {
 										zwischenerg+=Double.toString(y);
 										zwischenerg+=";";
 									}
-									for(int b=(sym-1)*100;b<anzahlstädte;b++){
+									for(int b=(sym-1)*100;b<numOfCities;b++){
 										City intermediate = All_Cities.getCity(b);
 									 	double x = intermediate.getLongitude();
 									 	double y=intermediate.getLatitude();
 										zwischenerg += Double.toString(x);
 										zwischenerg+=",";
 										zwischenerg+=Double.toString(y);
-										if(b==anzahlstädte-1)
+										if(b==numOfCities-1)
 										{}
 										else{
 											zwischenerg+=";";
@@ -821,7 +819,7 @@ public class Send_Request {
 								     int y=50;
 								     for(int c=(zeile-1)*100;c<(zeile-1)*100+50;c++){
 								    	 JSONArray dura_2=dura_1.getJSONArray(t);
-								    	 for(int d=(sym-1)*100;d<anzahlstädte;d++)
+								    	 for(int d=(sym-1)*100;d<numOfCities;d++)
 								    	 {
 								    		 erg[c][d] = dura_2.getDouble(s);								    		 								    	
 								    		 s++;
@@ -829,7 +827,7 @@ public class Send_Request {
 								    	 s=50;
 								    	 t++;
 								     }
-								    for(int e=(sym-1)*100;e<anzahlstädte;e++){	
+								    for(int e=(sym-1)*100;e<numOfCities;e++){	
 								    	 JSONArray dura_3=dura_1.getJSONArray(y);
 								    	 for(int f=(zeile-1)*100;f<(zeile-1)*100+50;f++){
 								    	 	erg[e][f] = dura_3.getDouble(x);		
@@ -854,14 +852,14 @@ public class Send_Request {
 										zwischenerg+=Double.toString(y);
 										zwischenerg+=";";
 									}
-									for(int b=(sym-1)*100;b<anzahlstädte;b++){
+									for(int b=(sym-1)*100;b<numOfCities;b++){
 										City intermediate = All_Cities.getCity(b);
 									 	double x = intermediate.getLongitude();
 									 	double y=intermediate.getLatitude();
 										zwischenerg += Double.toString(x);
 										zwischenerg+=",";
 										zwischenerg+=Double.toString(y);
-										if(b==anzahlstädte-1)
+										if(b==numOfCities-1)
 										{}
 										else{
 											zwischenerg+=";";
@@ -878,14 +876,14 @@ public class Send_Request {
 								     int y=50;
 								     for(int c=(zeile-1)*100+50;c<(zeile-1)*100+100;c++){
 								    	 JSONArray dura_2=dura_1.getJSONArray(t);
-								    	 for(int d=(sym-1)*100;d<anzahlstädte;d++){
+								    	 for(int d=(sym-1)*100;d<numOfCities;d++){
 								    		 erg[c][d] = dura_2.getDouble(s);								    		 								    	
 									    		s++;
 								    	 }
 								    	 s=50;
 								    	 t++;
 								     } 
-								    for(int e=(sym-1)*100;e<anzahlstädte;e++){
+								    for(int e=(sym-1)*100;e<numOfCities;e++){
 								    	 JSONArray dura_3=dura_1.getJSONArray(y);
 								    	 for(int f=(zeile-1)*100+50;f<(zeile-1)*100+100;f++){
 								    	 	erg[e][f] = dura_3.getDouble(x);		
@@ -931,8 +929,9 @@ public class Send_Request {
 	     for (int t=0; t<All_Cities.numberOfCities();t++){
 	    	JSONArray dura_2=dura_1.getJSONArray(t);
 	    	System.out.println(dura_2.toString());   
-	        for (int i = 0; i < All_Cities.numberOfCities(); i++) {
-	   	        System.out.println(erg.length);	    	
+	        for (int i = 0; i < GA.numOfCities; i++) {
+	        	System.out.println("erg length: "+ erg.length+ "GA.numofCIties:  "+GA.numOfCities);	    
+	   	        System.out.println("dura_1.length: "+dura_1.length()+"  dura_2.length:  "+dura_2.length());
 	   	        erg[t][i] = dura_2.getDouble(i);	    	    	
 	   	    }
 	    }

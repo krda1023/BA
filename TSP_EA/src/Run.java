@@ -11,19 +11,19 @@ public class Run {
 	public static void main(String[] args) throws Exception{
 		
 	
-		GA Optimierer= new GA();
+		GA Optimierer= new GA();								
 		Optimierer.gui_start();
-		
 		Optimierer.Formalitäten();
 		
 
 	    
 		Salesman Guy= new Salesman();
 		Guy.addListener(Optimierer);
+		Optimierer.addRouteServiceListener(Guy);
 		
 	
            
-
+System.out.print(GA.numOfCities);
        
      Optimierer.evolvePopulation(true);
   
@@ -31,11 +31,11 @@ public class Run {
 		//BERECHNE ERSTE LÖSUNG
      MyLogger log= new MyLogger();
      log.setLogger();
-       for (int z = 0; z < Optimierer.iterationen; z++) {
+       for (int z = 0; z < GA.iterationen; z++) {
            Optimierer.evolvePopulation(false);
            Guy.checkForEvents();
            
-        log.writeInfo(Optimierer.best.getDistance(),Optimierer.best);
+      //  log.writeInfo(Optimierer.best.getDistance(),Optimierer.best);
     
          
        }

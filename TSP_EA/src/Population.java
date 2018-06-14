@@ -2,7 +2,7 @@ public class Population {
 
     
     Tour[] tours;														// Holds population of tours
-    static Distanzmatrix dismat;
+    Distanzmatrix dismat;
 
     // Construct a population
     public Population(int populationSize, boolean initialise) {			//Constructor of population
@@ -23,15 +23,8 @@ public class Population {
     public void saveTour(int index, Tour tour) {						// Saves a tour
         tours[index] = tour; 
     }
-    
-  /*  public static double[][] getDistanzmatrix(){
-    	return dismat.getDistanzmatrix();
-    }
-    public static Distanzmatrix getDistanzmatrixalsKlasse(){
-    	return dismat;
-    } */
-    
-    
+
+        
     public Tour getTour(int index) {									// Gets a tour from population
         return tours[index];
     }
@@ -50,11 +43,7 @@ public class Population {
     public int populationSize() {									   // Gets population size
     	return tours.length;
     }
-    static double round(double wert)									//General method to round values
-	{
-		double erg=Math.round(wert*Math.pow(10,5))/Math.pow(10, 5);;
-		return erg;
-	}
+   
     
     
     }

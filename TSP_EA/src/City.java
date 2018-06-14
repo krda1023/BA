@@ -1,21 +1,16 @@
-import java.util.ArrayList;
+
 
 public class City {
-private final double[] position;																	//aray with longiude[0] and latitude[1]
+	final double[] position;																	//aray with longiude[0] and latitude[1]
 	private int id;				//String für Node ID?															//City's ID
-	TimeElement departureTime;
-	
-	public City(int id, double... position) {														// Constructs a city
+
+	public City(int id, double...position) {														// Constructs a city
 		super();
 		this.id = id;
 		this.position = position;
 	}
 	public void setID(int i) {
 		id=i;
-	}
-	
-	public void setDepTime() {
-		departureTime=new TimeElement();
 	}
 	
 	public double[] getPosition() {																	//Get Position array

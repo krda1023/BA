@@ -1,11 +1,15 @@
-import java.sql.Date;
+
 import java.util.EventObject;
 
 
 
 public class AtEvent extends EventObject {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	String EventType;
-	
 	long EventTime;
 	double longitude;
 	double latitude;

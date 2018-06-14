@@ -1,9 +1,9 @@
 import java.util.Calendar;
 import java.util.Random;
 public class GammaVerteilung {
-	private Random rng = new Random(Calendar.getInstance().getTimeInMillis() + Thread.currentThread().getId());
+	private static Random rng = new Random(Calendar.getInstance().getTimeInMillis() + Thread.currentThread().getId());
 
-	public double goGamma(double expectedTime, double k, double theta, double shiftDistance) {
+	public static double goGamma(double expectedTime, double k, double theta, double shiftDistance) {
 		boolean accept = false;
 		
 	    if (k < 1) {
