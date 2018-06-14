@@ -38,10 +38,13 @@ public class GA implements myListener {
 	static boolean elitism=false;
 	static boolean  fileLesen=true;
 	Tour best;
+	Population pop;
+	Population currrentPop;
+	Zeitfaktoren faktoren= new Zeitfaktoren();
 	ArrayList<City> Nodes;
 	ArrayList<City> Intersections;
 	double[] durations;
-	
+	double toDrivetoIntersection;
 	private ArrayList<RouteServiceListener> listenerList= new ArrayList<RouteServiceListener>();
 	
 	int h=1;
@@ -464,10 +467,11 @@ public class GA implements myListener {
 		dis= new Distanzmatrix(anzahlstaedte,fileLesen);
 		dis.erzeugeStaedteliste();
 		anzahlstaedte=dis.getAnzahlstädte();
-		allCities=dis.getAllCities();
+		
 		dis.erzeugeDistanzmatrix();
 		dis.erzeugeAlleDistanzmatrizen();
 	}
+	
 	
 	public boolean getfileLesen()
 	{
@@ -487,12 +491,14 @@ public class GA implements myListener {
 		listenerList.get(0).GAdidRequest(e);
 	}
 	
-	public static Distanzmatrix getMatrixObject(){					//ZENTRALES DISTANZMATRIX Object
+	public static  Distanzmatrix getMatrixObject(){					//ZENTRALES DISTANZMATRIX Object
 		return dis;
 	}
 	
-    public Population evolvePopulation(Population pop) {						// Evolves Population( Usage of all selected operators)
-    	
+    public void evolvePopulation(boolean initilize) {						// Evolves Population( Usage of all selected operators)
+    	if(initilize) {
+    		pop = new Population(anzahlstaedte, true);
+    	}
         Population newPopulation = new Population(pop.populationSize(), false);     //Create new population, no initialisation      
         int elitismOffset = 0;
         if (elitism) {																//Keep best tour elitism=true
@@ -595,7 +601,8 @@ public class GA implements myListener {
     	   }
        }
        best=newPopulation.getFittest();
-       return newPopulation;			
+       currrentPop= newPopulation;
+       			
     }
     
    
@@ -989,7 +996,6 @@ public class GA implements myListener {
             }
         }
     }
- 
     
    
     private static Tour tournamentSelection(Population pop) {				 // Selects candidate tour for crossover   
@@ -1044,6 +1050,70 @@ public class GA implements myListener {
 	@Override
 	public void GPS_Signal(AtEvent e)  {
 		
+		for( int i=0; i<Nodes.size()-1;i++) {								//Find nodes I am in between now
+			double maxLat= Math.max(Nodes.get(i).getLatitude(),Nodes.get(i+1).getLatitude());
+			double minLat= Math.min(Nodes.get(i).getLatitude(),Nodes.get(i+1).getLatitude());
+			double maxLon= Math.max(Nodes.get(i).getLongitude(),Nodes.get(i+1).getLongitude());
+			double minLon= Math.min(Nodes.get(i).getLongitude(),Nodes.get(i+1).getLongitude());
+			
+			if(e.getLatitude()<=maxLat&&e.getLatitude()>=minLat&&e.getLongitude()<=maxLon&&e.getLongitude()>=minLon) {
+				
+				double latratio= (Nodes.get(i+1).getLatitude()-e.getLatitude())/(Nodes.get(i+1).getLatitude()-Nodes.get(i).getLatitude());
+				double lonratio=(Nodes.get(i+1).getLongitude()-e.getLongitude())/(Nodes.get(i+1).getLongitude()-Nodes.get(i).getLongitude());
+				double ratio= (latratio+lonratio)/2;
+				TimeElement now= new TimeElement();
+				int hour= now.getHour();																//current hour
+				double ttnh=now.getTimeToNextHour();
+				if(durations[i]*ratio*faktoren.getFaktor(hour)>ttnh) {							//If the sum of the values + the actual value is bigger than the time to the next hour
+					double tohour=ttnh-durations[i]*ratio*faktoren.getFaktor(hour);		;									//calculate the time from sum to next hour
+					double hourratio= tohour/durations[i]*faktoren.getFaktor(hour)*ratio;				// Calculate ratio of driven way in this section
+					toDrivetoIntersection=hourratio*durations[i]*ratio*faktoren.getFaktor(hour)+(1-hourratio)*durations[i]*ratio*faktoren.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+					ttnh+=3600;																	// add 3600 seconds to timetonexthour
+																								//Update Sum 
+					hour+=1;
+					if(hour==24) {
+						hour=0;
+					}
+				}
+				else
+				{
+					toDrivetoIntersection=durations[i]*ratio*faktoren.getFaktor(hour);
+				}
+				int nextIntersection=-1;
+				for(int l=0; l<Intersections.size();l++) {
+					for(int k=i;k<Nodes.size();k++) {
+						if(Nodes.get(k).getId()==Intersections.get(l).getId()) {
+							nextIntersection=k;
+							break;	
+						}
+					
+					}
+					if(nextIntersection!=-1) {
+						break;
+					}
+						
+				}
+				
+				for(int j=i+1;j<=nextIntersection;j++) { // Nicht bis Node Size, bis nächste Intersection, wie finden?
+					
+					if(toDrivetoIntersection+durations[j]*faktoren.getFaktor(hour)>ttnh) {
+						double tohour=ttnh-durations[j]*faktoren.getFaktor(hour);		;									//calculate the time from sum to next hour
+						double hourratio= tohour/durations[j]*faktoren.getFaktor(hour);									// Calculate ratio of driven way in this section
+						toDrivetoIntersection+=hourratio*durations[j]*faktoren.getFaktor(hour)+(1-hourratio)*durations[i]*faktoren.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+						ttnh+=3600;	
+						hour+=1;
+						if(hour==24) {
+							hour=0;
+						}
+					
+					}
+					else {
+						toDrivetoIntersection+=durations[j]*faktoren.getFaktor(hour);
+					}
+				}
+				break;
+			}
+		}
 		
 	}
     

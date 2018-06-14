@@ -24,6 +24,10 @@ public class Route {
 		
 	}
 	
+     double round(double wert, double stellen){
+		double erg=Math.round(wert*Math.pow(10,stellen))/Math.pow(10, stellen);;
+		return erg;
+	}
 	public void WayFromTo(Tour best) throws Exception 
 	{
 		try {
@@ -73,10 +77,18 @@ public class Route {
 			}
 		}
 		Allnodes=anfrage.getNodes(Nodes);
-		for(int s=0;s<Allnodes.size();s++)
+		
+		for(int inters=1; inters<intersections.size();inters++) {		//Übergebe NodeID an Intersection zur Identifikation
+			for(int node=0; node<Allnodes.size();node++) {
+				if(intersections.get(inters).getLatitude()==round(Allnodes.get(node).getLatitude(),6)&&intersections.get(inters).getLongitude()==round(Allnodes.get(node).getLongitude(),6)) {
+					intersections.get(inters).setID(Allnodes.get(node).getId());
+				}
+			}
+		}
+		/*for(int s=0;s<Allnodes.size();s++)
 		{
 			System.out.println(Allnodes.get(s));
-		}
+		}*/
 		
 	}
 	

@@ -9,12 +9,12 @@ import org.json.JSONObject;
 	// Methode die mich auf jeden Eintrag im Ergebnis genau zurück greifen lässt
 	//um später in getdistance() von Klasse Tour zugreifen zu können
 public class Distanzmatrix {
-	static All_Cities liste = new All_Cities();
-	static double[][] matrix;
+	All_Cities liste = new All_Cities();
+	double[][] matrix;
 	int anzstädte;
 	Send_Request anfrage= new Send_Request(liste);
 	
-	GammaVerteilung gamma= new GammaVerteilung();
+	
 	static ArrayList<double[][]> allMatrix= new ArrayList<double[][]>();
 	ArrayList<double[][]> allGammaMatrix= new ArrayList<double[][]>();
 	boolean vonFileeinlesen=false;
@@ -40,9 +40,7 @@ public class Distanzmatrix {
 		
 	}
 	
-	public All_Cities getAllCities() {
-		return liste;
-	}
+	
 	
 	public void erzeugeStaedteliste (){		
 		if (vonFileeinlesen==true) {
@@ -54,7 +52,7 @@ public class Distanzmatrix {
 			zwischenmatrix=rf.getMatrix();
 			for(int a=0;a<anzstädte;a++) {			
 				City neueStaedte = new City(a,zwischenmatrix[a][2],zwischenmatrix[a][1]);
-				liste.addCity(neueStaedte);
+				All_Cities.addCity(neueStaedte);
 			}
 		}
 		if(vonFileeinlesen==false) {		
@@ -64,7 +62,7 @@ public class Distanzmatrix {
 				double longitude= round(x_2);
 				double latitude= round(y_2);
 				City neueStaedte = new City(i,longitude,latitude);
-				liste.addCity(neueStaedte);
+				All_Cities.addCity(neueStaedte);
 				//System.out.println(x +" "+y);
 			}
 		}
@@ -76,10 +74,10 @@ public class Distanzmatrix {
 			matrix= new double[anzstädte+1][anzstädte+1]; 						// +1 erzeugt Zeile und SPalte für zwischensteps
 			for(int i=0;i<anzstädte;i++) {		
 				for(int j=0;j<anzstädte;j++) {
-					double long1=liste.getCity(i).getLongitude();
-					double lat1=liste.getCity(i).getLatitude();
-					double long2=liste.getCity(j).getLongitude();
-					double lat2=liste.getCity(j).getLatitude();
+					double long1=All_Cities.getCity(i).getLongitude();
+					double lat1=All_Cities.getCity(i).getLatitude();
+					double long2=All_Cities.getCity(j).getLongitude();
+					double lat2=All_Cities.getCity(j).getLatitude();
 					double distance=distanceInKm(long1,lat1,long2,lat2);
 				
 					matrix[i][j]=distance;
@@ -115,18 +113,7 @@ public class Distanzmatrix {
 		allMatrix.add(matrix);
 	}
 	
-	public void allGammaMatrix(double k, double theta, double shiftDistance) {
-		for(int i=0;i<24;i++) {
-			double newGammaMatrix[][]= new double[matrix.length][matrix.length];
-			for(int j=0;j<matrix.length-1;j++) {
-				for(int l=0;l<matrix.length-1;l++) {
-				
-					newGammaMatrix[j][l]=gamma.goGamma(allMatrix.get(i)[j][l], k, theta, shiftDistance);
-				}
-			}
-			allGammaMatrix.add(newGammaMatrix);
-		}
-	}
+	
 	public double [][] getGammaMatrixatTime(int uhrzeit){
 		return allGammaMatrix.get(uhrzeit);
 	}
@@ -151,16 +138,6 @@ public class Distanzmatrix {
 	}
 
 	
-	public void spucksaus(){
-		for(int i=0; i<liste.numberOfCities();i++){
-			for(int j=0;j<liste.numberOfCities();j++){
-				System.out.print(matrix[i][j]+" ");
-			}
-			System.out.println("");
-		}
-	}
 	
-	public void asymMatrix() {
-		
-	}
+	
 }

@@ -6,11 +6,7 @@ import java.util.Scanner;
 
 public class Run {
 		
-		static Population pop;
-		
-		public static Population getPop() {
-			return pop;
-		}
+	
 		
 	public static void main(String[] args) throws Exception{
 		
@@ -20,13 +16,7 @@ public class Run {
 		
 		Optimierer.Formalitäten();
 		
-		pop = new Population(Optimierer.anzahlstaedte, true);
-        if(Optimierer.getfileLesen()==true){
-        	System.out.println("Initial distance: " + pop.getFittest().getDistance());
-        }
-	    if(Optimierer.getfileLesen()==false){
-	       	System.out.println("Initial duration: " + pop.getFittest().getDistance());
-	    }
+
 	    
 		Salesman Guy= new Salesman();
 		Guy.addListener(Optimierer);
@@ -35,17 +25,17 @@ public class Run {
            
 
        
-        pop = Optimierer.evolvePopulation(pop);
+     Optimierer.evolvePopulation(true);
   
 		
 		//BERECHNE ERSTE LÖSUNG
      MyLogger log= new MyLogger();
      log.setLogger();
        for (int z = 0; z < Optimierer.iterationen; z++) {
-           pop = Optimierer.evolvePopulation(pop);
-    
+           Optimierer.evolvePopulation(false);
+           Guy.checkForEvents();
            
-        log.writeInfo(pop.getFittest().getDistance(),pop.getFittest());
+        log.writeInfo(Optimierer.best.getDistance(),Optimierer.best);
     
          
        }
@@ -80,15 +70,15 @@ public class Run {
         // Print final results
       	System.out.println("Finished");
       	if(Optimierer.getfileLesen()==true) {
-      		System.out.println("Final distance: " + pop.getFittest().getDistance());
+      		System.out.println("Final distance: " + Optimierer.pop.getFittest().getDistance());
       	}
       	if(Optimierer.getfileLesen()==false) {
-      		System.out.println("Final duration: " + pop.getFittest().getDistance());
+      		System.out.println("Final duration: " + Optimierer.pop.getFittest().getDistance());
       	}
        System.out.println("Anzahl Städte: "+All_Cities.numberOfCities());
        System.out.println("Anzahlanfragen"+Send_Request.getAnfragencounter());
        System.out.println("Solution:");
-       System.out.println(pop.getFittest()); 
+       System.out.println(Optimierer.pop.getFittest()); 
        Date ende= new Date();
        System.out.print(ende);		
        //log.exit(); 

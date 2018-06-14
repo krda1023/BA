@@ -144,7 +144,7 @@ public class Salesman implements RouteServiceListener {
 			double ratio=0;
 			int positionInDurArray=0;
 			for(int findNode=0;findNode<ZF_GA_duration.length;findNode++) {
-				sum_d+=ZF_GA_duration[findNode]; //AUfpassen, erster Node liegt weiter hinten, ANPASSUNG?
+				sum_d+=ZF_GA_duration[findNode]; 
 				if(sum_d>eventTimeSum) {
 					positionInDurArray=findNode;
 					diffrence=sum_d-eventTimeSum;
@@ -165,20 +165,20 @@ public class Salesman implements RouteServiceListener {
 			upcomingEvents.add(ev);
 		}
 		
-		for(int inters=1; inters<Intersection.size();inters++) { //Gebe allen Intersections passende NodeId
+		for(int inters=1; inters<Intersection.size();inters++) { 
 			double sumIntD=0;
 			for(int node=0;node<Nodes.size();node++) {
-				sumIntD+=ZF_GA_duration[node];   //Aufpassen, erster Node liegt theoretisch weiter hinten, ÄNBDERUNG?
-				if(Intersection.get(inters).getLatitude()==round(Nodes.get(node).getLatitude(),6)&&Intersection.get(inters).getLongitude()==round(Nodes.get(node).getLongitude(),6)) {
+				sumIntD+=ZF_GA_duration[node];   
+				if(Intersection.get(inters).getId()==Nodes.get(node).getId()) {
 					if(inters==Intersection.size()-1) {
-						Intersection.get(inters).setID(Nodes.get(node).getId());
-						AtEvent ev= new AtEvent(this,"AtCity",(long)(now.startInMilli+(sumIntD*1000)),Nodes.get(node).getLatitude(),Nodes.get(node).getLongitude());
+						
+						AtEvent ev= new AtEvent(this,"AtCity",(long)(now.startInMilli+(sumIntD*1000)),Intersection.get(inters).getLatitude(),Intersection.get(inters).getLongitude());
 						upcomingEvents.add(ev);
 						break;
 					}
 					else {
-						Intersection.get(inters).setID(Nodes.get(node).getId());
-						AtEvent ev= new AtEvent(this,"AtIntersection",(long)(now.startInMilli+(sumIntD*1000)),Nodes.get(node).getLatitude(),Nodes.get(node).getLongitude());
+						
+						AtEvent ev= new AtEvent(this,"AtIntersection",(long)(now.startInMilli+(sumIntD*1000)),Intersection.get(inters).getLatitude(),Intersection.get(inters).getLongitude());
 						upcomingEvents.add(ev);
 						break;
 					}

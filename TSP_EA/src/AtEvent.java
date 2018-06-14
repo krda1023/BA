@@ -16,7 +16,7 @@ public class AtEvent extends EventObject {
 		this.EventTime=Time;
 		this.longitude=lon;
 		this.latitude=lat;
-		//this.EventTime=salesman.getStartzeit()+salesman.getFahrtzeit()+Time;
+		
 	}
 	
 	public long getEventTime(){
@@ -24,5 +24,11 @@ public class AtEvent extends EventObject {
 	}
 	public String getEventType(){
 		return EventType;
+	}
+	public double getLongitude() {
+		return longitude;
+	}
+	public double getLatitude() {
+		return latitude;
 	}
 }

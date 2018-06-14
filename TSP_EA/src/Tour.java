@@ -56,7 +56,7 @@ public class Tour{
         return fitness;
     }
     
-  /*  public double getDuration() {
+  /*  public double getDuration(double toIntersection,) {
     	long duration=0;
     	
     	for(int i=1; i<tour.size();i++) {
