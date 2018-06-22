@@ -1,12 +1,14 @@
 
 
 public class City {
-	final double[] position;																	//aray with longiude[0] and latitude[1]
-	private int id;				//String für Node ID?															//City's ID
+	double[] position;																	//aray with longiude[0] and latitude[1]
+	public String type;
+	public int id;				//String für Node ID?															//City's ID
 
-	public City(int id, double...position) {														// Constructs a city
+	public City(int id,String type, double...position) {														// Constructs a city
 		super();
 		this.id = id;
+		this.type=type;
 		this.position = position;
 	}
 	public void setID(int i) {
@@ -29,6 +31,9 @@ public class City {
 	 public int getId() {																			 //Gets city's id
 			return id;
 		}
+	 public String getType() {
+		 return type;
+	 }
 	 public double expectedTravTime(City to,TimeElement startTime) {								//Calculates the expcted travel time from one city to another, regarding daytime and velocity factor
 		 double expTime=0;
 		 int hour= startTime.getHour();																// hour as int of point of time of city we're travelling from

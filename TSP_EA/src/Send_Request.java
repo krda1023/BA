@@ -28,32 +28,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Send_Request {
-	All_Cities liste = new All_Cities();
-	double[][] erg;																				//2-dim. array for saving table service response
-	JSONObject Way;																				//JSON Object for saving routing service response
+	All_Cities liste= new All_Cities();
+																				//2-dim. array for saving table service response
+																			//JSON Object for saving routing service response
 	static int anfragencounter=0;																// request counter
 
-	public Send_Request(All_Cities liste ) {
-			 this.liste=new All_Cities();
-			 this.erg= new double[GA.numOfCities+1][GA.numOfCities+1];
-	}
-
-
-	public static int getAnfragencounter(){		
-		return anfragencounter;
-	}
-	
-	public double[][] getergebnis(){															//Gets 2 dim array	
-		return erg;
-	}
-	
-	public JSONObject getDirection(){															//Gets JSONObject
-		return Way;
-	}
-	
-
-	
-	public StringBuffer gogo(String gesamt) throws Exception{									//sends URL and gets response in Stringbuffer
+		
+	public static  StringBuffer gogo(String gesamt) throws Exception{									//sends URL and gets response in Stringbuffer
 		URL obj = new URL(gesamt);																//create new URL Object
 	    HttpURLConnection con = (HttpURLConnection) obj.openConnection();						//open a http connection
 	    con.setRequestMethod("GET");															
@@ -70,7 +51,8 @@ public class Send_Request {
 	    return response;
 	}
 	
-	public void createRouteRequest(Tour fittest) throws Exception{							//Creates String with URL, applies gogo and saves response in an JSONObejct
+	public static JSONObject createRouteRequest(Tour fittest) throws Exception{	
+		JSONObject Way;		//Creates String with URL, applies gogo and saves response in an JSONObejct
 		String gesamt= "http://router.project-osrm.org/route/v1/driving/";						//Fixed URL Start
 		City From=fittest.getCity(0);	//??? Korrekt???
 		City To=fittest.getCity(1);		//???Korrekt???
@@ -82,10 +64,10 @@ public class Send_Request {
 		//System.out.println(gesamt);
 		StringBuffer response = gogo(gesamt);													//Open HTTP Connection and send URL
 		Way= new JSONObject(response.toString());												//Save response in JSONObject
-		
+		return Way;
 	}
 	//MUSS NOCH GETESTET WERDEN!!!
-	public ArrayList<City> getNodes(double[]nodes) throws Exception{		//Muss wahrscheinlich String übergeben werden da Zahl zu groß								//Gets geo-coordinates for all received OSM nodes
+	public static ArrayList<City> getNodes(double[]nodes) throws Exception{		//Muss wahrscheinlich String übergeben werden da Zahl zu groß								//Gets geo-coordinates for all received OSM nodes
 		ArrayList<City> Nodes= new ArrayList<City>();																//Contains all nodes that has to be converted
 		for(int i=0;i<nodes.length;i++){												
 			String url="http://www.openstreetmap.org/api/0.6/node/";								//Fixed URL start
@@ -105,14 +87,25 @@ public class Send_Request {
 			double[]pos=new double[2];
 			pos[0]=Double.parseDouble(LONG);
 			pos[1]=Double.parseDouble(LAT);
-			City newWP= new City(id,pos);
+			City newWP= new City(id,"City",pos);
 			Nodes.add(newWP);
 		}
 		return Nodes;
 	}
 	
-	public void createAsymMatrix(City stepCity) throws Exception{								//Gets all distances from upcoming WP Node to all cities
-		int numOfCities=GA.numOfCities;
+	
+	
+	
+	
+	public static double[] IntersectionMatrix(City Intersection) throws Exception{								//Gets all distances from upcoming WP Node to all cities
+		int numOfCities;
+		if(All_Cities.getCity(All_Cities.numberOfCities()-2).getType()=="Intersection") {
+			numOfCities=All_Cities.numberOfCities()-2;
+		}
+		else {
+			numOfCities=All_Cities.numberOfCities()-1;
+		}
+		double[] erg=new double[numOfCities];
 		int numberOfCases;
 		if(numOfCities%99==0){
 		 numberOfCases= numOfCities/99;	
@@ -124,14 +117,14 @@ public class Send_Request {
 			if(numOfCities-(asym*99)<0){      //wenn splitted Asymanfrage 
 				String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
 				String zwischenerg="";
-				double x = stepCity.getLongitude();
-			 	double y = stepCity.getLatitude();
+				double x = Intersection.getLongitude();			//Intersection an erster Stelle in URL
+			 	double y = Intersection.getLatitude();
 			 	zwischenerg += Double.toString(x);
 				zwischenerg+=",";
 				zwischenerg+=Double.toString(y);
 				zwischenerg+=";";
 				for(int position=((asym-1)*99);position<numOfCities;position++){
-					City intermediate = All_Cities.getCity(position);
+					City intermediate = All_Cities.getCity(position);				//Klappere All_Cities ab
 				 	double x1 = intermediate.getLongitude();
 				 	double y1=intermediate.getLatitude();
 					zwischenerg += Double.toString(x1);
@@ -148,12 +141,12 @@ public class Send_Request {
 				 StringBuffer response = gogo(gesamt); 
 			     JSONObject jobj= new JSONObject(response.toString());
 			     JSONArray dura_1 = jobj.getJSONArray("durations");
-			     int z=1;
-			     int fromCityID=stepCity.getId();
+			     int z=1;//Überspringe 0 wert am anfang;
+			   
 			     JSONArray dura_2=dura_1.getJSONArray(0);
 			     for (int positionzeile=((asym-1)*99);positionzeile<numOfCities;positionzeile++){
 			    	 int toCityID=All_Cities.getCity(positionzeile).getId();				   	   			    	    	
-			    	 erg[fromCityID-1][toCityID-1] = dura_2.getDouble(z);
+			    	 erg[toCityID] = dura_2.getDouble(z);
 			    	 z++;				    	    	
 			     }			   	    				    	
 			    	z=1;
@@ -162,8 +155,8 @@ public class Send_Request {
 			if(numOfCities-(asym*99)>=0){	//wenn volle 1x99 Anfrage
 				String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
 				String zwischenerg="";
-				double x = stepCity.getLongitude();
-			 	double y = stepCity.getLatitude();
+				double x = Intersection.getLongitude();
+			 	double y = Intersection.getLatitude();
 				 zwischenerg += Double.toString(x);
 				 zwischenerg+=",";
 				 zwischenerg+=Double.toString(y);
@@ -187,21 +180,21 @@ public class Send_Request {
 			     JSONObject jobj= new JSONObject(response.toString());
 			     JSONArray dura_1 = jobj.getJSONArray("durations");
 			     int z=1;
-			     
-			     int fromCityID=stepCity.getId();
 			     JSONArray dura_2=dura_1.getJSONArray(0);
 			     for (int positionzeile=((asym-1)*99);positionzeile<asym*99;positionzeile++){
 			    	 int toCityID=All_Cities.getCity(positionzeile).getId();				   	   			    	    	
-			    	 erg[fromCityID-1][toCityID-1] = dura_2.getDouble(z);
+			    	 erg[toCityID] = dura_2.getDouble(z);
 			    	 z++;				    	    	
 			     }			   	    				    	
 			    z=1;
 			}	
 		}
+		return erg;
 	}
 
-	public void createBasicMatrix() throws Exception {
+	public static double[][]createBasicMatrix() throws Exception {
 		// System.out.println("start:"+timestamp1);
+		double[][] erg=new double[GA.numOfCities][GA.numOfCities];
 		int numOfCities=All_Cities.numberOfCities();
 		int numberOfCases;
 		int SplittedtoAdd;
@@ -902,9 +895,11 @@ public class Send_Request {
 				}	
 			}
 		}
+		return erg;
 	}
 
-	public void createsmallMatrix() throws Exception{
+	public static double[][] createsmallMatrix() throws Exception{
+		double[][] erg=new double[GA.numOfCities][GA.numOfCities];
 		String urlAnfang="https://api.openrouteservice.org/matrix?api_key=58d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=";
 		//String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
 		 String zwischenerg="";
@@ -935,6 +930,7 @@ public class Send_Request {
 	   	        erg[t][i] = dura_2.getDouble(i);	    	    	
 	   	    }
 	    }
+	     return erg;
 	}
 }
 	

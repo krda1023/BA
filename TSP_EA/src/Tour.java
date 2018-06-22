@@ -9,10 +9,10 @@ public class Tour{
     // Cache
     private double fitness = 0;
     private double distance = 0;  //time?
-    
+    static final City startCity=Distanzmatrix.startCity;
     // Constructs a blank tour
     public Tour(){
-        for (int i = 0; i < GA.numOfCities; i++) {
+        for (int i = 0; i < All_Cities.numberOfCities(); i++) {
             tour.add(null);
         }
     }
@@ -29,6 +29,11 @@ public class Tour{
         }
         // Randomly reorder the tour
         Collections.shuffle(tour);
+        int startcitypos= tour.indexOf(startCity);
+      
+        tour.set(startcitypos, tour.get(0));
+        tour.set(0, startCity);
+       
     }
 
     // Gets a city from the tour
@@ -53,33 +58,40 @@ public class Tour{
         return fitness;
     }
     
-  /*  public double getDuration(double toIntersection,) {
-    	long duration=0;
-    	
-    	for(int i=1; i<tour.size();i++) {
-    		City destinationcity;
-    		if(i+1<tour.size()) {
-    			destinationcity=tour.get(i+1);
-    		}
-    		else {
-    			destinationcity=tour.get(0);					//Nur wenn erste Stadt auch noch an erster Stelle steht, sprich anfang der reise, oder Serste stadt für immer an erster stelle lasssen und abfragen umdesignen
-    		}
-	    		TimeElement traveltime=Salesman.getTimeE();		
-	    		traveltime.addTimeInMillis(Salesman.getTimeE().getExistTime()+duration);
-	    		duration+=(long)1000*tour.get(i).expectedTravTime(destinationcity, traveltime);
-    		
-    	}
+    public double getDuration() {
+    	double duration=GA.toDrivetoIntersection;
+    	double[][] matrix =Distanzmatrix.getDistanzmatrix();
+    	int hour=GA.lastEventTime.getHour();
+    	double ttnh=GA.lastEventTime.getTimeToNextHour();
+    	 for (int cityIndex=1; cityIndex < tourSize(); cityIndex++) { 		
+			 City fromCity = getCity(cityIndex);
+			 City destinationCity;	  							// Check we're not on our tour's last city, if we are set our 
+			 													// tour's final destination city to our starting city
+			 if(cityIndex+1 < tourSize()){
+                
+				 destinationCity = getCity(cityIndex+1);
+             }
+		 
+			 
+             else{    	 
+                 destinationCity = getCity(0);
+             }
+			 
+			 int a = fromCity.getId();
+			 int b = destinationCity.getId();
+    	 }
     	double durationInSec= (double)(duration/1000);
     	return durationInSec;
-    }*/
+    }
     
     
     // Gets the total distance of the tour
     public double getDistance(){
-        
+      //  System.out.println(this);
     	if (distance ==0) {
     		double tourdistance =0;
-    		double[][] matrix =GA.getMatrixObject().getDistanzmatrix();				//Distanzmatrix aus DIstanzmatrixKlasse holen
+    		
+			double[][] matrix =Distanzmatrix.getDistanzmatrix();				//Distanzmatrix aus DIstanzmatrixKlasse holen
     		 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) { 		
     			 City fromCity = getCity(cityIndex);
     			 City destinationCity;	  							// Check we're not on our tour's last city, if we are set our 
@@ -91,17 +103,21 @@ public class Tour{
     		 
     			 
                  else{    	 
-                     destinationCity = getCity(0);
+                     destinationCity = Distanzmatrix.startCity;
+                   //  System.out.println(destinationCity.getId());
                  }
     			 
     			 int a = fromCity.getId();
+    			 //System.out.println(destinationCity.getId());
     			 int b = destinationCity.getId();
-    			 
+    			// System.out.println(matrix[a][b]);
     			 tourdistance+=matrix[a][b];
+    			// System.out.println(tourdistance);
     		 }
     		 distance=tourdistance;	        	 
     	}
-    	distance= Maths.round(distance,5);    //Runden
+    	distance= Maths.round(distance,5);
+    		//	System.out.println("Round finished");    //Runden
     	return distance;  		
     }
     	

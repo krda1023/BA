@@ -10,11 +10,14 @@ public class Population {
         tours = new Tour[populationSize];
         this.dismat=GA.getMatrixObject();
     	}            
-        if (initialise) {												// If we need to initialise a population of tours do so     
-            for (int i = 0; i < populationSize(); i++) {				  // Loop and create individuals
+        if (initialise) {											// If we need to initialise a population of tours do so     
+           
+        	System.out.println(populationSize);
+        	for (int i = 0; i < populationSize; i++) {				  // Loop and create individuals
                 Tour newTour = new Tour();
                 newTour.generateIndividual();
                 saveTour(i, newTour);									// save individual
+          
             }
         }
     }

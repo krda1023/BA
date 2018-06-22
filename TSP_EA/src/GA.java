@@ -26,31 +26,33 @@ public class GA implements myListener {
     static int numOfCities=50;   //FINAL
 	static int popSize=50;			//FINAL
 	static int iterationen=100;		//FINAL
-	static boolean ox2C=false;
-	static boolean ordC=true;
-	static boolean pmxC=false;
+	static boolean ox2C=true;
+	static boolean ordC=false;
+	static boolean pmxC=true;
 	static boolean cycC=false;
-	static boolean disM=false;
-	static boolean insM=true;
+	static boolean disM=true;
+	static boolean insM=false;
 	static boolean invM=false;
 	static boolean excM=false;
 	static boolean mexM=false;
-	static boolean elitism=false;
-	static boolean  fileLesen=false;
+	static boolean elitism=true;
+	static boolean  fileLesen=true;
 	static double c=1;
 	static double theta=1;
 	static double shiftDistance=0;
-	
+	static int EventCounter=0;
 	GUI_Start form;
-	
+	static int blockedCities=2;
 	Tour best;
 	Population pop;
 	Population currrentPop;
+	static City lastCity;
 	
 	ArrayList<City> Nodes;
 	ArrayList<City> Intersections;
 	double[] durations;
-	double toDrivetoIntersection;
+	static double toDrivetoIntersection;
+	static TimeElement lastEventTime;
 	private ArrayList<RouteServiceListener> listenerList= new ArrayList<RouteServiceListener>();
 	
 	int h;
@@ -60,14 +62,14 @@ public class GA implements myListener {
 	All_Cities allCities;   	//ALL_CITIES welches das aktuelle sein soll --- Hier einfügen und Streichen
    
 	public void gui_start() {
-		form= new GUI_Start();
+		
 		Thread t = new Thread()
 		{
 		  @Override public void run()
 		  {
 		    try
 		    {
-		      ;
+		    	form= new GUI_Start(); ;
 		    }
 		    catch ( ThreadDeath td )
 		    {
@@ -77,7 +79,7 @@ public class GA implements myListener {
 		  }
 		};
 		t.start();
-		try { Thread.sleep( 25000 ); } catch ( Exception e ) { }
+		try { Thread.sleep( 8000 ); } catch ( Exception e ) { }
 		t.stop();
 	}
 	
@@ -221,7 +223,7 @@ public class GA implements myListener {
 				if(e.getSource()==FileNo) {
 					h=2;
 					city.setEnabled(true);
-					System.out.println("nolesen");
+					
 					
 					
 					
@@ -229,6 +231,7 @@ public class GA implements myListener {
 				if(e.getSource()==FileJa) {
 					h=1;
 					city.setEnabled(false);
+					
 				}
 				
 			}
@@ -408,73 +411,39 @@ public class GA implements myListener {
 	public void Formalitäten(){
 	   
 		
-		/*	
-		System.out.println("Soll von einer File eingelesen werden, 1 für Ja");
-		Scanner sc1 = new Scanner(System.in);
-		int h=sc1.nextInt();
-		if(h==1)
-		{
-			fileLesen=true;
-		}
-		if(fileLesen==false)
-		{
-			System.out.println("Wieviele Städte sollen erzeugt werden? Maximum ist 100, Minimum 3");
-			
-			int g =sc1.nextInt();
-			anzahlstädte1=g;
-		}
-		System.out.println("Wieviele Iterationen sollen durchgeführt werden?");
-		int e1 =sc1.nextInt();
-		interationen=e1;
-		System.out.println("Wie groß soll eine Population sein?");
-		int e2 =sc1.nextInt();
-		populationsgröße=e2;*/
-		
-		
-	/*	System.out.println("Welchen Crossover-Operator möchtest du verwenden?\n Wähle 1 für Ox2 Crossover\n Wähle 2 für OrderCrossover\n Wähle 3 für PMX-Crossover\n Wähle 4 für Cycle-Crossover");
-		int i = sc1.nextInt();
-		
-		System.out.println("Welchen Mutation-Operator möchtest du verwenden?\n Wähle 1 für Displacement-Mutation\n Wähle 2 für Insertion-Mutation\n Wähle 3 für Inversion-Mutation\n Wähle 4 für Exchange Mutation\n Wähle 5 für MultipleExchange-Mutation");
-		
-		int j = sc1.nextInt();
-		
-		System.out.println("Elitism aktivieren??\n Wähle 1 für Ja\n Wähle 2 Nein");
-		
-		
-		int k = sc1.nextInt();
-		sc1.close();
-		*/
-		
 		System.out.println("Bitte warten.....");
 		System.out.println();
 		System.out.println();
 		switch(i){
-			case 1: ox2C=true;break;
-			case 2: ordC=true;break;
-			case 3: pmxC=true;break;
-			case 4: cycC=true; break;
+		case 1: ox2C=true;break;
+		case 2: ordC=true;break;
+		case 3: pmxC=true;break;
+		case 4: cycC=true; break;
 		}
 		switch(j){
-			case 1: disM=true;break;
-			case 2: insM=true;break;
-			case 3: invM=true;break;
-			case 4: excM=true;break;
-			case 5: mexM=true;break;
+		case 1: disM=true;break;
+		case 2: insM=true;break;
+		case 3: invM=true;break;
+		case 4: excM=true;break;
+		case 5: mexM=true;break;
 		}
-		if(k==1){
-			elitism=true;
+		switch(k) {
+		case 1: elitism=true;
+		case 2: elitism=false;
 		}
 		
-		if(h==1){
-			fileLesen=true;
+		switch(h){
+		case 1: fileLesen=true;
+		case 2:fileLesen=false;
 		}
-		System.out.println("H:  "+h);
-		dis= new Distanzmatrix(numOfCities,fileLesen);
-		dis.erzeugeStaedteliste();
-		numOfCities=Distanzmatrix.getAnzahlstädte();
 		
-		dis.erzeugeDistanzmatrix();
-		dis.erzeugeAlleDistanzmatrizen();
+		Distanzmatrix.CreatingnumOfCities=numOfCities;
+		Distanzmatrix.vonFileeinlesen=fileLesen;
+		Distanzmatrix.erzeugeStaedteliste();
+		numOfCities=Distanzmatrix.getCreatedAnzahlstädte();
+		
+		Distanzmatrix.erzeugeDistanzmatrix();
+		Distanzmatrix.erzeugeAlleDistanzmatrizen();
 	}
 	
 	
@@ -502,9 +471,9 @@ public class GA implements myListener {
 	
     public void evolvePopulation(boolean initilize) {						// Evolves Population( Usage of all selected operators)
     	if(initilize) {
-    		pop = new Population(numOfCities, true);
+    		pop = new Population(popSize, true);
     	}
-        Population newPopulation = new Population(pop.populationSize(), false);     //Create new population, no initialisation      
+        Population newPopulation = new Population(popSize, false);     //Create new population, no initialisation      
         int elitismOffset = 0;
         if (elitism) {																//Keep best tour elitism=true
             newPopulation.saveTour(0, pop.getFittest());
@@ -530,7 +499,9 @@ public class GA implements myListener {
                 Tour child= OrderCrossover(parent1,parent2);						//Receive offspring
                 newPopulation.saveTour(z, child);                    				// save offspring in new Population
         	}      	
-    	  }
+    		 
+    	   }
+    	   
        }
        if(cycC){
     	   for (int z = elitismOffset; z < newPopulation.populationSize(); z++) {   	 // Loop through all tours of population
@@ -548,7 +519,8 @@ public class GA implements myListener {
                    Tour parent2 = tournamentSelection(pop);           				   	// Choose second parent chromosome with tournament selection
                    Tour child= OrderCrossover(parent1,parent2);							//Receive offspring
                    newPopulation.saveTour(z, child);                    				// save offspring in new Population
-           		}      	
+           		}
+    		
     	   }
        }
        if(pmxC) {      
@@ -575,7 +547,8 @@ public class GA implements myListener {
                Tour parent2 = tournamentSelection(pop);									//Choose second parent chromosome with tournament selection
                Tour child = OrderCrossover(parent1, parent2);							//receive offspring
                newPopulation.saveTour(i, child);										//Save offspring
-           }
+             
+    	   }
        }
        
        
@@ -583,6 +556,7 @@ public class GA implements myListener {
        if(disM) {
            for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {        //Loop through all tours of new population and use displacement mutation
         	   DisplacementMutation(newPopulation.getTour(i));
+        	  
            }
        }
        if(mexM) {
@@ -598,6 +572,7 @@ public class GA implements myListener {
        if(insM) {
     	   for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {		//Loop through all tours of new population and use insertion mutation
     		   InsertionMutation(newPopulation.getTour(i));
+    		  
     	   }
        }
        if(invM) {				
@@ -605,32 +580,42 @@ public class GA implements myListener {
         	InversionMutation(newPopulation.getTour(i));
     	   }
        }
+       
        best=newPopulation.getFittest();
        currrentPop= newPopulation;
        			
     }
     
-   
+    //parent1.tour-size-2 damit startpos endpos selbe länge hat wie im array zu verändern, position aber um 2 verschoben
+   //bei startpos und endpos wieder draufschlagen dann veränderst die richtigen Positionen
     public static Tour OrderCrossover(Tour parent1, Tour parent2) {
-      
+    	
+    	if(GA.EventCounter==0) {
+    		blockedCities=1;
+    	}
         Tour child = new Tour();										
-        int number1 = (int) (Math.random() * parent1.tourSize());		//create first random number
-        int number2 = (int) (Math.random() * parent1.tourSize());		//create second random number
-       	while(number1==number2)	{										//If random numbers are equal, do it again
-    		number1 = (int) (Math.random() * parent1.tourSize());		
-    		number2 = (int) (Math.random() * parent1.tourSize()); 
+        int number1 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		//create first random number
+        int number2 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		//create second random number
+       
+        while(number1==number2)	{										//If random numbers are equal, do it again
+    		number1 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		
+    		number2 = (int) (Math.random() * (parent1.tourSize()-blockedCities)); 
     		continue;
     	}
-        int startPos= Math.min(number1, number2);						//startposition is minimum of the two random numbers
-        int endPos= Math.max(number1, number2);        					// endposition is the maximum of the two random numbers
-        for (int i = 0; i < parent1.tourSize(); i++) {					// Loop through parent 1
+        int startPos= Math.min(number1, number2)+blockedCities;						//startposition is minimum of the two random numbers
+        int endPos= Math.max(number1, number2)+blockedCities;        					// endposition is the maximum of the two random numbers
+        for(int bl=0;bl<blockedCities;bl++) {
+        	child.setCity(bl, parent1.getCity(bl));
+        }
+        for (int i =blockedCities; i < parent1.tourSize(); i++) {					// Loop through parent 1
             if (i >= startPos && i <= endPos) {							//if i is in the selected substring
                 child.setCity(i, parent1.getCity(i));					// set city in offspring at position i
+            
             } 
         }
-        for (int i = 0; i < parent2.tourSize(); i++) {					// Loop through parent 2
+        for (int i = blockedCities; i < parent2.tourSize(); i++) {					// Loop through parent 2
             if (!child.containsCity(parent2.getCity(i))) {				//If offspring does not cointain actual city of parent2 add to offspring
-                for (int ii = 0; ii < child.tourSize(); ii++) {			//Loop through offspring
+                for (int ii = blockedCities; ii < child.tourSize(); ii++) {			//Loop through offspring
                     if (child.getCity(ii) == null) {					//Find spare position
                         child.setCity(ii, parent2.getCity(i));			//save city in offspring
                         break;
@@ -638,23 +623,35 @@ public class GA implements myListener {
                 }
             }
         }
+    /*    System.out.println(parent1);
+        System.out.println(parent2);
+        System.out.println(child);
+        System.out.println();
+        System.out.println();*/
         return child;
     }
    
     public static Tour[] Ox2Crossover(Tour parent1, Tour parent2) {	
+    	if(GA.EventCounter==0) {
+    		blockedCities=1;
+    	}
     	Tour child1=new Tour();
     	Tour child2=new Tour();
     	Tour[] kids= new Tour[2];										// Tour array for returning
-    	int number1 = (int) (Math.random() * All_Cities.numberOfCities());	//First random number
-    	int number2 = (int) (Math.random() * All_Cities.numberOfCities());	//Second random number
+    	int number1 = (int) (Math.random() *( parent1.tourSize()-blockedCities));	//First random number
+    	int number2 = (int) (Math.random() * ( parent1.tourSize()-blockedCities));	//Second random number
     	while(number1==number2)	{										//If random numbers are equal, do it again	
-    		number1 = (int) (Math.random() * parent1.tourSize());
-    		number2 = (int) (Math.random() * parent1.tourSize()); 
+    		number1 = (int) (Math.random() * (parent1.tourSize()-blockedCities));
+    		number2 = (int) (Math.random() * (parent1.tourSize()-blockedCities)); 
     		continue;
     	}
-    	int startPos= Math.min(number1, number2);						//startposition is minimum of the two random numbers
-    	int endPos= Math.max(number1, number2);							// endposition is the maximum of the two random numbers
-    	for(int j=0;j<parent1.tourSize();j++) {   						//Loop through parent1
+    	   for(int bl=0;bl<blockedCities;bl++) {
+           	child1.setCity(bl, parent1.getCity(bl));
+           	child2.setCity(bl,parent2.getCity(bl));
+           }
+    	int startPos= Math.min(number1, number2)+blockedCities;						//startposition is minimum of the two random numbers
+    	int endPos= Math.max(number1, number2)+blockedCities;							// endposition is the maximum of the two random numbers
+    	for(int j=blockedCities;j<parent1.tourSize();j++) {   						//Loop through parent1
     		if(j >= startPos && j <= endPos) {							//if j is in the selected substring
     			City cityP1=parent1.getCity(j);							
     			City cityP2=parent2.getCity(j);
@@ -662,9 +659,9 @@ public class GA implements myListener {
     			child2.setCity(j, cityP1);								//set city of parent1 in second offsrping at position j
     		}
     	}    	
-    	for(int k=0;k<parent1.tourSize();k++) {    						//Loop through parent1
+    	for(int k=blockedCities;k<parent1.tourSize();k++) {    						//Loop through parent1
     		if (!child1.containsCity(parent1.getCity(k))) {   			//If first offspring does not cointain actual city of parent1 add to offspring
-                for (int ii = 0; ii < child1.tourSize(); ii++)  {		//Loop through offsrping       
+                for (int ii = blockedCities; ii < child1.tourSize(); ii++)  {		//Loop through offsrping       
                     if (child1.getCity(ii) == null)	{		 			//Find spare position                
                     	City city1 = parent1.getCity(k);
                         child1.setCity(ii, city1);						//Save city of parent1 in offspring
@@ -673,7 +670,7 @@ public class GA implements myListener {
                 }
             }
     	}
-    	for(int k=0;k<parent2.tourSize();k++) {							//Loop through parent2
+    	for(int k=blockedCities;k<parent2.tourSize();k++) {							//Loop through parent2
     		if (!child2.containsCity(parent2.getCity(k))) {				//If second offsrping does not cointain actual city of parent 2 add to offspring
                 for (int ii = 0; ii < child2.tourSize(); ii++) {       	//Loop through second offspring                      
                     if (child2.getCity(ii) == null) {      				//Find spare position
@@ -689,36 +686,115 @@ public class GA implements myListener {
     	return kids;
     }
     
-    public static Tour[] PMX (Tour parent1, Tour parent2) { //Muss noch gemacht werden	
-		int cut1 =(int) (Math.random() *parent1.tourSize());
-		int cut2 = (int) (Math.random() *parent1.tourSize());
+    
+    public static Tour[] PMX2 (Tour parent1, Tour parent2) { //Muss noch gemacht werden	
+    	if(GA.EventCounter==0) {
+    		blockedCities=1;
+    	}
+    	int number1 =(int) (Math.random() *(parent1.tourSize()-blockedCities));
+		int number2 = (int) (Math.random() *(parent1.tourSize()-blockedCities));
 		Tour kids[]=new Tour[2];
 		Tour child1=new Tour();
 		Tour child2= new Tour();
 		ArrayList<City> conflicts1= new ArrayList<City>();
 		ArrayList<City> conflicts2= new ArrayList<City>();
-		while (cut1 == cut2) {
-			cut1 =(int) (Math.random() *parent1.tourSize());
-			cut2 = (int) (Math.random() *parent1.tourSize());
+		while (number1 == number2) {
+			number1 =(int) (Math.random() *(parent1.tourSize()-blockedCities));
+			number2= (int) (Math.random() *(parent1.tourSize()-blockedCities));
 		}
-		if (cut1 > cut2) {
-			int swap = cut1;
-			cut1 = cut2;
-			cut2 = swap;
-		}
-		System.out.println(cut1);
-		System.out.println(cut2);
-		for(int i=0;i<parent1.tourSize();i++) {
+		int cut1= Math.min(number1, number2)+blockedCities;						//startposition is minimum of the two random numbers
+    	int cut2= Math.max(number1, number2)+blockedCities;
+		for(int bl=0;bl<blockedCities;bl++) {
+	       	child1.setCity(bl, parent1.getCity(bl));
+	       	child2.setCity(bl,parent2.getCity(bl));
+	    }
+		for(int i=blockedCities;i<parent1.tourSize();i++) {
 			City c1= parent1.getCity(i);
 			City c2= parent2.getCity(i);
 			child1.setCity(i, c1);
 			child2.setCity(i, c2);
+	
+			
 		}
+		for(int j=cut1;j<=cut2;j++) {	
+			City c1= parent1.getCity(j);
+			City c2= parent2.getCity(j);
+			child1.setCity(j, c2);
+			child2.setCity(j, c1);
+			System.out.println("cut1: "+cut1);
+			System.out.println("cut2: "+cut2);
+			System.out.println("parent1: "+parent1);
+			System.out.println("child1 "+child1);
+			System.out.println("parent2: "+parent2);
+			System.out.println("child2 "+child2);
+		} 
+		for(int j=cut1;j<=cut2;j++) {	
+			City c1= parent1.getCity(j);
+			City c2= parent2.getCity(j);
+			for(int jj=blockedCities;jj<parent1.tourSize();jj++)
+			{
+				if(jj<cut1||jj>cut2) {
+					if(c2==parent1.getCity(jj)) {
+						conflicts1.add(c2);
+					}
+				}
+				if(jj<cut1||jj>cut2) {
+					if(c1==parent2.getCity(jj)) {
+					conflicts2.add(c1);
+					}
+				}
+			}
+		}
+		 
+		
+    }
+    public static Tour[] PMX (Tour parent1, Tour parent2) { //Muss noch gemacht werden	
+    	if(GA.EventCounter==0) {
+    		blockedCities=1;
+    	}
+    	int number1 =(int) (Math.random() *(parent1.tourSize()-blockedCities));
+		int number2 = (int) (Math.random() *(parent1.tourSize()-blockedCities));
+		Tour kids[]=new Tour[2];
+		Tour child1=new Tour();
+		Tour child2= new Tour();
+		ArrayList<City> conflicts1= new ArrayList<City>();
+		ArrayList<City> conflicts2= new ArrayList<City>();
+		while (number1 == number2) {
+			number1 =(int) (Math.random() *(parent1.tourSize()-blockedCities));
+			number2= (int) (Math.random() *(parent1.tourSize()-blockedCities));
+		}
+		int cut1= Math.min(number1, number2)+blockedCities;						//startposition is minimum of the two random numbers
+    	int cut2= Math.max(number1, number2)+blockedCities;
+		for(int bl=0;bl<blockedCities;bl++) {
+	       	child1.setCity(bl, parent1.getCity(bl));
+	       	child2.setCity(bl,parent2.getCity(bl));
+	    }
+		for(int i=blockedCities;i<parent1.tourSize();i++) {
+			City c1= parent1.getCity(i);
+			City c2= parent2.getCity(i);
+			child1.setCity(i, c1);
+			child2.setCity(i, c2);
+	
+			
+		}
+		for(int j=cut1;j<=cut2;j++) {	
+			City c1= parent1.getCity(j);
+			City c2= parent2.getCity(j);
+			child1.setCity(j, c2);
+			child2.setCity(j, c1);
+			System.out.println("cut1: "+cut1);
+			System.out.println("cut2: "+cut2);
+			System.out.println("parent1: "+parent1);
+			System.out.println("child1 "+child1);
+			System.out.println("parent2: "+parent2);
+			System.out.println("child2 "+child2);
+		} 
 		for(int j=cut1;j<=cut2;j++) {	
 			City c1= parent1.getCity(j);
 			City c2= parent2.getCity(j);
 			if(child1.containsCity(c2)) {	
 				conflicts1.add(c2);
+				
 			}
 			if(child2.containsCity(c1)) {		
 				conflicts2.add(c1);
@@ -730,17 +806,14 @@ public class GA implements myListener {
 		System.out.println("p2: "+parent2);
 		System.out.println("c1: "+child1);
 		System.out.println("c2: "+child2);
-		Tour p2Copy=new Tour();
-		for(int x=0; x<parent2.tourSize();x++) {		
-			City abc=parent2.getCity(x);
-			p2Copy.setCity(x,abc);
-		}
+		
+	
 		while(conflicts1.isEmpty()==false) {
 			City inter1;
 			int pos1;
 			int start1;
 			do {			
-				System.out.println();
+				
 				pos1= parent2.positionofCity(conflicts1.get(0));
 				start1= parent2.positionofCity(conflicts1.get(0));
 				inter1=parent1.getCity(pos1);
@@ -753,8 +826,7 @@ public class GA implements myListener {
 			child1.setCity(start1, inter1);
 			conflicts1.remove(0);
 		}
-		System.out.println("p2: "+parent2);
-		System.out.println("c1: "+child1);
+	
 		while(conflicts2.isEmpty()==false) {
 			City inter2;
 			int pos2;
@@ -772,10 +844,8 @@ public class GA implements myListener {
 			child2.setCity(start2, inter2);
 			conflicts2.remove(0);
 		}
-		System.out.println("p1: "+parent1);
-		System.out.println("c2: "+child2);
-		System.out.println();
-		System.out.println();
+		
+		System.out.println("done DONE done DONE");
 		kids[0]=child1;
 		kids[1]=child2;
 		return kids;
@@ -789,10 +859,14 @@ public class GA implements myListener {
 	 	City city2;
 	 	Tour[] kids= new Tour[2];											// returning array
 	 	int rundenzaehler=0;													// counts cycles
-	 	int position=0;														//actual position of cycle process
-	 	int start=0;														//starting position of cycle process
+	 	int position=2;														//actual position of cycle process
+	 	int start=2;														//starting position of cycle process
 	 	ArrayList<City> notvisited= new ArrayList<City>();					//ArrayList to check which cities have not been visited
-	 	for(int a=0; a<parent1.tourSize();a++) {		 					//Loop through parent1
+	    for(int bl=0;bl<blockedCities;bl++) {
+           	child1.setCity(bl, parent1.getCity(bl));
+           	child2.setCity(bl,parent2.getCity(bl));
+        }
+	 	for(int a=blockedCities; a<parent1.tourSize();a++) {		 					//Loop through parent1
 			 City ci= parent1.getCity(a);
 			 notvisited.add(ci);											//add all cities to ArrayList
 		}
@@ -800,7 +874,7 @@ public class GA implements myListener {
 	 	//System.out.println(parent2);	 	
 	 	while(notvisited.isEmpty()==false) { 								//while ArrayList contains a not visited city
 	 		if(rundenzaehler%2==1) {											//if we have an odd number of cycles
-	 			for(int a=0; a<parent1.tourSize();a++) {					//Loop through parent1
+	 			for(int a=blockedCities; a<parent1.tourSize();a++) {					//Loop through parent1
 					if(notvisited.contains(parent1.getCity(a))) {			//find fist not visited city in parent1
 						start=a;											//Update starting point	
 						position=start;										//update position
@@ -885,11 +959,11 @@ public class GA implements myListener {
 	 }
  
     private static void ExchangeMutation(Tour tour) {   	
-    	int tourPos1 = (int) (tour.tourSize() * Math.random()); 			//Create two random positions that should be swapped
-        int tourPos2 = (int) (tour.tourSize() * Math.random());
+    	int tourPos1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities; 			//Create two random positions that should be swapped
+        int tourPos2 = (int) ((tour.tourSize() -blockedCities)* Math.random())+blockedCities;
         while(tourPos1==tourPos2){											//If positions are equal, do it again
-             tourPos1 = (int) (tour.tourSize() * Math.random());			
-             tourPos2 = (int) (tour.tourSize() * Math.random());    
+             tourPos1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;			
+             tourPos2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;    
         }       
         City city1 = tour.getCity(tourPos1);								//Swap the selected cities
         City city2 = tour.getCity(tourPos2);
@@ -902,11 +976,11 @@ public class GA implements myListener {
     
     private static void InversionMutation(Tour tour) {  
     	Tour child= new Tour();
-    	int number1 = (int) (Math.random() * tour.tourSize());				//Create two random positions that should be swapped
-		int number2 = (int) (Math.random() * tour.tourSize());
+    	int number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;				//Create two random positions that should be swapped
+		int number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
     	while(number1==number2) { 		  									//If positions are equal, do it again
-    		number1 = (int) (Math.random() * tour.tourSize());
-    		number2 = (int) (Math.random() * tour.tourSize()); 
+    		number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
+    		number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities; 
 		}   	
     	int startPos= Math.min(number1, number2);							//startingpoint is the minimum of both random numbers
 		int endPos= Math.max(number1, number2);								//endposition is the maximum of the two random numbers
@@ -924,7 +998,7 @@ public class GA implements myListener {
     		d=d+1;															//increase start position copy
     	}		
     	
-    	for (int i = 0; i < tour.tourSize(); i++) {							//Loop through tour
+    	for (int i = blockedCities; i < tour.tourSize(); i++) {							//Loop through tour
     		 if (!child.containsCity(tour.getCity(i))) {	 				//If offspring does not contain city, add to offspring
     			 City city1 =tour.getCity(i);
     			 child.setCity(i, city1);									//save city 
@@ -934,17 +1008,17 @@ public class GA implements myListener {
     }
     private static void DisplacementMutation(Tour tour) {    
     	Tour child = new Tour();    	
-    	int number1 = (int) (Math.random() * All_Cities.numberOfCities());		//Create first random number
-    	int number2 = (int) (Math.random() * All_Cities.numberOfCities());		//Create second random number
+    	int number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;		//Create first random number
+    	int number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;		//Create second random number
     	while(number1==number2) { 		  									//If positions are equal, do it again
-    		number1 = (int) (Math.random() * tour.tourSize());
-    		number2 = (int) (Math.random() * tour.tourSize());  
+    		number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
+    		number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;  
     	}
     	int startPos= Math.min(number1, number2);							//startingpoint is the minimum of both random numbers
 		int endPos= Math.max(number1, number2);								//endposition is the maximum of the two random numbers
-    	int insertPos=(int) (Math.random() * (All_Cities.numberOfCities()-(endPos-startPos))); 	//create random position for insertion
+    	int insertPos=(int) (Math.random() * (tour.tourSize()-(endPos-startPos)-blockedCities))+blockedCities; 	//create random position for insertion
     	int zaehler=0;														//counter
-    	for(int i=0; i<tour.tourSize();i++) { 								//Loop through tour
+    	for(int i=blockedCities; i<tour.tourSize();i++) { 								//Loop through tour
     		if(i >= startPos && i <= endPos) { 								//if we are within the substring 
     			City city1= tour.getCity(i);
     			child.setCity(insertPos+zaehler, city1);						//save in offspring at insertposition + counter
@@ -952,7 +1026,7 @@ public class GA implements myListener {
     		}
     	}
     	zaehler=0;															//reset counter
-    	for(int j=0;j<tour.tourSize();j++) {   								//Loop through tour
+    	for(int j=blockedCities;j<tour.tourSize();j++) {   								//Loop through tour
     		if (!child.containsCity(tour.getCity(j))) {						//If offspring does not contain city
                 for (int ii = 0; ii < child.tourSize(); ii++) {
                     if (child.getCity(ii) == null) {						//find spare position in offspring
@@ -968,11 +1042,11 @@ public class GA implements myListener {
     }
     
     private static void InsertionMutation(Tour tour)    {  	  	
-    	int oldPos = (int) (Math.random() * All_Cities.numberOfCities());	//Select a random city
-    	int newPos = (int) (Math.random() * All_Cities.numberOfCities());   //Select a new random position									
+    	int oldPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;;	//Select a random city
+    	int newPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;   //Select a new random position									
     	while(oldPos==newPos) {		
-    		oldPos = (int) (tour.tourSize() * Math.random());			//If Position is the same, do again   
-    		newPos = (int) (tour.tourSize() * Math.random());
+    		oldPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;			//If Position is the same, do again   
+    		newPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
         }
     	City citytaken=tour.getCity(oldPos);							//save selected city
     	if(oldPos<newPos) { 											//shift all cities with a smaller position than newPos one position backwards
@@ -993,7 +1067,7 @@ public class GA implements myListener {
     private static void MultipleExchangeMutation(Tour tour) {  
         for(int tourPos1=0; tourPos1 < tour.tourSize(); tourPos1++){		//Loop through tour
             if(Math.random() < mutationRate){               				//If a random number is smaller than our selected mutationrate do the mutation
-                int tourPos2 = (int) (tour.tourSize() * Math.random()) ;    // Get a random position in the tour
+                int tourPos2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;;    // Get a random position in the tour
                 City city1 = tour.getCity(tourPos1); 						// Get the cities at target position in tour
                 City city2 = tour.getCity(tourPos2);             
                 tour.setCity(tourPos2, city1);								// Swap them
@@ -1037,24 +1111,37 @@ public class GA implements myListener {
 
 	@Override
 	public void atCity(AtEvent e) throws Exception{
+		EventCounter++;
 		Route route= new Route();
+		lastEventTime= new TimeElement();
 		route.WayFromTo(best);
 		durations=route.Duration;
 		Nodes=route.Allnodes;
 		Intersections=route.intersections;
 		RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations);
 		fireEvent(event);
-	}
-
-	@Override
-	public void atIntersection(AtEvent e) {
-
 		
 	}
 
 	@Override
+	public void atIntersection(AtEvent e) {
+		EventCounter++;
+		All_Cities.deleteCity(lastCity);
+		City Intersection= new City(numOfCities,"Intersection",e.longitude,e.latitude);
+		All_Cities.addCity(Intersection);
+		lastCity=Intersection;
+		lastEventTime= new TimeElement();
+		toDrivetoIntersection=0; //
+	}
+
+	@Override
 	public void GPS_Signal(AtEvent e)  {
-		TimeElement now= new TimeElement();
+		EventCounter++;
+		All_Cities.deleteCity(lastCity);
+		City GPS= new City(numOfCities,"GPS",e.longitude,e.latitude);
+		All_Cities.addCity(GPS);
+		lastCity=GPS;
+		lastEventTime= new TimeElement();
 		for( int i=0; i<Nodes.size()-1;i++) {								//Find nodes I am in between now
 			double maxLat= Math.max(Nodes.get(i).getLatitude(),Nodes.get(i+1).getLatitude());
 			double minLat= Math.min(Nodes.get(i).getLatitude(),Nodes.get(i+1).getLatitude());
@@ -1067,8 +1154,8 @@ public class GA implements myListener {
 				double lonratio=(Nodes.get(i+1).getLongitude()-e.getLongitude())/(Nodes.get(i+1).getLongitude()-Nodes.get(i).getLongitude());
 				double ratio= (latratio+lonratio)/2;
 				
-				int hour= now.getHour();																//current hour
-				double ttnh=now.getTimeToNextHour();
+				int hour= lastEventTime.getHour();																//current hour
+				double ttnh=lastEventTime.getTimeToNextHour();
 				if(durations[i]*ratio*Maths.getFaktor(hour)>ttnh) {							//If the sum of the values + the actual value is bigger than the time to the next hour
 					double tohour=ttnh-durations[i]*ratio*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
 					double hourratio= tohour/durations[i]*Maths.getFaktor(hour)*ratio;				// Calculate ratio of driven way in this section

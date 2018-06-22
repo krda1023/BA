@@ -12,15 +12,15 @@ public class Run {
 		
 	
 		GA Optimierer= new GA();								
-		Optimierer.gui_start();
+	//	Optimierer.gui_start();
 		Optimierer.Formalitäten();
 		
 
 	    
-		Salesman Guy= new Salesman();
+	/*	Salesman Guy= new Salesman();
 		Guy.addListener(Optimierer);
 		Optimierer.addRouteServiceListener(Guy);
-		
+		*/
 	
            
 System.out.print(GA.numOfCities);
@@ -33,7 +33,7 @@ System.out.print(GA.numOfCities);
      log.setLogger();
        for (int z = 0; z < GA.iterationen; z++) {
            Optimierer.evolvePopulation(false);
-           Guy.checkForEvents();
+      //     Guy.checkForEvents();
            
       //  log.writeInfo(Optimierer.best.getDistance(),Optimierer.best);
     
@@ -76,7 +76,7 @@ System.out.print(GA.numOfCities);
       		System.out.println("Final duration: " + Optimierer.pop.getFittest().getDistance());
       	}
        System.out.println("Anzahl Städte: "+All_Cities.numberOfCities());
-       System.out.println("Anzahlanfragen"+Send_Request.getAnfragencounter());
+       System.out.println("Anzahlanfragen"+Send_Request.anfragencounter);
        System.out.println("Solution:");
        System.out.println(Optimierer.pop.getFittest()); 
        Date ende= new Date();

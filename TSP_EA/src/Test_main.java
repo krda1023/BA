@@ -16,13 +16,11 @@ public class Test_main {
 	public static void main(String[]args) {
 	
 		
-		
-		All_Cities abc= new All_Cities();
-		City city= new City(1, null);
-		abc.addCity(city);
-		All_Cities def= new All_Cities();
-		System.out.print(def.getCity(0).getId());
-		
+	
+	
+	System.out.println((int)(0.9999*10));
+
+
 		
 		
 		

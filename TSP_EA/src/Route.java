@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Route {
@@ -12,7 +11,7 @@ public class Route {
 	double[]Distance;
 	ArrayList<City> intersections;
 	ArrayList<double[]> allDurations =new ArrayList<double[]>();
-	Send_Request anfrage;
+	
 	
 	GammaVerteilung gamma= new GammaVerteilung();
 	JSONObject Way;
@@ -20,7 +19,7 @@ public class Route {
 	public Route()
 	{
 		this.liste=new All_Cities();
-		this.anfrage=new Send_Request(liste);
+		
 		
 	}
 	
@@ -28,8 +27,8 @@ public class Route {
 	public void WayFromTo(Tour best) throws Exception 
 	{
 		try {
-		anfrage.createRouteRequest(best);
-		Way=anfrage.getDirection();
+		
+		Way=Send_Request.createRouteRequest(best);
 		}
 		catch(Exception e)
 		{
@@ -52,7 +51,7 @@ public class Route {
 				double [] position= new double[2];
 				position[0]=location.getDouble(0);
 				position[1]=location.getDouble(1);
-				City newCity= new City(id,position);
+				City newCity= new City(id,"Intersection",position);
 				intersections.add(newCity);  //.....nochmal überdneken, nodeabgleich erforderlich
 				id++;
 				
@@ -73,7 +72,7 @@ public class Route {
 			Distance[a]=distance.getDouble(a);
 			}
 		}
-		Allnodes=anfrage.getNodes(Nodes);
+		Allnodes=Send_Request.getNodes(Nodes);
 		
 		for(int inters=1; inters<intersections.size();inters++) {		//Übergebe NodeID an Intersection zur Identifikation
 			for(int node=0; node<Allnodes.size();node++) {

@@ -11,6 +11,7 @@ public class AtEvent extends EventObject {
 
 	String EventType;
 	long EventTime;
+	
 	double longitude;
 	double latitude;
 	

@@ -4,7 +4,7 @@ public class All_Cities {
 	
 	    // Holds our cities
 	private static ArrayList<City> destinationCities = new ArrayList<City>();
-
+	static final City startCity=Distanzmatrix.startCity;
 	    // Adds a destination city
 	public static void addCity(City city) {
 	        destinationCities.add(city);
