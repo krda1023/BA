@@ -99,7 +99,7 @@ public class Salesman implements RouteServiceListener {
 		double durationSumZFGA=0;																//Sum of gamma and time factor influenced values looped
 		ZF_GA_duration= new double[gammaDuration.length];										//Array for final values for Simulation, gamma and time factor influenced
 		int hour= now.getHour();																//actual hour
-		double ttnh=now.getTimeToNextHour();													// Duration to next hour in seconds
+		double ttnh=now.getTimeToNextHour();												// Duration to next hour in seconds
 			for(int j=0; j<gammaDuration.length;j++) {											//Loop through Gamma 
 				
 				if(durationSumZFGA+gammaDuration[j]*Maths.getFaktor(hour)>ttnh) {			//If the sum of the values + the actual value is bigger than the time to the next hour

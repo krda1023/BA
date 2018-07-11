@@ -24,7 +24,7 @@ public class Population {
     
     
     public void saveTour(int index, Tour tour) {						// Saves a tour
-        tours[index] = tour; 
+        tours[index] = tour;
     }
 
         
