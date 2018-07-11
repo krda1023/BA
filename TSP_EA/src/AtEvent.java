@@ -9,18 +9,16 @@ public class AtEvent extends EventObject {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	String EventType;
+	public String status;
 	long EventTime;
+	City location;
 	
-	double longitude;
-	double latitude;
 	
-	public AtEvent(Salesman salesman, String type, long Time, double lon, double lat) {
+	public AtEvent(Salesman salesman, City loc, long Time) {
 		super(salesman);
-		this.EventType=type;
+		this.location=loc;
 		this.EventTime=Time;
-		this.longitude=lon;
-		this.latitude=lat;
+	
 		
 	}
 	
@@ -28,12 +26,12 @@ public class AtEvent extends EventObject {
 		return EventTime;
 	}
 	public String getEventType(){
-		return EventType;
+		return location.type;
 	}
 	public double getLongitude() {
-		return longitude;
+		return location.position[0];
 	}
 	public double getLatitude() {
-		return latitude;
+		return location.position[1];
 	}
 }

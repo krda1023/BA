@@ -12,7 +12,7 @@ public class readFile {
 	Scanner s ;
 	String path;
 	double[][] erg;
-	int id;
+	
 	int countlines=0;
 	
 	
@@ -20,7 +20,7 @@ public class readFile {
 	{
 		return countlines;
 	}
-	public double[][] getMatrix()
+	public double[][] getCoordinates()
 	{
 		return erg;
 	}
@@ -60,19 +60,19 @@ public class readFile {
 			System.out.print("Error reading file");
 		}
 		
-		erg= new double[countlines][3];
+		erg= new double[countlines][2];
 		
 		
 	
 		for(int j=0;j<countlines;j++)
 		{
-		String a=s.next();
+		
 		String b= s.next();
 		String c=s.next();
-		id=Integer.parseInt(a);
-		erg[(id-1)][0]=(double)id;
-		erg[(id-1)][1]=Double.parseDouble(b);
-		erg[(id-1)][2]=Double.parseDouble(c);
+		
+		
+		erg[j][0]=Double.parseDouble(b);
+		erg[j][1]=Double.parseDouble(c);
 	
 
 

@@ -28,14 +28,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Send_Request {
-	All_Cities liste= new All_Cities();
+	
 																				//2-dim. array for saving table service response
 																			//JSON Object for saving routing service response
 	static int anfragencounter=0;																// request counter
 
 		
 	public static  StringBuffer gogo(String gesamt) throws Exception{									//sends URL and gets response in Stringbuffer
-		URL obj = new URL(gesamt);																//create new URL Object
+		URL obj = new URL(gesamt);
+		System.out.println(gesamt);//create new URL Object
 	    HttpURLConnection con = (HttpURLConnection) obj.openConnection();						//open a http connection
 	    con.setRequestMethod("GET");															
 	    con.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -53,9 +54,9 @@ public class Send_Request {
 	
 	public static JSONObject createRouteRequest(Tour fittest) throws Exception{	
 		JSONObject Way;		//Creates String with URL, applies gogo and saves response in an JSONObejct
-		String gesamt= "http://router.project-osrm.org/route/v1/driving/";						//Fixed URL Start
-		City From=fittest.getCity(0);	//??? Korrekt???
-		City To=fittest.getCity(1);		//???Korrekt???
+		String gesamt= "https://w-bdlab-s1.hs-karlsruhe.de/osrm/route/v1/driving/";						//Fixed URL Start
+		City From=fittest.getCity(1);	//??? Korrekt wenn Tour angepasst bei ankunft: C->C
+		City To=fittest.getCity(2);		//???Korrekt???
 		double x1=From.getLongitude();															//Longitude of departing city
 		double y1=From.getLatitude();															//Latitude of departing city
 		double x2=To.getLongitude();															//Longitude of destination city
@@ -67,10 +68,11 @@ public class Send_Request {
 		return Way;
 	}
 	//MUSS NOCH GETESTET WERDEN!!!
-	public static ArrayList<City> getNodes(double[]nodes) throws Exception{		//Muss wahrscheinlich String übergeben werden da Zahl zu groß								//Gets geo-coordinates for all received OSM nodes
+	public static ArrayList<City> getNodes(String[]nodes) throws Exception{		//Muss wahrscheinlich String übergeben werden da Zahl zu groß								//Gets geo-coordinates for all received OSM nodes
 		ArrayList<City> Nodes= new ArrayList<City>();																//Contains all nodes that has to be converted
 		for(int i=0;i<nodes.length;i++){												
 			String url="http://www.openstreetmap.org/api/0.6/node/";								//Fixed URL start
+			System.out.println(nodes[i]);
 			url+=nodes[i];																		//add node id
 			StringBuffer response = gogo(url); 													//Open HTTP Connection and send URL
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();				
@@ -81,13 +83,13 @@ public class Send_Request {
 			Node node= nList.item(0);
 			Element el= (Element) node;
 			String ID =(el.getAttribute("id"));
-			int id = Integer.parseInt(ID);
+			
 			String LONG=(el.getAttribute("lon"));
 			String LAT=(el.getAttribute("lat"));
 			double[]pos=new double[2];
 			pos[0]=Double.parseDouble(LONG);
 			pos[1]=Double.parseDouble(LAT);
-			City newWP= new City(id,"City",pos);
+			City newWP= new City(ID,"Node",pos);
 			Nodes.add(newWP);
 		}
 		return Nodes;
@@ -100,10 +102,10 @@ public class Send_Request {
 	public static double[] IntersectionMatrix(City Intersection) throws Exception{								//Gets all distances from upcoming WP Node to all cities
 		int numOfCities;
 		if(All_Cities.getCity(All_Cities.numberOfCities()-2).getType()=="Intersection") {
-			numOfCities=All_Cities.numberOfCities()-2;
+			numOfCities=All_Cities.numberOfCities()-2;   //Falls wir an Intersection Matrixanfrage starten
 		}
 		else {
-			numOfCities=All_Cities.numberOfCities()-1;
+			numOfCities=All_Cities.numberOfCities()-1; 	//Falls wir an City Matrixanfrage starten
 		}
 		double[] erg=new double[numOfCities];
 		int numberOfCases;
@@ -115,7 +117,7 @@ public class Send_Request {
 		}
 		for(int asym=1;asym<=numberOfCases;asym++){
 			if(numOfCities-(asym*99)<0){      //wenn splitted Asymanfrage 
-				String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+				String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 				String zwischenerg="";
 				double x = Intersection.getLongitude();			//Intersection an erster Stelle in URL
 			 	double y = Intersection.getLatitude();
@@ -145,7 +147,7 @@ public class Send_Request {
 			   
 			     JSONArray dura_2=dura_1.getJSONArray(0);
 			     for (int positionzeile=((asym-1)*99);positionzeile<numOfCities;positionzeile++){
-			    	 int toCityID=All_Cities.getCity(positionzeile).getId();				   	   			    	    	
+			    	 int toCityID=Integer.parseInt(All_Cities.getCity(positionzeile).getId());				   	   			    	    	
 			    	 erg[toCityID] = dura_2.getDouble(z);
 			    	 z++;				    	    	
 			     }			   	    				    	
@@ -153,7 +155,7 @@ public class Send_Request {
 			}	
 			
 			if(numOfCities-(asym*99)>=0){	//wenn volle 1x99 Anfrage
-				String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+				String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 				String zwischenerg="";
 				double x = Intersection.getLongitude();
 			 	double y = Intersection.getLatitude();
@@ -182,7 +184,7 @@ public class Send_Request {
 			     int z=1;
 			     JSONArray dura_2=dura_1.getJSONArray(0);
 			     for (int positionzeile=((asym-1)*99);positionzeile<asym*99;positionzeile++){
-			    	 int toCityID=All_Cities.getCity(positionzeile).getId();				   	   			    	    	
+			    	 int toCityID=Integer.parseInt(All_Cities.getCity(positionzeile).getId());				   	   			    	    	
 			    	 erg[toCityID] = dura_2.getDouble(z);
 			    	 z++;				    	    	
 			     }			   	    				    	
@@ -194,7 +196,7 @@ public class Send_Request {
 
 	public static double[][]createBasicMatrix() throws Exception {
 		// System.out.println("start:"+timestamp1);
-		double[][] erg=new double[GA.numOfCities][GA.numOfCities];
+		double[][] erg=new double[Distanzmatrix.CreatingnumOfCities+1][Distanzmatrix.CreatingnumOfCities+1];
 		int numOfCities=All_Cities.numberOfCities();
 		int numberOfCases;
 		int SplittedtoAdd;
@@ -229,11 +231,11 @@ public class Send_Request {
 			}
 		}
 		
-		/*System.out.println("numOfCities: "+numOfCities);
+		System.out.println("numOfCities: "+numOfCities);
 		System.out.println("Anzahl Sym Matrix: "+numberSymmMatrix);
 		System.out.println("Plitt to add: "+SplittedtoAdd);
 		System.out.println("Anzahl Splitt Matrix: "+numberSplittedMatrix);
-		System.out.println("Number of Cases "+numberOfCases);*/
+		System.out.println("Number of Cases "+numberOfCases);
 		
 		//Symmetrische Matrizen
 		int IFzähler=0;
@@ -243,7 +245,7 @@ public class Send_Request {
 					erg[numOfCities-1][numOfCities-1]=0;
 				}
 				else{
-					String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+					String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 					String zwischenerg="";
 					for(int position=((sym-1)*100);position<numOfCities;position++){
 						City intermediate = All_Cities.getCity(position);
@@ -280,7 +282,7 @@ public class Send_Request {
 				}
 			}		
 			if(numOfCities-(sym*100)>=0)  { //100x100 volle
-				String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+				String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 				String zwischenerg="";
 				for(int position=(sym-1)*100;position<sym*100;position++){
 					City intermediate = All_Cities.getCity(position);
@@ -326,7 +328,7 @@ public class Send_Request {
 						for(int caseNR=1;caseNR<=4;caseNR++){	
 							switch (caseNR){
 								case 1: {
-									String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+									String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 									String zwischenerg="";
 									for(int a=(zeile-1)*100;a<(zeile-1)*100+50;a++){// /50 Städte der aktuellen zeile
 									City intermediate = All_Cities.getCity(a);
@@ -378,7 +380,7 @@ public class Send_Request {
 									 continue;
 								}
 								case 2: {
-									String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+									String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 									String zwischenerg="";
 									for(int a=(zeile-1)*100+50;a<(zeile-1)*100+100;a++){// /50 Städte der aktuellen zeile
 										City intermediate = All_Cities.getCity(a);
@@ -430,7 +432,7 @@ public class Send_Request {
 									continue;
 								}
 								case 3: {
-									String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+									String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 									String zwischenerg="";
 									for(int a=(zeile-1)*100;a<(zeile-1)*100+50;a++){// /50 Städte der aktuellen zeile
 										City intermediate = All_Cities.getCity(a);
@@ -484,7 +486,7 @@ public class Send_Request {
 									    continue;
 								}
 								case 4: {
-									String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+									String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 									String zwischenerg="";
 									for(int a=(zeile-1)*100+50;a<(zeile-1)*100+100;a++){// /50 Städte der aktuellen zeile
 										City intermediate = All_Cities.getCity(a);
@@ -526,7 +528,7 @@ public class Send_Request {
 								    		 erg[d][c]= dura_3.getDouble(x);
 									    		s++;
 									    		x++;
-									    		System.out.print(s+" ");
+									    		
 								    	 }
 								    	 s=50;
 								    	 x=0;
@@ -548,7 +550,7 @@ public class Send_Request {
 						for(int caseNR=1;caseNR<=4;caseNR++){
 							switch (caseNR){
 								case 1: {
-									String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+									String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 									String zwischenerg="";
 									for(int a=(zeile-1)*100;a<(zeile-1)*100+50;a++){// /50 Städte der aktuellen zeile
 										
@@ -601,7 +603,7 @@ public class Send_Request {
 									    continue;
 								}
 								case 2: {
-									String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+									String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 									String zwischenerg="";
 									for(int a=(zeile-1)*100+50;a<(zeile-1)*100+100;a++){// /50 Städte der aktuellen zeile									
 										City intermediate = All_Cities.getCity(a);
@@ -654,7 +656,7 @@ public class Send_Request {
 									 continue;
 								}
 								case 3: {
-									String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+									String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 									String zwischenerg="";
 									for(int a=(zeile-1)*100;a<(zeile-1)*100+50;a++){// /50 Städte der aktuellen zeile
 										City intermediate = All_Cities.getCity(a);
@@ -711,7 +713,7 @@ public class Send_Request {
 								    continue;
 								}
 								case 4:{ 
-									String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+									String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 									String zwischenerg="";
 									for(int a=(zeile-1)*100+50;a<(zeile-1)*100+100;a++){// /50 Städte der aktuellen zeile
 										City intermediate = All_Cities.getCity(a);
@@ -776,7 +778,7 @@ public class Send_Request {
 						for(int caseNR=1;caseNR<=2;caseNR++){
 							switch (caseNR){
 								case 1: {
-									String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+									String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 									String zwischenerg="";
 									for(int a=(zeile-1)*100;a<(zeile-1)*100+50;a++){// /50 Städte der aktuellen zeile
 										City intermediate = All_Cities.getCity(a);
@@ -802,7 +804,7 @@ public class Send_Request {
 										
 									}
 									String gesamt=urlAnfang+zwischenerg;
-									System.out.println(gesamt);
+									
 									 StringBuffer response = gogo(gesamt); 
 								     JSONObject jobj= new JSONObject(response.toString());
 								     JSONArray dura_1 = jobj.getJSONArray("durations");
@@ -830,11 +832,11 @@ public class Send_Request {
 									     y++;
 								    }
 								    IFzähler++;
-								    System.out.println("IF 5, Case1: "+IFzähler);
+								
 								    continue;
 								}
 								case 2: {
-									String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
+									String urlAnfang = "https://w-bdlab-s1.hs-karlsruhe.de/osrm/table/v1/driving/";
 									String zwischenerg="";
 									for(int a=(zeile-1)*100+50;a<(zeile-1)*100+100;a++){// /50 Städte der aktuellen zeile
 										City intermediate = All_Cities.getCity(a);
@@ -859,7 +861,7 @@ public class Send_Request {
 										}
 									}
 									String gesamt=urlAnfang+zwischenerg;
-								    System.out.println(gesamt);
+								  
 									 StringBuffer response = gogo(gesamt); 
 								     JSONObject jobj= new JSONObject(response.toString());
 								     JSONArray dura_1 = jobj.getJSONArray("durations");
@@ -886,7 +888,7 @@ public class Send_Request {
 									     y++;
 								    }
 								    IFzähler++;
-								    System.out.println("IF 5, Case2: "+IFzähler);
+								    
 								    continue;
 								}
 							}						
@@ -917,16 +919,15 @@ public class Send_Request {
 			} 
 		 }
 		 String gesamt=urlAnfang+zwischenerg;
-		 System.out.println(gesamt);
+		
 		 StringBuffer response = gogo(gesamt); 	 
 	     JSONObject jobj= new JSONObject(response.toString());
 	     JSONArray dura_1 = jobj.getJSONArray("durations");  
 	     for (int t=0; t<All_Cities.numberOfCities();t++){
 	    	JSONArray dura_2=dura_1.getJSONArray(t);
-	    	System.out.println(dura_2.toString());   
+	    	
 	        for (int i = 0; i < GA.numOfCities; i++) {
-	        	System.out.println("erg length: "+ erg.length+ "GA.numofCIties:  "+GA.numOfCities);	    
-	   	        System.out.println("dura_1.length: "+dura_1.length()+"  dura_2.length:  "+dura_2.length());
+	       
 	   	        erg[t][i] = dura_2.getDouble(i);	    	    	
 	   	    }
 	    }

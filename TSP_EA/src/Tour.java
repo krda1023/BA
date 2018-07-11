@@ -41,6 +41,12 @@ public class Tour{
         return (City)tour.get(tourPosition);
     }
 
+    public void deleteCity(int pos) {
+    	tour.remove(pos);
+    }
+    public void addatPosition(int pos, City city) {
+    	tour.add(pos,city );
+    }
     // Sets a city in a certain position within a tour
     public void setCity(int tourPosition, City city) {
         tour.set(tourPosition, city);
@@ -77,8 +83,7 @@ public class Tour{
                  destinationCity = getCity(0);
              }
 			 
-			 int a = fromCity.getId();
-			 int b = destinationCity.getId();
+			
     	 }
     	double durationInSec= (double)(duration/1000);
     	return durationInSec;
@@ -107,14 +112,18 @@ public class Tour{
                    //  System.out.println(destinationCity.getId());
                  }
     			 
-    			 int a = fromCity.getId();
-    			 //System.out.println(destinationCity.getId());
-    			 int b = destinationCity.getId();
-    			// System.out.println(matrix[a][b]);
-    			 tourdistance+=matrix[a][b];
-    			// System.out.println(tourdistance);
+    			 String a = fromCity.getId();
+    			 
+    			 String b = destinationCity.getId();
+    			 
+    			
+    			 tourdistance+=matrix[Integer.parseInt(a)][Integer.parseInt(b)];
+    		
+    			
     		 }
-    		 distance=tourdistance;	        	 
+    		 distance=tourdistance;	  
+    		
+    		 
     	}
     	distance= Maths.round(distance,5);
     		//	System.out.println("Round finished");    //Runden

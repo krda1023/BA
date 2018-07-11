@@ -6,6 +6,7 @@ public class Salesman implements RouteServiceListener {
 	private ArrayList<AtEvent> pastEvents = new ArrayList<AtEvent>();
 	ArrayList<City> Nodes;
 	ArrayList<City> Intersection;
+	Tour best;
 	double[] duration;
 	double[] ZF_GA_duration;
 	int GPS_frequency=10;
@@ -47,7 +48,6 @@ public class Salesman implements RouteServiceListener {
 		try {
 			fireEvent(currentEvent);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -82,6 +82,7 @@ public class Salesman implements RouteServiceListener {
 		Nodes=e.Nodes;
 		Intersection= e.Intersection;
 		duration=e.durations;
+		best=e.best;
 		createEvents();
 		
 	}
@@ -91,7 +92,7 @@ public class Salesman implements RouteServiceListener {
 		double[] gammaDuration= new double[duration.length];												//Array for Gamma influenced values
 																	
 		for(int i=0; i<duration.length;i++) {													//Loop through duration values and use gamma function
-			gammaDuration[i]=GammaVerteilung.goGamma(duration[i], k, theta, shiftDistance);	
+			gammaDuration[i]=Maths.goGamma(duration[i], k, theta, shiftDistance);	
 		}
 		
 		TimeElement now= new TimeElement();
@@ -121,19 +122,7 @@ public class Salesman implements RouteServiceListener {
 				}
 			}
 			
-		//Passe Start und End Node an	
-		double lat_ratio_start=(Nodes.get(1).getLatitude()-Intersection.get(0).getLatitude())/(Nodes.get(1).getLatitude()-Nodes.get(0).getLatitude());	
-		double lon_ratio_start=(Nodes.get(1).getLongitude()-Intersection.get(0).getLongitude())/(Nodes.get(1).getLongitude()-Nodes.get(0).getLongitude());
-		double avg_ratio_start= (lat_ratio_start+lon_ratio_start)/2;
-		ZF_GA_duration[0]=ZF_GA_duration[0]*avg_ratio_start;
-		Nodes.set(0, Intersection.get(0));
-		
-		double lat_ratio_end=(Nodes.get(Nodes.size()-1).getLatitude()-Intersection.get(Intersection.size()-1).getLatitude())/(Nodes.get(Nodes.size()-1).getLatitude()-Nodes.get(Nodes.size()-2).getLatitude());	
-		double lon_ratio_end=(Nodes.get(Nodes.size()-1).getLongitude()-Intersection.get(Intersection.size()-1).getLongitude())/(Nodes.get(Nodes.size()-1).getLongitude()-Nodes.get(Nodes.size()-2).getLongitude());
-		double avg_ratio_end= (lat_ratio_end+lon_ratio_end)/2;
-		ZF_GA_duration[ZF_GA_duration.length-1]=ZF_GA_duration[ZF_GA_duration.length-1]*avg_ratio_end;
-		Nodes.set(Nodes.size()-1, Intersection.get(Intersection.size()-1));
-		
+	
 		
 		int numberofGPSEvents= (int)durationSumZFGA/GPS_frequency;
 		double eventTimeSum=0;
@@ -161,35 +150,44 @@ public class Salesman implements RouteServiceListener {
 			
 			double newlat= (lat2-lat1)*ratio+lat1;
 			double newlon=(lon2-lon1)*ratio+lon1;
-			
-			AtEvent ev= new AtEvent(this,"GPS_Signal",now.startInMilli+(long)(eventTimeSum*1000),newlon,newlat);
+			City GPS = new City(Integer.toString(events),"GPS",newlon,newlat);
+			AtEvent ev= new AtEvent(this,GPS,now.startInMilli+(long)(eventTimeSum*1000));
 			upcomingEvents.add(ev);
 		}
 		
 		for(int inters=1; inters<Intersection.size();inters++) { 
 			double sumIntD=0;
-			for(int node=0;node<Nodes.size();node++) {
-				sumIntD+=ZF_GA_duration[node];   
-				if(Intersection.get(inters).getId()==Nodes.get(node).getId()) {
-					if(inters==Intersection.size()-1) {
-						
-						AtEvent ev= new AtEvent(this,"AtCity",(long)(now.startInMilli+(sumIntD*1000)),Intersection.get(inters).getLatitude(),Intersection.get(inters).getLongitude());
-						upcomingEvents.add(ev);
-						break;
-					}
-					else {
-						
-						AtEvent ev= new AtEvent(this,"AtIntersection",(long)(now.startInMilli+(sumIntD*1000)),Intersection.get(inters).getLatitude(),Intersection.get(inters).getLongitude());
-						upcomingEvents.add(ev);
-						break;
-					}
-					
+			if(inters==Intersection.size()-1) {
+				for(int dur=0;dur<ZF_GA_duration.length;dur++) {
+					sumIntD+=ZF_GA_duration[dur];
+				}											//Letztes Event, Intersection last = City "City"
+				AtEvent ev= new AtEvent(this,Intersection.get(inters) ,(long)(now.startInMilli+(sumIntD*1000)));
+				if(Intersection.get(inters)==Distanzmatrix.startCity) {
+					ev.status="Erste Stadt wieder erreicht";
 				}
+			
+				
+				if(All_Cities.checkForCities()<=1) {
+					ev.status="Letze Stadt erreicht";
+				}
+				upcomingEvents.add(ev);
+				break;
 			}
 			
+			else {
+				for(int node=0;node<Nodes.size();node++) {
+					sumIntD+=ZF_GA_duration[node];   
+					if(Intersection.get(inters).getId()==Nodes.get(node).getId()) { //Hier hat Intersection noch die ID der korresponiderenden Nodes
+							AtEvent ev= new AtEvent(this,Intersection.get(inters),(long)(now.startInMilli+(sumIntD*1000)));
+							if((All_Cities.checkForCities()==2 &&Intersection.get(inters)==Intersection.get(Intersection.size()-2))) {
+								ev.status="Operatoren-Stop";
+							}
+							upcomingEvents.add(ev);
+							break;	
+					}	
+				}
+			}	
 		}
-		
-		
 	}
 }
 	

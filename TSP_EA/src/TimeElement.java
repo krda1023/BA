@@ -10,8 +10,10 @@ public class TimeElement{
 		this.startInMilli= start.getTimeInMillis();
 	}
 	
-	public TimeElement(Calendar d) {
-		this.start=d;
+	public TimeElement(long timeinMilli) {
+		 Calendar cal =Calendar.getInstance();
+		 cal.setTimeInMillis(timeinMilli);
+		 this.start=cal;
 		this.startInMilli=start.getTimeInMillis();
 	}
 	

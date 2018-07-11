@@ -6,7 +6,8 @@ import java.util.Scanner;
 
 public class Run {
 		
-	
+	static int count=0;
+	static boolean runs=true;
 		
 	public static void main(String[] args) throws Exception{
 		
@@ -22,63 +23,43 @@ public class Run {
 		Optimierer.addRouteServiceListener(Guy);
 		*/
 	
-           
-System.out.print(GA.numOfCities);
+        
        
      Optimierer.evolvePopulation(true);
-  
+     double d = GA.pop.getFittest().getDistance();
 		
 		//BERECHNE ERSTE LÖSUNG
      MyLogger log= new MyLogger();
      log.setLogger();
-       for (int z = 0; z < GA.iterationen; z++) {
+      for (int z = 0; z < GA.iterationen; z++) {
            Optimierer.evolvePopulation(false);
-      //     Guy.checkForEvents();
+     
            
-      //  log.writeInfo(Optimierer.best.getDistance(),Optimierer.best);
+       log.writeInfo(Optimierer.best.getDistance(),Optimierer.best);
     
-         
        }
+    //  Optimierer.start();
+  
        
-       // 1 Directions Abfrage
-          
-      // Route route= new Route();
-       //route.WayFromTo();
-       
-       
-      
-		
-		
-      /* Tour oldFittest=new Tour();
-        Tour newFittest= new Tour();
-        int counter=0;
-        do {
-        	oldFittest=pop.getFittest();
-            pop = Algorithmus.evolvePopulation(pop);
-            newFittest=pop.getFittest();
-            if(newFittest.getDistance()==oldFittest.getDistance())
-            {
-            	counter++;
-            }
-            else
-            {
-            	counter=0;
-            }
-        }
-        while(counter<2);*/
 
+        int counter=0;
+    /*    do {
+        	
+            
+            Optimierer.evolvePopulation(false);
+            //     Guy.checkForEvents();
+          
+        }
+        while(runs==true);
+*/
         // Print final results
-      	System.out.println("Finished");
-      	if(Optimierer.getfileLesen()==true) {
-      		System.out.println("Final distance: " + Optimierer.pop.getFittest().getDistance());
-      	}
-      	if(Optimierer.getfileLesen()==false) {
-      		System.out.println("Final duration: " + Optimierer.pop.getFittest().getDistance());
-      	}
+        System.out.println(("Initial duration : "+d));
+        System.out.println("Final duration: " + GA.pop.getFittest().getDistance());
+      	
        System.out.println("Anzahl Städte: "+All_Cities.numberOfCities());
        System.out.println("Anzahlanfragen"+Send_Request.anfragencounter);
        System.out.println("Solution:");
-       System.out.println(Optimierer.pop.getFittest()); 
+       System.out.println(GA.pop.getFittest()); 
        Date ende= new Date();
        System.out.print(ende);		
        //log.exit(); 
