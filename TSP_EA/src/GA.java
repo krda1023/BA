@@ -47,20 +47,18 @@ public class GA implements myListener {
 	Tour best;
 	static Population pop;
 	Tour lastbest;
-	static City lastCity;
-	static City lastIntersection;
-	static City lastGPS;
+	static City lastLocation;
+	
 	static boolean OP_Stop=false;
 	double distance=0;
 	ArrayList<City> Nodes;
 	ArrayList<City> Intersections;
-	double[] durations;
+	static double[] durations;
 	static double toDrivetoIntersection;
 	static double toDrivetoCity;
+	static double toDrivetoNode;
 	static TimeElement lastEventTime;
 	private ArrayList<RouteServiceListener> listenerList= new ArrayList<RouteServiceListener>();
-	City saveNode1;
-	City saveNode2;
 	
 	int i;
 	int j;
@@ -464,7 +462,7 @@ public class GA implements myListener {
 	            newPopulation.saveTour(0, pop.getFittest());
 	            elitismOffset = 1;							
 	        }
-	        lastbest=pop.getFittest();
+	       
 	       
 	       if(ox2C){
 	    	   for (int z = elitismOffset; z < newPopulation.populationSize(); z++) {   //Loop through every tour of the population
@@ -575,17 +573,6 @@ public class GA implements myListener {
 	    else {
 	    	//Mach nix
 	    }
-    }
-    
-    public boolean changeinFittest() {
-    	boolean change;
-    	if(lastbest==best) {
-    		change=false;
-    	}
-    	else {
-    		change=true;
-    	}
-    	return change;
     }
     
     
@@ -1324,15 +1311,19 @@ public class GA implements myListener {
 		double avg_ratio_start= (lat_ratio_start+lon_ratio_start)/2;  
 		durations[0]=durations[0]*avg_ratio_start;
 		
-		Intersections.set(0,best.getCity(1));
+		int pos = All_Cities.destinationCities.indexOf(best.getCity(1)); //IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
+		All_Cities.destinationCities.set(pos, Intersections.get(0));
 		Nodes.set(0, Intersections.get(0)); //e.location == City "City"
 		
 		double lat_ratio_end=(Nodes.get(Nodes.size()-1).getLatitude()-Intersections.get(Intersections.size()-1).getLatitude())/(Nodes.get(Nodes.size()-1).getLatitude()-Nodes.get(Nodes.size()-2).getLatitude());	
 		double lon_ratio_end=(Nodes.get(Nodes.size()-1).getLongitude()-Intersections.get(Intersections.size()-1).getLongitude())/(Nodes.get(Nodes.size()-1).getLongitude()-Nodes.get(Nodes.size()-2).getLongitude());
 		double avg_ratio_end= (lat_ratio_end+lon_ratio_end)/2;
 		durations[durations.length-1]=durations[durations.length-1]*avg_ratio_end;
-		Intersections.set(Intersections.size()-1,best.getCity(2));
+		
+		int pos2 = All_Cities.destinationCities.indexOf(best.getCity(2)); //IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
+		All_Cities.destinationCities.set(pos2, Intersections.get(Intersections.size()-1));
 		Nodes.set(Nodes.size()-1, Intersections.get(Intersections.size()-1));
+		
 		RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations,best);
 		fireEvent(event);
 		for ( int t =0; t<pop.populationSize();t++) {
@@ -1348,53 +1339,36 @@ public class GA implements myListener {
 				pop.getTour(t).addatPosition(1, best.getCity(2));
 			}
 		}
+		best.deleteCity(0);
+		if(Intersections.get(1).getType()=="Intersection") {
+			best.addatPosition(1, Intersections.get(1));
+		}
 		if(Intersections.get(1).getType()=="Intersection"){
 			All_Cities.addCity(Intersections.get(1));
 			Distanzmatrix.updateAllMatrix();
 		}
-		lastCity=Distanzmatrix.startCity;
+		
 		if(Intersections.get(1).getType()=="City") {  //falls keine Intersection auf der Strecke liegt, außer Start und Zielstadt
 			for(int n=0; n<Nodes.size()-1;n++) {
-				if(toDrivetoIntersection+durations[n]*Maths.getFaktor(hour)>ttnh) {
-					double tohour=ttnh-durations[n]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
-					double hourratio= tohour/durations[n]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
-					toDrivetoIntersection+=hourratio*durations[n]*Maths.getFaktor(hour)+(1-hourratio)*durations[n]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-					ttnh+=3600;	
-					hour+=1;
-					if(hour==24) {
-						hour=0;
-					}
-				
-				}
-				else {
-					toDrivetoIntersection+=durations[n]*Maths.getFaktor(hour);
-				}
+				toDriveto("City",n,hour,ttnh,1);
 			}
 		}
 		
 		else {
-			for(int n=0; n<Nodes.size()-1;n++) {
-				if(Nodes.get(n).getId()==Intersections.get(1).getId()) {		//Sobald Node gefunden der gleich der ersten Intersection ist, stoppe
+			int PosinNode=0;
+			for(int a=0; a<Nodes.size();a++) {
+				if(Nodes.get(a).getId()==Intersections.get(1).getId()) {
 					break;
 				}
-				else {
-					if(toDrivetoIntersection+durations[n]*Maths.getFaktor(hour)>ttnh) {
-						double tohour=ttnh-durations[n]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
-						double hourratio= tohour/durations[n]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
-						toDrivetoIntersection+=hourratio*durations[n]*Maths.getFaktor(hour)+(1-hourratio)*durations[n]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-						ttnh+=3600;	
-						hour+=1;
-						if(hour==24) {
-							hour=0;
-						}
-					
-					}
-					else {
-						toDrivetoIntersection+=durations[n]*Maths.getFaktor(hour);
-					}
-				}
+				PosinNode++;				
 			}
+			for(int n=0; n<PosinNode;n++) {
+				toDriveto("Intersection",j,hour,ttnh,1);
+			}
+			
 		}
+		lastLocation=Distanzmatrix.startCity;
+		lastbest=best;
     }
 	@Override
 	//Zuerst Route Request  mit unangepasster Tour +  triggert RouteService Event, dann Tour anpassen
@@ -1403,7 +1377,7 @@ public class GA implements myListener {
 	
 	
 	public void atCity(AtEvent e){
-		
+		toDrivetoNode=0;
 		toDrivetoIntersection=0;
 		toDrivetoCity=0;
 		EventCounter++;
@@ -1450,10 +1424,13 @@ public class GA implements myListener {
 			double avg_ratio_start= (lat_ratio_start+lon_ratio_start)/2;  
 			durations[0]=durations[0]*avg_ratio_start;
 			if(All_Cities.checkForCities()==1) {
-				Intersections.set(0,letzterRequest.getCity(1));
-			}
+				int pos = All_Cities.destinationCities.indexOf(letzterRequest.getCity(1)); //IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
+				All_Cities.getCity(pos).setCoordinates(Intersections.get(0).getLongitude(), Intersections.get(0).getLatitude());
+			}//??????????????????????????????????????????????????????????????????????
 			else {
-				Intersections.set(0,best.getCity(1));
+				int pos = All_Cities.destinationCities.indexOf(best.getCity(1)); //IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
+				All_Cities.getCity(pos).setCoordinates(Intersections.get(0).getLongitude(), Intersections.get(0).getLatitude());
+				
 			}
 			Nodes.set(0, Intersections.get(0)); //e.location == City "City"
 			
@@ -1462,10 +1439,12 @@ public class GA implements myListener {
 			double avg_ratio_end= (lat_ratio_end+lon_ratio_end)/2;
 			durations[durations.length-1]=durations[durations.length-1]*avg_ratio_end;
 			if(All_Cities.checkForCities()==1) {
-				Intersections.set(Intersections.size()-1,All_Cities.startCity);
+
+				All_Cities.startCity.setCoordinates(Intersections.get(Intersections.size()-1).getLongitude(), Intersections.get(Intersections.size()-1).getLatitude());
 			}
 			else {
-				Intersections.set(Intersections.size()-1,best.getCity(2));				// == City "City"
+				int pos = All_Cities.destinationCities.indexOf(best.getCity(2)); //IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
+				All_Cities.getCity(pos).setCoordinates(Intersections.get(Intersections.size()-1).getLongitude(), Intersections.get(Intersections.size()-1).getLatitude());		
 			}
 			Nodes.set(Nodes.size()-1, Intersections.get(Intersections.size()-1));
 			//Infomiere Simulator
@@ -1489,8 +1468,12 @@ public class GA implements myListener {
 					}
 				}
 			}
+			best.deleteCity(0);
+			if(Intersections.get(1).getType()=="Intersection") {
+				best.addatPosition(1, Intersections.get(1));
+			}
 			//Lösche letzten Standort aus All_Cities
-			All_Cities.deleteCity(lastCity);
+			All_Cities.deleteCity(lastLocation);
 			//Füge Intersection in All_Cities eins und führe Distanzmatrixupdate durch
 			if(Intersections.get(1).getType()=="Intersection"){
 				All_Cities.addCity(Intersections.get(1));
@@ -1512,22 +1495,9 @@ public class GA implements myListener {
 				
 			if(All_Cities.checkForCities()<=2||Intersections.get(1).getType()=="City") {  //FALL 3 , 4 & Sonderfall
 				for(int n=0; n<Nodes.size()-1;n++) {
-					if(toDrivetoCity+durations[n]*Maths.getFaktor(hour)>ttnh) {
-						double tohour=ttnh-durations[n]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
-						double hourratio= tohour/durations[n]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
-						toDrivetoCity+=hourratio*durations[n]*Maths.getFaktor(hour)+(1-hourratio)*durations[n]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-						ttnh+=3600;	
-						hour+=1;
-						if(hour==24) {
-							hour=0;
-						}
-						
-						}
-						else {
-							toDrivetoCity+=durations[n]*Maths.getFaktor(hour);
-						}
-					}
+					toDriveto("City",n,hour,ttnh,1);
 				}
+			}
 				
 				//TO DRIVE TO INTERSECTION
 				
@@ -1540,26 +1510,12 @@ public class GA implements myListener {
 						PosinNode++;
 					}
 					for(int n=0;n<PosinNode;n++) {
-						if(toDrivetoIntersection+durations[n]*Maths.getFaktor(hour)>ttnh) {
-							double tohour=ttnh-durations[n]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
-							double hourratio= tohour/durations[n]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
-							toDrivetoIntersection+=hourratio*durations[n]*Maths.getFaktor(hour)+(1-hourratio)*durations[n]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-							ttnh+=3600;	
-							hour+=1;
-							if(hour==24) {
-								hour=0;
-							}			
-						}
-						else {
-							toDrivetoIntersection+=durations[n]*Maths.getFaktor(hour);
-						}
+						toDriveto("Intersection",n,hour,ttnh,1);
 					}
 				}
 		}
-				
-				
-		//Speichere neue lastCity
-		lastCity=e.location;  
+		//Speichere neue lastLocation
+		lastLocation=e.location;  
 		lastbest=best;
 	}
 
@@ -1569,14 +1525,15 @@ public class GA implements myListener {
 		EventCounter++;
 		toDrivetoIntersection=0;
 		toDrivetoCity=0;
-		lastEventTime= new TimeElement(e.getEventTime());			//ODER DOCH EVENTZEIT????????????
+		toDrivetoNode=0;
+		lastEventTime= new TimeElement(e.getEventTime());			
 		int hour= lastEventTime.getHour();																//current hour
 		double ttnh=lastEventTime.getTimeToNextHour();
-		if(e.status=="Operatoren-Stop") {
-			OP_Stop=true;
-		}
+		//Stoppe Algorithmus, da sich an Abfolge nichts mehr ändern kann
 		
+		//FallWechsel in Lösung und mehr als eine Stadt in All_Cities/Touren -> Behandle Event wie/ähnlich AtCity Methode
 		if(All_Cities.checkForCities()>1 && lastbest.getCity(2)!=best.getCity(2)) {  //WECHSEL IN BESTE LÖSUNG SEIT LETZTEM EVENT
+			//Neuer RouteRequest und Speicherung der Werte
 			Route route= new Route();
 			try {
 				route.WayFromTo(best);
@@ -1586,21 +1543,27 @@ public class GA implements myListener {
 			durations=route.Duration;
 			Nodes=route.Nodes_as_City;
 			Intersections=route.intersections;
+			
+			//Berechne Duration für neuen Start- & End-Node
+			//GLEICHES FRAGE WIE BEI ALLCITIES
+			//??????????????????????????????????????????????????? IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
 			double lat_ratio_start=(Nodes.get(1).getLatitude()-Intersections.get(0).getLatitude())/(Nodes.get(1).getLatitude()-Nodes.get(0).getLatitude());	
 			double lon_ratio_start=(Nodes.get(1).getLongitude()-Intersections.get(0).getLongitude())/(Nodes.get(1).getLongitude()-Nodes.get(0).getLongitude());
 			double avg_ratio_start= (lat_ratio_start+lon_ratio_start)/2;  
 			durations[0]=durations[0]*avg_ratio_start;
-			Intersections.set(0,best.getCity(1));    //=Intersection we've reached
-		
+			//Positionsersetzung weggelassen!?
 			double lat_ratio_end=(Nodes.get(Nodes.size()-1).getLatitude()-Intersections.get(Intersections.size()-1).getLatitude())/(Nodes.get(Nodes.size()-1).getLatitude()-Nodes.get(Nodes.size()-2).getLatitude());	
 			double lon_ratio_end=(Nodes.get(Nodes.size()-1).getLongitude()-Intersections.get(Intersections.size()-1).getLongitude())/(Nodes.get(Nodes.size()-1).getLongitude()-Nodes.get(Nodes.size()-2).getLongitude());
 			double avg_ratio_end= (lat_ratio_end+lon_ratio_end)/2;
 			durations[durations.length-1]=durations[durations.length-1]*avg_ratio_end;
-			Intersections.set(Intersections.size()-1,best.getCity(2));
 			
+			//Ersetze Koordinaten der aktuellen Ziel-City durch Koordinaten aus Intersections
+			int pos = All_Cities.destinationCities.indexOf(best.getCity(2));
+			All_Cities.destinationCities.set(pos, Intersections.get(Intersections.size()-1));
 			RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations,best);
 			fireEvent(event);
 			
+			//Loope alle Touren der Population
 			for ( int t =0; t<pop.populationSize();t++) {
 				//Lösche letzten Standort aus Touren
 				pop.getTour(t).deleteCity(0);
@@ -1615,9 +1578,13 @@ public class GA implements myListener {
 					pop.getTour(t).addatPosition(1, best.getCity(2));
 				}
 			}
-			
-			All_Cities.deleteCity(lastCity);
-			//Füge Intersection in All_Cities eins und führe Distanzmatrixupdate durch
+			best.deleteCity(0);
+			if(Intersections.get(1).getType()=="Intersection") {
+				best.addatPosition(1, Intersections.get(1));
+			}
+			//Lösche letzten Standort aus All_Cities
+			All_Cities.deleteCity(lastLocation);
+			//Füge Intersection in All_Cities ein und führe Distanzmatrixupdate durch
 			if(Intersections.get(1).getType()=="Intersection"){
 				All_Cities.addCity(Intersections.get(1));
 				try {
@@ -1627,24 +1594,11 @@ public class GA implements myListener {
 				}
 				
 			}
-			if(Intersections.get(1).getType()=="City") {  // Sonderfall
+			if(Intersections.get(1).getType()=="City") {  // Sonderfall: Kein Type="Intersection" vorhanden
 				for(int n=0; n<Nodes.size()-1;n++) {
-					if(toDrivetoCity+durations[n]*Maths.getFaktor(hour)>ttnh) {
-						double tohour=ttnh-durations[n]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
-						double hourratio= tohour/durations[n]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
-						toDrivetoCity+=hourratio*durations[n]*Maths.getFaktor(hour)+(1-hourratio)*durations[n]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-						ttnh+=3600;	
-						hour+=1;
-						if(hour==24) {
-							hour=0;
-						}
-						
-						}
-						else {
-							toDrivetoCity+=durations[n]*Maths.getFaktor(hour);
-						}
-					}
+					toDriveto("City",n,hour,ttnh,1);
 				}
+			}
 			
 			else {
 				int PosinNode=0;
@@ -1655,19 +1609,7 @@ public class GA implements myListener {
 					PosinNode++;
 				}
 				for(int n=0;n<PosinNode;n++) {
-					if(toDrivetoIntersection+durations[n]*Maths.getFaktor(hour)>ttnh) {
-						double tohour=ttnh-durations[n]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
-						double hourratio= tohour/durations[n]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
-						toDrivetoIntersection+=hourratio*durations[n]*Maths.getFaktor(hour)+(1-hourratio)*durations[n]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-						ttnh+=3600;	
-						hour+=1;
-						if(hour==24) {
-							hour=0;
-						}			
-					}
-					else {
-						toDrivetoIntersection+=durations[n]*Maths.getFaktor(hour);
-					}
+					toDriveto("Intersection",n,hour,ttnh,1);
 				}
 			}
 			
@@ -1677,8 +1619,10 @@ public class GA implements myListener {
 			
 			
 		}//
-		else{			// KEIN WECHSEL
-			
+		else{			// Kein Wechsel in bester Lösung seit letztem Standort
+			if(e.status=="Operatoren-Stop") {
+				OP_Stop=true;
+			}
 			int PosinInter=Intersections.indexOf(e.location);
 			
 			for ( int t =0; t<pop.populationSize();t++) {
@@ -1695,12 +1639,16 @@ public class GA implements myListener {
 					pop.getTour(t).addatPosition(1, best.getCity(2));
 				}
 			}
-			
-			All_Cities.deleteCity(lastCity);
+			best.deleteCity(0);
+			if(Intersections.get(PosinInter+1).getType()=="Intersection") {
+				best.addatPosition(1, Intersections.get(PosinInter+1));
+			}
+		
+			All_Cities.deleteCity(lastLocation);
 			//Füge Intersection in All_Cities eins und führe Distanzmatrixupdate durch
 			if(Intersections.get(PosinInter+1).getType()=="Intersection"){
 				All_Cities.addCity(Intersections.get(PosinInter+1));
-				if(All_Cities.checkForCities()>=2 &&lastIntersection!=Intersections.get(Intersections.size()-3)) {		//Nur Update wenn All_cities größer gleich 2 und 
+				if(All_Cities.checkForCities()>=2 &&e.location!=Intersections.get(Intersections.size()-2)) {		//Nur Update wenn All_cities größer gleich 2 und nicht vorletzter Node (==echter letzter Node)
 					try {
 						Distanzmatrix.updateAllMatrix();
 					} catch (Exception e1) {
@@ -1720,20 +1668,7 @@ public class GA implements myListener {
 					PosinNode++;
 				}
 				for(int n=PosinNode; n<Nodes.size()-1;n++) {
-					if(toDrivetoCity+durations[n]*Maths.getFaktor(hour)>ttnh) {
-						double tohour=ttnh-durations[n]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
-						double hourratio= tohour/durations[n]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
-						toDrivetoCity+=hourratio*durations[n]*Maths.getFaktor(hour)+(1-hourratio)*durations[n]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-						ttnh+=3600;	
-						hour+=1;
-						if(hour==24) {
-							hour=0;
-						}
-					
-					}
-					else {
-						toDrivetoCity+=durations[n]*Maths.getFaktor(hour);
-					}
+					toDriveto("City",n,hour,ttnh,1);
 				}
 			}
 			
@@ -1753,26 +1688,13 @@ public class GA implements myListener {
 					PosinNode2++;
 				}
 					 for(int n=PosinNode1; n<PosinNode2;n++) {
-						if(toDrivetoIntersection+durations[n]*Maths.getFaktor(hour)>ttnh) {
-							double tohour=ttnh-durations[n]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
-							double hourratio= tohour/durations[n]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
-							toDrivetoIntersection+=hourratio*durations[n]*Maths.getFaktor(hour)+(1-hourratio)*durations[n]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-							ttnh+=3600;	
-							hour+=1;
-							if(hour==24) {
-								hour=0;
-							}
-						
-						}
-						else {
-							toDrivetoIntersection+=durations[n]*Maths.getFaktor(hour);
-						}
+							toDriveto("Intersection",n,hour,ttnh,1);
 					}
 				}
 			}		
 		
 		lastbest=best;
-		lastIntersection=e.location;
+		lastLocation=e.location;
 		
 	}
 
@@ -1782,66 +1704,54 @@ public class GA implements myListener {
 		EventCounter++;
 		toDrivetoIntersection=0;
 		toDrivetoCity=0;
+		toDrivetoNode=0;
 		lastEventTime= new TimeElement(e.getEventTime());
 		int hour= lastEventTime.getHour();																//current hour
 		double ttnh=lastEventTime.getTimeToNextHour();
-All_Cities.deleteCity(lastCity);
-		//////////
-		All_Cities.addCity(e.location);
+		
+		//Finde GPS-Position innerhalb zweier Nodes
 		for( int i=0; i<Nodes.size();i++) {	
 			double maxLat=0;
 			double minLat=0;
 			double maxLon=0;
 			double minLon=0;
-			if(i==0) {
-				 maxLat= Math.max(saveNode1.getLatitude(),Nodes.get(i+1).getLatitude());
-				 minLat= Math.min(saveNode1.getLatitude(),Nodes.get(i+1).getLatitude());
-				 maxLon= Math.max(saveNode1.getLongitude(),Nodes.get(i+1).getLongitude());
-				 minLon= Math.min(saveNode1.getLongitude(),Nodes.get(i+1).getLongitude());
-			}
-			else if (i==Nodes.size()-1) {
-				 maxLat= Math.max(Nodes.get(i).getLatitude(),saveNode2.getLatitude());
-				 minLat= Math.min(Nodes.get(i).getLatitude(),saveNode2.getLatitude());
-				 maxLon= Math.max(Nodes.get(i).getLongitude(),saveNode2.getLongitude());
-				 minLon= Math.min(Nodes.get(i).getLongitude(),saveNode2.getLongitude());
-			}
-			else {
+		
 			 maxLat= Math.max(Nodes.get(i).getLatitude(),Nodes.get(i+1).getLatitude());
 			 minLat= Math.min(Nodes.get(i).getLatitude(),Nodes.get(i+1).getLatitude());
 			 maxLon= Math.max(Nodes.get(i).getLongitude(),Nodes.get(i+1).getLongitude());
 			 minLon= Math.min(Nodes.get(i).getLongitude(),Nodes.get(i+1).getLongitude());
-			}
+			
 			if(e.getLatitude()<=maxLat&&e.getLatitude()>=minLat&&e.getLongitude()<=maxLon&&e.getLongitude()>=minLon) {
 				break;
 			}
-			GPSinNode++;
+			GPSinNode++;  //Speichere Node-Position "hinter" GPS Punkt; GPS+1= "davor"
 		}
-																																											
+		
+		//Passe Tour an -> Lösche letzte Location/Position 0
+		//-> Füge an Position 0 GPS aus Event ein
+		for ( int t =0; t<pop.populationSize();t++) {
+			//Lösche letzten Standort aus Touren
+			pop.getTour(t).deleteCity(0);
+			pop.getTour(t).addatPosition(0,e.location);
+		}
+		best.deleteCity(0);
+		best.addatPosition(0, e.location);
+		All_Cities.deleteCity(lastLocation); //Lösche letzte Location
+		All_Cities.addCity(e.location);		//Füge GPS-Location aus Event hinzu
+
+		 //TO DRIVE TO NODE
 
 			double latratio= (Nodes.get(GPSinNode+1).getLatitude()-e.getLatitude())/(Nodes.get(GPSinNode+1).getLatitude()-Nodes.get(GPSinNode).getLatitude());
 			double lonratio=(Nodes.get(GPSinNode+1).getLongitude()-e.getLongitude())/(Nodes.get(GPSinNode+1).getLongitude()-Nodes.get(GPSinNode).getLongitude());
 			double ratio= (latratio+lonratio)/2;
-			double toDrivetoNode=0;
-			if(durations[GPSinNode]*ratio*Maths.getFaktor(hour)>ttnh) {							//If the sum of the values + the actual value is bigger than the time to the next hour
-				double tohour=ttnh-durations[GPSinNode]*ratio*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
-				double hourratio= tohour/durations[GPSinNode]*Maths.getFaktor(hour)*ratio;				// Calculate ratio of driven way in this section
-				toDrivetoNode=hourratio*durations[GPSinNode]*ratio*Maths.getFaktor(hour)+(1-hourratio)*durations[i]*ratio*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-				ttnh+=3600;																	// add 3600 seconds to timetonexthour
-																							//Update Sum 
-				hour+=1;
-				if(hour==24) {
-					hour=0;
-				}
-			}
-			else{
-				toDrivetoNode=durations[GPSinNode]*ratio*Maths.getFaktor(hour);
-			}
+			
+			toDriveto("Node",GPSinNode,hour,ttnh,ratio);
 				
 				
-				
-	//BIS HIER MUSS IMMER GEMACHT WERDEN; DANN UNTERSCHEIDUNG NACH FALL
-			if(OP_Stop==false)	{
-				if(All_Cities.checkForIntersection()>0) { 			//FALL 1
+			//BIS HIER MUSS IMMER GEMACHT WERDEN; DANN UNTERSCHEIDUNG NACH FALL
+			
+			if(OP_Stop==false&&All_Cities.checkForIntersection()>0)	{
+				 			//FALL 1 -> toDrivetoIntersection: Wenn noch Wegänderung an Intersection eintreten kann und wir nicht an der letzten Intersection der aktuellen Route befinden
 				int nextIntersection=0;
 				for(int l=1; l<Intersections.size();l++) {
 					for(int k=GPSinNode+1;k<Nodes.size();k++) {  //Beginne ab nächstem Node
@@ -1857,54 +1767,97 @@ All_Cities.deleteCity(lastCity);
 						
 				}
 				toDrivetoIntersection=toDrivetoNode;
+			
 				for(int j=GPSinNode+1;j<nextIntersection;j++) { 
 					
-					if(toDrivetoIntersection+durations[j]*Maths.getFaktor(hour)>ttnh) {
-						double tohour=ttnh-durations[j]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
-						double hourratio= tohour/durations[j]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
-						toDrivetoIntersection+=hourratio*durations[j]*Maths.getFaktor(hour)+(1-hourratio)*durations[j]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-						ttnh+=3600;	
-						hour+=1;
-						if(hour==24) {
-							hour=0;
-						}
-					
-					}
-					else {
-						toDrivetoIntersection+=durations[j]*Maths.getFaktor(hour);
-					}
+					toDriveto("Intersection",j,hour,ttnh,1);
 				}
 			}
-				else {						//FALL 2
+			//Info: GPS-Signal zwischen vorletztem und letztem Node abgedeckt, da Positon des letzten Nodes=GPS+1=duration.lenght -> nicht mehr in schleife enthalten
+				else {						//FALL 2,3,4
 					toDrivetoCity=toDrivetoNode;
-					if(GPSinNode<Nodes.size()-2) { // NUR WENN WIR NOCH NICHT BEIM VORLETZTEN KNOTEN ANGEKOMMEN SIND KANN NOCH toDriveToCity BERECHNET WERDEN
 						for(int m= GPSinNode+1;m<durations.length;m++) {
-							if(toDrivetoCity+durations[j]*Maths.getFaktor(hour)>ttnh) {
-								double tohour=ttnh-durations[j]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
-								double hourratio= tohour/durations[j]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
-								toDrivetoCity+=hourratio*durations[j]*Maths.getFaktor(hour)+(1-hourratio)*durations[j]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-								ttnh+=3600;	
-								hour+=1;
-								if(hour==24) {
-									hour=0;
-								}
-							
-							}
-							else {
-								toDrivetoCity+=durations[j]*Maths.getFaktor(hour);
-							}
-						}
+							toDriveto("City",m,hour,ttnh,1);					
 					}
 				}
-		}
 			
 			
-		//FALL 3&4	
-			
-		lastGPS=e.location;
-		lastbest=best;
+				
+	
+		lastLocation=e.location;
+		
 	}
-    
+    public static void toDriveto(String Location,int durationPosition, int hour, double ttnh,double ratio) { //Wenn kein Node, ratio das übergeben wird ist irrelevant
+    	if(Location=="City") {
+    		int h_next;
+			if(hour==23) {
+				h_next=0;
+			}
+			else {
+				h_next=hour+1;
+			}
+    		if(toDrivetoCity+durations[durationPosition]*Maths.getFaktor(hour)>ttnh) {
+				double tohour=ttnh-durations[durationPosition]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
+				double hourratio= tohour/durations[durationPosition]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
+				toDrivetoCity+=hourratio*durations[durationPosition]*Maths.getFaktor(hour)+(1-hourratio)*durations[durationPosition]*Maths.getFaktor(h_next);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+				ttnh+=3600;	
+				hour+=1;
+				if(hour==24) {
+					hour=0;
+				}
+			
+			}
+			else {
+				toDrivetoCity+=durations[durationPosition]*Maths.getFaktor(hour);
+			}
+    	}
+    	else if(Location=="Intersection") {
+	    	if(toDrivetoIntersection+durations[durationPosition]*Maths.getFaktor(hour)>ttnh) {
+	    		int h_next;
+				if(hour==23) {
+					h_next=0;
+				}
+				else {
+					h_next=hour+1;
+				}
+	    		double tohour=ttnh-durations[durationPosition]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
+				double hourratio= tohour/durations[durationPosition]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
+				toDrivetoIntersection+=hourratio*durations[durationPosition]*Maths.getFaktor(hour)+(1-hourratio)*durations[durationPosition]*Maths.getFaktor(h_next);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+				ttnh+=3600;	
+				hour+=1;
+				if(hour==24) {
+					hour=0;
+				}
+			
+			}
+			else {
+				toDrivetoIntersection+=durations[durationPosition]*Maths.getFaktor(hour);
+			}
+    	}
+     	else if(Location=="Node") {
+	    	if(toDrivetoNode+durations[durationPosition]*ratio*Maths.getFaktor(hour)>ttnh) {
+				int h_next;
+				if(hour==23) {
+					h_next=0;
+				}
+				else {
+					h_next=hour+1;
+				}
+	    		double tohour=ttnh-durations[durationPosition]*ratio*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
+				double hourratio= tohour/durations[durationPosition]*ratio*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
+				toDrivetoNode+=hourratio*durations[durationPosition]*ratio*Maths.getFaktor(hour)+(1-hourratio)*durations[durationPosition]*Maths.getFaktor(h_next);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+				ttnh+=3600;	
+				hour+=1;
+				if(hour==24) {
+					hour=0;
+				}
+			
+			}
+			else {
+				toDrivetoNode+=durations[durationPosition]*ratio*Maths.getFaktor(hour);
+			}
+     	}
+    }
 }
 
 

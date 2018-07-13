@@ -64,7 +64,7 @@ public class Tour{
         return fitness;
     }
     
-    public double getDuration() {
+    public double getDuration123Test() {
     	double duration=GA.toDrivetoIntersection;
     	double[][] matrix =Distanzmatrix.getDistanzmatrix();
     	int hour=GA.lastEventTime.getHour();
@@ -89,6 +89,86 @@ public class Tour{
     	return durationInSec;
     }
     
+    public double getDuration() {
+    	int index=1;
+    	double totalDuration =GA.toDrivetoCity+GA.toDrivetoIntersection;
+    	int hour=GA.lastEventTime.getHour();
+    	double ttnh=GA.lastEventTime.getTimeToNextHour();
+    	if(this.getCity(1).getType()=="Intersection"&&GA.OP_Stop==false) {
+    		int a=Integer.parseInt(this.getCity(2).getId());
+    		int h_next;
+			if(hour==23) {
+				h_next=0;
+			}
+			else {
+				h_next=hour+1;
+			}
+			 if(totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a]>ttnh) {
+					double tohour=ttnh-totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];		;									//calculate the time from sum to next hour
+					double hourratio= tohour/totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];									// Calculate ratio of driven way in this section
+					totalDuration+=hourratio*totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a]+(1-hourratio)*totalDuration+Distanzmatrix.allMatrix.get(h_next)[GA.numOfCities][a];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+					ttnh+=3600;	
+					hour+=1;
+					if(hour==24) {
+						hour=0;
+					}
+				
+				}
+				else {
+					totalDuration+=totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];
+			
+				}
+    		index=2;
+    	}
+    	
+    	
+    	//Bedingung noch für letzte Runden, das stimmt noch nicht ganz und auch tour.size nochmal überdenken
+    	
+    	for (int cityIndex=index; cityIndex < tourSize(); cityIndex++) { 		//city index noch falsch
+			 City fromCity = getCity(cityIndex);
+			 City destinationCity;	  							// Check we're not on our tour's last city, if we are set our 
+			 													// tour's final destination city to our starting city
+			 if(cityIndex+1 < tourSize()){
+               
+				 destinationCity = getCity(cityIndex+1);
+            }
+		 
+			 
+            else{    	 
+                destinationCity = Distanzmatrix.startCity;
+              //  System.out.println(destinationCity.getId());
+            }
+			 
+			int a = Integer.parseInt(fromCity.getId());
+			int b = Integer.parseInt(destinationCity.getId());
+			int h_next;
+			if(hour==23) {
+				h_next=0;
+			}
+			else {
+				h_next=hour+1;
+			}
+			 
+			 if(totalDuration+Distanzmatrix.allMatrix.get(hour)[a][b]>ttnh) {
+					double tohour=ttnh-Distanzmatrix.allMatrix.get(hour)[a][b];		;									//calculate the time from sum to next hour
+					double hourratio= tohour/Distanzmatrix.allMatrix.get(hour)[a][b];									// Calculate ratio of driven way in this section
+					totalDuration+=hourratio*Distanzmatrix.allMatrix.get(hour)[a][b]+(1-hourratio)*Distanzmatrix.allMatrix.get(h_next)[a][b];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+					ttnh+=3600;	
+					hour+=1;
+					if(hour==24) {
+						hour=0;
+					}
+				
+				}
+				else {
+					totalDuration+=Distanzmatrix.allMatrix.get(hour)[a][b];
+			// tourdistance+=matrix[a][b];
+				}
+    	}
+    	return totalDuration;
+    }
+    
+    
     
     // Gets the total distance of the tour
     public double getDistance(){
@@ -112,12 +192,12 @@ public class Tour{
                    //  System.out.println(destinationCity.getId());
                  }
     			 
-    			 String a = fromCity.getId();
+    			 int a = Integer.parseInt(fromCity.getId());
     			 
-    			 String b = destinationCity.getId();
+    			 int b = Integer.parseInt(destinationCity.getId());
     			 
     			
-    			 tourdistance+=matrix[Integer.parseInt(a)][Integer.parseInt(b)];
+    			 tourdistance+=matrix[a][b];
     		
     			
     		 }

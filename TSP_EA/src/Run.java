@@ -43,7 +43,7 @@ public class Run {
        
 
         int counter=0;
-    /*    do {
+        /*do {
         	
             
             Optimierer.evolvePopulation(false);

@@ -79,13 +79,13 @@ public class Distanzmatrix {
 	
 	
 	public static void updateAllMatrix() throws Exception {
-		
+		double faktor;
 		double[]IntersectionMatrix=Send_Request.IntersectionMatrix(All_Cities.getCity(All_Cities.numberOfCities()-1));
 		for(int i=0;i<matrix.length-1;i++) {
 			matrix[matrix.length-1][i]=IntersectionMatrix[i];
 		}
 		for(int i=0; i<24;i++) {
-			double faktor= Maths.getFaktor(i);
+			faktor= Maths.getFaktor(i);
 			for(int j=0;j<matrix.length-1;j++) {				//Matrix wird in BasicMatrix mit +1 Stellen extra erzeugt für Zwischenwerte
 				
 					allMatrix.get(i)[matrix.length-1][j]=IntersectionMatrix[j]*faktor;

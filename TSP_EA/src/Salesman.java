@@ -162,12 +162,12 @@ public class Salesman implements RouteServiceListener {
 					sumIntD+=ZF_GA_duration[dur];
 				}											//Letztes Event, Intersection last = City "City"
 				AtEvent ev= new AtEvent(this,Intersection.get(inters) ,(long)(now.startInMilli+(sumIntD*1000)));
-				if(Intersection.get(inters)==Distanzmatrix.startCity) {
+				if(Intersection.get(inters).getLatitude()==Distanzmatrix.startCity.getLatitude()&&Intersection.get(inters).getLongitude()==Distanzmatrix.startCity.getLongitude()) {
 					ev.status="Erste Stadt wieder erreicht";
 				}
 			
 				
-				if(All_Cities.checkForCities()<=1) {
+				else if(All_Cities.checkForCities()==1) {
 					ev.status="Letze Stadt erreicht";
 				}
 				upcomingEvents.add(ev);
@@ -179,7 +179,7 @@ public class Salesman implements RouteServiceListener {
 					sumIntD+=ZF_GA_duration[node];   
 					if(Intersection.get(inters).getId()==Nodes.get(node).getId()) { //Hier hat Intersection noch die ID der korresponiderenden Nodes
 							AtEvent ev= new AtEvent(this,Intersection.get(inters),(long)(now.startInMilli+(sumIntD*1000)));
-							if((All_Cities.checkForCities()==2 &&Intersection.get(inters)==Intersection.get(Intersection.size()-2))) {
+							if(All_Cities.checkForCities()==2 &&Intersection.get(inters+1).getType()=="City") {
 								ev.status="Operatoren-Stop";
 							}
 							upcomingEvents.add(ev);

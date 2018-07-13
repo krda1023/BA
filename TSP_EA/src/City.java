@@ -31,6 +31,11 @@ public class City {
 	 public double getLatitude(){																	 // Gets city's latitude coordinate
 	        return position[1];
 	    }
+	 
+	 public void setCoordinates(double lon, double lat) {
+		 position[0]=lon;
+		 position[1]=lat;
+	 }
 	
 	 public String getId() {																			 //Gets city's id
 			return id;
