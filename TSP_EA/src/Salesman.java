@@ -19,15 +19,13 @@ public class Salesman implements RouteServiceListener {
 		listenerList.add(toAdd);
 	}
 	
-	
-
 	public Salesman() {
 		this.k=GA.c;
 		this.theta=GA.theta;
 		this.shiftDistance=GA.shiftDistance;
 		
 	}
-    
+	
 	public void checkForEvents()
 	{	AtEvent currentEvent = null;
 		long jetzt= System.currentTimeMillis();
@@ -46,7 +44,7 @@ public class Salesman implements RouteServiceListener {
 		}
 		upcomingEvents.remove(currentEvent);
 		try {
-			fireEvent(currentEvent);
+			fireAtEvent(currentEvent);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -61,7 +59,8 @@ public class Salesman implements RouteServiceListener {
 			}
 		} */
 	}
-	public void fireEvent(AtEvent e) throws Exception{
+	
+	public void fireAtEvent(AtEvent e) throws Exception{
 		
 		if(e.getEventType()=="AtCity"){
 			listenerList.get(0).atCity(e);
@@ -75,9 +74,7 @@ public class Salesman implements RouteServiceListener {
 			listenerList.get(0).GPS_Signal(e);
 		}
 	}
-
-
-	@Override
+	
 	public void GAdidRequest(RouteServiceEvent e) {
 		Nodes=e.Nodes;
 		Intersection= e.Intersection;
@@ -86,7 +83,6 @@ public class Salesman implements RouteServiceListener {
 		createEvents();
 		
 	}
-	
 	
 	public void createEvents() {
 		double[] gammaDuration= new double[duration.length];												//Array for Gamma influenced values

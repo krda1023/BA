@@ -21,19 +21,20 @@ public class GA implements myListener {
 
     /* GA parameters - Which operators are selected*/
     private static double mutationRate = 0.2;   //Mutationrate for Multiple Exchange Mutation
-    private static int tournamentSize = 2;	//Tournament size for Tournament Selection
-    static Distanzmatrix dis;			//Finale Distanzmatrix 
-   
-    static int numOfCities=170;   //FINAL
-	static int popSize=20;			//FINAL
-	static int iterationen=1000;		//FINAL
+    private static int tournamentSize = 5;	//Tournament size for Tournament Selection
+    			
+   //Grunddaten
+    static int numOfCities;
+	static int popSize=50;			//FINAL
+	static int iterationen=10000;		//FINAL
+	//Operatoren
 	static boolean ox2C=false;
-	static boolean ordC=true;
+	static boolean ordC=false;
 	static boolean pmxC=false;
-	static boolean cycC=false;
+	static boolean cycC=true;
 	static boolean disM=false;
 	static boolean insM=true;
-	static boolean invM=false;
+	static boolean invM=false;		//kannst voll vergessen
 	static boolean excM=false;
 	static boolean mexM=false;
 	static boolean elitism=true;
@@ -41,6 +42,7 @@ public class GA implements myListener {
 	static double c=1;
 	static double theta=1;
 	static double shiftDistance=0;
+	
 	static int EventCounter=0;
 	GUI_Start form;
 	static int blockedCities=2;
@@ -285,32 +287,8 @@ public class GA implements myListener {
 			EliNo.setBackground(Color.lightGray);
 			EliNo.setBounds(200, 180, 200, 50);
 			EliNo.addActionListener(new eliListener());
-			vonFileText= new JLabel("Soll von einer TSP-File eingelesen werden?");
-			vonFileText.setBounds(0,240,500,20);
-			FileJa= new JRadioButton("Ja");
-			FileJa.setBackground(Color.lightGray);
-			FileJa.setBounds(0, 260, 200,50);
-			FileJa.setSelected(true);
-		//	FileJa.addActionListener(new FileListener());
-			FileNo= new JRadioButton("Nein");
-			FileNo.setBackground(Color.lightGray);
-			FileNo.setBounds(200, 260, 200, 50);
-			//FileNo.addActionListener(new FileListener());
-			numCityText= new JLabel("Falls Sie nicht von einer Tsp-File lesen: Wieviel Städte sollen erzeugt werden?");
-			numCityText.setBounds(0,320, 1000, 20);
-			int cityMayor=20;
-			int cityMinor=5;
-			 city= new JSlider(0,200,50);
-			 
-			 city.setBounds(0, 340, 500, 50);
-			 city.setBackground(Color.lightGray);
-			 city.setForeground(Color.YELLOW);
-			 city.setPaintTicks(true);
-			 city.setPaintLabels(true);
-			 city.setMajorTickSpacing(cityMayor);
-			 city.setMinorTickSpacing(cityMinor);
-			 city.addChangeListener(new cityListener());
-			 city.setEnabled(false);
+			
+		
 			 iterText= new JLabel("Wieviel Iterationen sollen durchgeführt werden?");
 			 iterText.setBounds(0, 410, 1000, 20);
 			 int iterMayor=1000;
@@ -347,9 +325,7 @@ public class GA implements myListener {
 			 ButtonGroup crossover= new ButtonGroup();
 			 ButtonGroup mutation= new ButtonGroup();
 			 ButtonGroup elitism= new ButtonGroup();
-			 ButtonGroup File= new ButtonGroup();
-			 File.add(FileJa);
-			 File.add(FileNo);
+			
 			 elitism.add(EliNo);
 			 elitism.add(EliJa);
 			 crossover.add(Jox2C);
@@ -361,7 +337,7 @@ public class GA implements myListener {
 			 mutation.add(JdisM);
 			 mutation.add(JexcM);
 			 mutation.add(JmexM);
-			 add(city);
+			 
 			 add(iteration);
 			 add(population);
 			 add(Jox2C);
@@ -378,10 +354,8 @@ public class GA implements myListener {
 			 add(EliJa);
 			 add(EliNo);
 			 add(ElitismText);
-			 add(vonFileText);
-			 add(FileJa);
-			 add(FileNo);
-			 add(numCityText);
+		
+			
 			 add(popText);
 			 add(iterText);
 			 add(close);
@@ -389,7 +363,6 @@ public class GA implements myListener {
 		}
 		}
 
-	
 	public void Formalitäten(){
 	   
 		
@@ -415,28 +388,14 @@ public class GA implements myListener {
 		}
 		
 	
-		
-		Distanzmatrix.CreatingnumOfCities=numOfCities;
-	
-		Distanzmatrix.erzeugeStaedteliste();
-		numOfCities=Distanzmatrix.getCreatedAnzahlstädte();
-		
-		Distanzmatrix.erzeugeDistanzmatrix();
-		Distanzmatrix.erzeugeAlleDistanzmatrizen();
+		Distanzmatrix.createAll_Cities();
+		numOfCities=Distanzmatrix.CreatingnumOfCities;
+		Distanzmatrix.createDurationMatrix();;
+		Distanzmatrix.createAllMatrixes();;
 		
 		
 	}
-	
-	
-	/*public boolean getfileLesen()
-	{
-		return fileLesen;
-	}*/
-	public static  int getnumOfCities()
-	{
-		return numOfCities;
-	}
-	
+
 	public void addRouteServiceListener(RouteServiceListener toAdd) {
 		listenerList.add(toAdd);
 	}
@@ -444,10 +403,6 @@ public class GA implements myListener {
 	public void fireEvent(RouteServiceEvent e)
 	{
 		listenerList.get(0).GAdidRequest(e);
-	}
-	
-	public static  Distanzmatrix getMatrixObject(){					//ZENTRALES DISTANZMATRIX Object
-		return dis;
 	}
 	
     public void evolvePopulation(boolean initilize) {						// Evolves Population( Usage of all selected operators)
@@ -574,7 +529,6 @@ public class GA implements myListener {
 	    	//Mach nix
 	    }
     }
-    
     
     //parent1.tour-size-2 damit startpos endpos selbe länge hat wie im array zu verändern, position aber um 2 verschoben
    //bei startpos und endpos wieder draufschlagen dann veränderst die richtigen Positionen
@@ -752,7 +706,6 @@ public class GA implements myListener {
 	  kids[1]=child2;  
 	  return kids;
     }
-    
     
     public static Tour[] PMX (Tour parent1, Tour parent2) { //Muss noch gemacht werden	
     	if(GA.EventCounter==0) {
@@ -1189,6 +1142,7 @@ public class GA implements myListener {
     	}  	
     	tour=child;    		
     }
+    
     private static void DisplacementMutation(Tour tour) {    
     	Tour child = new Tour();    	
     	int number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;		//Create first random number
@@ -1305,7 +1259,9 @@ public class GA implements myListener {
 		//Passe Start und End IntersectionCity an damit gleichheit mit All_Cities und tour besteht,
 		//sowie start und end node	aus dem gleichen Ziel
 		//Berechne duration für neuen Start und End Node über Approximation
-
+		
+		Run.runs=true;
+		
 		double lat_ratio_start=(Nodes.get(1).getLatitude()-Intersections.get(0).getLatitude())/(Nodes.get(1).getLatitude()-Nodes.get(0).getLatitude());	
 		double lon_ratio_start=(Nodes.get(1).getLongitude()-Intersections.get(0).getLongitude())/(Nodes.get(1).getLongitude()-Nodes.get(0).getLongitude());
 		double avg_ratio_start= (lat_ratio_start+lon_ratio_start)/2;  
@@ -1370,12 +1326,11 @@ public class GA implements myListener {
 		lastLocation=Distanzmatrix.startCity;
 		lastbest=best;
     }
-	@Override
+    
 	//Zuerst Route Request  mit unangepasster Tour +  triggert RouteService Event, dann Tour anpassen
 	//Asymm. Matrix request
-	
-	
-	
+    
+    @Override
 	public void atCity(AtEvent e){
 		toDrivetoNode=0;
 		toDrivetoIntersection=0;
@@ -1787,7 +1742,8 @@ public class GA implements myListener {
 		lastLocation=e.location;
 		
 	}
-    public static void toDriveto(String Location,int durationPosition, int hour, double ttnh,double ratio) { //Wenn kein Node, ratio das übergeben wird ist irrelevant
+    
+	public static void toDriveto(String Location,int durationPosition, int hour, double ttnh,double ratio) { //Wenn kein Node, ratio das übergeben wird ist irrelevant
     	if(Location=="City") {
     		int h_next;
 			if(hour==23) {

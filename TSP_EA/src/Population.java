@@ -1,14 +1,11 @@
 public class Population {
-
-    
+	
     Tour[] tours;														// Holds population of tours
-    Distanzmatrix dismat;
-
+    
     // Construct a population
     public Population(int populationSize, boolean initialise) {			//Constructor of population
     	{
         tours = new Tour[populationSize];
-        this.dismat=GA.getMatrixObject();
     	}            
         if (initialise) {											// If we need to initialise a population of tours do so     
            
@@ -26,8 +23,7 @@ public class Population {
     public void saveTour(int index, Tour tour) {						// Saves a tour
         tours[index] = tour;
     }
-
-        
+    
     public Tour getTour(int index) {									// Gets a tour from population
         return tours[index];
     }
@@ -42,11 +38,8 @@ public class Population {
         return fittest;
     }
 
-
     public int populationSize() {									   // Gets population size
     	return tours.length;
     }
-   
-    
-    
+
     }

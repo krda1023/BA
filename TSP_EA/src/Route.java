@@ -5,17 +5,12 @@ import org.json.JSONObject;
 
 public class Route {
 	
+	double[]Duration;
 	String[]Nodes;
 	ArrayList<City> Nodes_as_City= new ArrayList<City>();
-	double[]Duration;
-	double[]Distance;
 	ArrayList<City> intersections= new ArrayList<City>();
 	ArrayList<double[]> allDurations =new ArrayList<double[]>();
-	
 	JSONObject Way;
-	
-
-	
 
 	public void WayFromTo(Tour best) throws Exception 
 	{
@@ -36,12 +31,12 @@ public class Route {
 		
 		JSONArray nodes=annotation.getJSONArray("nodes");
 		JSONArray duration=annotation.getJSONArray("duration");
-		JSONArray distance=annotation.getJSONArray("distance");
+		
 		JSONArray steps= l1.getJSONArray("steps");
 		
 		Nodes= new String[nodes.length()];
 		Duration= new double[duration.length()];
-		Distance= new double[distance.length()];
+		
 		
 		
 
@@ -60,7 +55,7 @@ public class Route {
 			System.out.println("duration: "+duration.getDouble(a));
 
 			Duration[a]=duration.getDouble(a);
-			Distance[a]=distance.getDouble(a);
+			
 			
 			}
 		}
@@ -141,22 +136,16 @@ public class Route {
 		
 	}
 	
-
-	
-
 	public ArrayList<City> getNodes_as_City()
 	{
 		//zieh aus JSOn object nodes wenn nodes =null
 		return Nodes_as_City;
 	}
+	
 	public double[]getDuration()
 	{
 		//zieh aus JSOn object duration wenn duration =null
 		return Duration;
 	}
-	public double[]getDistance()
-	{
-		//zieh aus JSOn object distance wenn distance =null
-		return Distance;
-	}
+	
 }

@@ -19,17 +19,7 @@ public class Distanzmatrix {
 	static ArrayList<double[][]> allMatrix= new ArrayList<double[][]>();	
 
 	
-
-
-	
-	public static int getCreatedAnzahlstädte() {
-		return CreatingnumOfCities;
-	}
-	
-	
-	
-	
-	public static void erzeugeStaedteliste (){		
+	public static void createAll_Cities (){		
 		
 			double[][] zwischenmatrix;
 			String s= "C:\\Users\\BADai\\git\\BA\\TSP_EA\\src\\TSP-Instanz-Karlsruhe";
@@ -46,10 +36,7 @@ public class Distanzmatrix {
 		
 	}
 																				//Methode erzeugt Send_Request Object mit erg[][]als Distanzmatrix im zweidim. array
-	public static void erzeugeDistanzmatrix() {
-		
-		
-	
+	public static void createDurationMatrix() {
 			matrix= new double[CreatingnumOfCities+1][CreatingnumOfCities+1]; 
 			try {		
 		        
@@ -59,10 +46,8 @@ public class Distanzmatrix {
 				e.printStackTrace();
 			}
 		}
-		
 	
-
-	public static void erzeugeAlleDistanzmatrizen(){
+	public static void createAllMatrixes(){
 		
 		for(int i=0; i<24;i++) {
 			double faktor= Maths.getFaktor(i);
@@ -76,7 +61,6 @@ public class Distanzmatrix {
 		}
 		allMatrix.add(matrix);
 	}
-	
 	
 	public static void updateAllMatrix() throws Exception {
 		double faktor;
@@ -100,26 +84,12 @@ public class Distanzmatrix {
 		}*/
 		}
 	
-	
-	
-	
 	public static double [][] getDistanzmatrix(){
 		return matrix;
 	}
+	
 	public static ArrayList<double [][]> getAllMatrix(){
 		return allMatrix;
 	}
-	public static double distanceInKm( double lon1, double lat1, double lon2, double lat2) {   //Haversine-Formel
-	    int radius = 6371;
-	    double lat = Math.toRadians(lat2 - lat1);
-	    double lon = Math.toRadians(lon2- lon1);
-	    double a = Math.sin(lat / 2) * Math.sin(lat / 2) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(lon / 2) * Math.sin(lon / 2);
-	    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	    double d = radius * c;  
-	    return Math.abs(d);
-	}
 
-	
-	
-	
 }

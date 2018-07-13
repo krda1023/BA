@@ -67,7 +67,8 @@ public class Send_Request {
 		Way= new JSONObject(response.toString());												//Save response in JSONObject
 		return Way;
 	}
-	//MUSS NOCH GETESTET WERDEN!!!
+	
+	//Muss noch getestet werden
 	public static ArrayList<City> getNodes(String[]nodes) throws Exception{		//Muss wahrscheinlich String übergeben werden da Zahl zu groß								//Gets geo-coordinates for all received OSM nodes
 		ArrayList<City> Nodes= new ArrayList<City>();																//Contains all nodes that has to be converted
 		for(int i=0;i<nodes.length;i++){												
@@ -94,10 +95,6 @@ public class Send_Request {
 		}
 		return Nodes;
 	}
-	
-	
-	
-	
 	
 	public static double[] IntersectionMatrix(City Intersection) throws Exception{								//Gets all distances from upcoming WP Node to all cities
 		int numOfCities;

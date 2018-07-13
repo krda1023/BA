@@ -6,10 +6,8 @@ public class Tour{
 
     // Holds our tour of cities
     private ArrayList<City> tour= new ArrayList<City>();
-    // Cache
     private double fitness = 0;
-    private double distance = 0;  //time?
-    static final City startCity=Distanzmatrix.startCity;
+     double totalduration = 0;  //time?
     // Constructs a blank tour
     public Tour(){
         for (int i = 0; i < All_Cities.numberOfCities(); i++) {
@@ -29,10 +27,10 @@ public class Tour{
         }
         // Randomly reorder the tour
         Collections.shuffle(tour);
-        int startcitypos= tour.indexOf(startCity);
+        int startcitypos= tour.indexOf(Distanzmatrix.startCity);
       
         tour.set(startcitypos, tour.get(0));
-        tour.set(0, startCity);
+        tour.set(0, Distanzmatrix.startCity);
        
     }
 
@@ -44,6 +42,7 @@ public class Tour{
     public void deleteCity(int pos) {
     	tour.remove(pos);
     }
+   
     public void addatPosition(int pos, City city) {
     	tour.add(pos,city );
     }
@@ -52,14 +51,13 @@ public class Tour{
         tour.set(tourPosition, city);
         // If the tours been altered we need to reset the fitness and distance
         fitness = 0;
-        distance = 0;
+        totalduration=0;
     }
 
     // Gets the tours fitness
     public double getFitness() {
         if (fitness == 0) {
-        //    fitness = 1/(double)getDistance();
-        	fitness = 1/(double)getDistance();
+        	fitness = 1/(double)getDuration();
         }
         return fitness;
     }
@@ -90,151 +88,116 @@ public class Tour{
     }
     
     public double getDuration() {
-    	int index=1;
-    	double totalDuration =GA.toDrivetoCity+GA.toDrivetoIntersection;
-    	int hour=GA.lastEventTime.getHour();
-    	double ttnh=GA.lastEventTime.getTimeToNextHour();
-    	if(this.getCity(1).getType()=="Intersection"&&GA.OP_Stop==false) {
-    		int a=Integer.parseInt(this.getCity(2).getId());
-    		int h_next;
-			if(hour==23) {
-				h_next=0;
-			}
-			else {
-				h_next=hour+1;
-			}
-			 if(totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a]>ttnh) {
-					double tohour=ttnh-totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];		;									//calculate the time from sum to next hour
-					double hourratio= tohour/totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];									// Calculate ratio of driven way in this section
-					totalDuration+=hourratio*totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a]+(1-hourratio)*totalDuration+Distanzmatrix.allMatrix.get(h_next)[GA.numOfCities][a];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-					ttnh+=3600;	
-					hour+=1;
-					if(hour==24) {
-						hour=0;
-					}
-				
+    	totalduration=0;
+    	if(Run.runs==true) {
+	    	int index=1;
+	    	double totalDuration =GA.toDrivetoCity+GA.toDrivetoIntersection;
+	    	int hour=GA.lastEventTime.getHour();
+	    	double ttnh=GA.lastEventTime.getTimeToNextHour();
+	    	if(this.getCity(1).getType()=="Intersection"&&GA.OP_Stop==false) {
+	    		int a=Integer.parseInt(this.getCity(2).getId());
+	    		int h_next;
+				if(hour==23) {
+					h_next=0;
 				}
 				else {
-					totalDuration+=totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];
-			
+					h_next=hour+1;
 				}
-    		index=2;
-    	}
-    	
-    	
-    	//Bedingung noch für letzte Runden, das stimmt noch nicht ganz und auch tour.size nochmal überdenken
-    	
-    	for (int cityIndex=index; cityIndex < tourSize(); cityIndex++) { 		//city index noch falsch
-			 City fromCity = getCity(cityIndex);
-			 City destinationCity;	  							// Check we're not on our tour's last city, if we are set our 
-			 													// tour's final destination city to our starting city
-			 if(cityIndex+1 < tourSize()){
-               
-				 destinationCity = getCity(cityIndex+1);
-            }
-		 
-			 
-            else{    	 
-                destinationCity = Distanzmatrix.startCity;
-              //  System.out.println(destinationCity.getId());
-            }
-			 
-			int a = Integer.parseInt(fromCity.getId());
-			int b = Integer.parseInt(destinationCity.getId());
-			int h_next;
-			if(hour==23) {
-				h_next=0;
-			}
-			else {
-				h_next=hour+1;
-			}
-			 
-			 if(totalDuration+Distanzmatrix.allMatrix.get(hour)[a][b]>ttnh) {
-					double tohour=ttnh-Distanzmatrix.allMatrix.get(hour)[a][b];		;									//calculate the time from sum to next hour
-					double hourratio= tohour/Distanzmatrix.allMatrix.get(hour)[a][b];									// Calculate ratio of driven way in this section
-					totalDuration+=hourratio*Distanzmatrix.allMatrix.get(hour)[a][b]+(1-hourratio)*Distanzmatrix.allMatrix.get(h_next)[a][b];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-					ttnh+=3600;	
-					hour+=1;
-					if(hour==24) {
-						hour=0;
+				 if(totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a]>ttnh) {
+						double tohour=ttnh-totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];		;									//calculate the time from sum to next hour
+						double hourratio= tohour/totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];									// Calculate ratio of driven way in this section
+						totalDuration+=hourratio*totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a]+(1-hourratio)*totalDuration+Distanzmatrix.allMatrix.get(h_next)[GA.numOfCities][a];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+						ttnh+=3600;	
+						hour+=1;
+						if(hour==24) {
+							hour=0;
+						}
+					
 					}
+					else {
+						totalDuration+=totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];
 				
+					}
+	    		index=2;
+	    	}
+	    	
+	    	
+	    	//Bedingung noch für letzte Runden, das stimmt noch nicht ganz und auch tour.size nochmal überdenken
+	    	
+	    	for (int cityIndex=index; cityIndex < tourSize(); cityIndex++) { 		//city index noch falsch
+				 City fromCity = getCity(cityIndex);
+				 City destinationCity;	  							// Check we're not on our tour's last city, if we are set our 
+				 													// tour's final destination city to our starting city
+				 if(cityIndex+1 < tourSize()){
+	               
+					 destinationCity = getCity(cityIndex+1);
+	            }
+			 
+				 
+	            else{    	 
+	                destinationCity = Distanzmatrix.startCity;
+	              //  System.out.println(destinationCity.getId());
+	            }
+				 
+				int a = Integer.parseInt(fromCity.getId());
+				int b = Integer.parseInt(destinationCity.getId());
+				int h_next;
+				if(hour==23) {
+					h_next=0;
 				}
 				else {
-					totalDuration+=Distanzmatrix.allMatrix.get(hour)[a][b];
-			// tourdistance+=matrix[a][b];
+					h_next=hour+1;
 				}
+				 
+				 if(totalDuration+Distanzmatrix.allMatrix.get(hour)[a][b]>ttnh) {
+						double tohour=ttnh-Distanzmatrix.allMatrix.get(hour)[a][b];		;									//calculate the time from sum to next hour
+						double hourratio= tohour/Distanzmatrix.allMatrix.get(hour)[a][b];									// Calculate ratio of driven way in this section
+						totalDuration+=hourratio*Distanzmatrix.allMatrix.get(hour)[a][b]+(1-hourratio)*Distanzmatrix.allMatrix.get(h_next)[a][b];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+						ttnh+=3600;	
+						hour+=1;
+						if(hour==24) {
+							hour=0;
+						}
+					
+					}
+					else {
+						totalDuration+=Distanzmatrix.allMatrix.get(hour)[a][b];
+				// totalduration+=matrix[a][b];
+					}
+	    	}
+	    	return totalDuration;
     	}
-    	return totalDuration;
-    }
-    
-    
-    
-    // Gets the total distance of the tour
-    public double getDistance(){
-      //  System.out.println(this);
-    	if (distance ==0) {
-    		double tourdistance =0;
-    		
-			double[][] matrix =Distanzmatrix.getDistanzmatrix();				//Distanzmatrix aus DIstanzmatrixKlasse holen
-    		 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) { 		
-    			 City fromCity = getCity(cityIndex);
-    			 City destinationCity;	  							// Check we're not on our tour's last city, if we are set our 
-    			 													// tour's final destination city to our starting city
-    			 if(cityIndex+1 < tourSize()){
-                    
-    				 destinationCity = getCity(cityIndex+1);
-                 }
-    		 
-    			 
-                 else{    	 
-                     destinationCity = Distanzmatrix.startCity;
-                   //  System.out.println(destinationCity.getId());
-                 }
-    			 
-    			 int a = Integer.parseInt(fromCity.getId());
-    			 
-    			 int b = Integer.parseInt(destinationCity.getId());
-    			 
-    			
-    			 tourdistance+=matrix[a][b];
-    		
-    			
-    		 }
-    		 distance=tourdistance;	  
-    		
-    		 
+    	else {
+    		double[][] matrix =Distanzmatrix.getDistanzmatrix();				//Distanzmatrix aus DIstanzmatrixKlasse holen
+   		 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) { 		
+   			 City fromCity = getCity(cityIndex);
+   			 City destinationCity;	  							// Check we're not on our tour's last city, if we are set our 
+   			 													// tour's final destination city to our starting city
+   			 if(cityIndex+1 < tourSize()){
+                   
+   				 destinationCity = getCity(cityIndex+1);
+                }
+   		 
+   			 
+                else{    	 
+                    destinationCity = Distanzmatrix.startCity;
+                  //  System.out.println(destinationCity.getId());
+                }
+   			 
+   			 int a = Integer.parseInt(fromCity.getId());
+   			 
+   			 int b = Integer.parseInt(destinationCity.getId());
+   			 
+   			
+   			 totalduration+=matrix[a][b];
+   		
+   			
+   		 }
+   	totalduration= Maths.round(totalduration,5);
+   		//	System.out.println("Round finished");    //Runden
+   	return totalduration;  	
     	}
-    	distance= Maths.round(distance,5);
-    		//	System.out.println("Round finished");    //Runden
-    	return distance;  		
     }
-    	
-    	/*if (distance == 0) {
-            int tourDistance = 0;
-            // Loop through our tour's cities
-            for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) {
-                // Get city we're travelling from
-                City fromCity = getCity(cityIndex);
-                // City we're travelling to
-                City destinationCity;
-                // Check we're not on our tour's last city, if we are set our 
-                // tour's final destination city to our starting city
-                if(cityIndex+1 < tourSize()){
-                    destinationCity = getCity(cityIndex+1);
-                }
-                else{
-                    destinationCity = getCity(0);
-                }
-                // Get the distance between the two cities
-                tourDistance += fromCity.distanceTo(destinationCity);
-            }
-            distance = tourDistance;
-        }
-        return distance;*/
-    	
-		 
-    
 
     // Get number of cities on our tour
     public int tourSize() {
@@ -245,17 +208,10 @@ public class Tour{
     public boolean containsCity(City city){
         return tour.contains(city);
     }
+    
     public int positionofCity(City city) {    
     	int position =tour.indexOf(city);
     	return position;
-    }
-    public boolean isEmpty(){
-    	if(tour.isEmpty()) {
-    		return true;
-    	}
-    	else {
-    		return false;
-    	}
     }
     
     @Override

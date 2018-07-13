@@ -17,33 +17,11 @@ public class TimeElement{
 		this.startInMilli=start.getTimeInMillis();
 	}
 	
-	public Calendar gibZeit(){
-		return start;
-	}
-	public long gibMillis(){
-		return startInMilli;
-	}
-	public void setTimeInMillis(long newtime) {
-		start.setTimeInMillis(newtime);
-	}
-	public void addTimeInMillis(long addtime) {
-		
-		start.setTimeInMillis(startInMilli+addtime);
-		startInMilli=start.getTimeInMillis();
-	}
-	public long getExistTime(){
-		long erg= System.currentTimeMillis()-startInMilli;
-		return erg;
-	}
-	
 	@SuppressWarnings("deprecation")
 	public int getHour(){
 		return start.getTime().getHours();
 	}
 	
-	public double getSeconds() {
-		return start.getTimeInMillis()/1000;
-	}
 	public double getTimeToNextHour() { 	
 		int year=start.getTime().getYear()+1900;
 		int month=start.getTime().getMonth();

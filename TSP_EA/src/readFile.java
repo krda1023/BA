@@ -15,22 +15,22 @@ public class readFile {
 	
 	int countlines=0;
 	
-	
-	public int getNumberofCities()
-	{
-		return countlines;
-	}
-	public double[][] getCoordinates()
-	{
-		return erg;
-	}
-	
 	public readFile(String f)
 	{
 		this.path=f;
 		this.file= new File(f);
 	}
 	
+	public int getNumberofCities()
+	{
+		return countlines;
+	}
+	
+	public double[][] getCoordinates()
+	{
+		return erg;
+	}
+		
 	public void readingFile()
 	{
 		try

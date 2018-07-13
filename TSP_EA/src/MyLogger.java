@@ -15,6 +15,7 @@ import java.util.logging.SimpleFormatter;
 public class MyLogger {
 
 	private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	
 	public void setLogger(){
 
 		Handler fileHandler = null;
@@ -50,6 +51,7 @@ public class MyLogger {
 			LOGGER.log(Level.SEVERE, "Error occur in FileHandler.", exception);
 		}
 	}
+	
 	public Logger getLogger() {
 		return LOGGER;
 	}
