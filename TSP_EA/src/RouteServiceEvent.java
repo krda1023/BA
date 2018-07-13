@@ -3,6 +3,7 @@ import java.util.EventObject;
 
 public class RouteServiceEvent extends EventObject{
 
+	private static final long serialVersionUID = 1L;
 	double[] durations;
 	Tour best;
 	ArrayList<City> Nodes;

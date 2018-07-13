@@ -14,25 +14,11 @@ public class Test_main {
 		return erg;
 	}
 	public static void main(String[]args) throws Exception {
-		City c1= new City("2","City", 8.390443,49.013294);
-		City c2= new City("2","City", 8.390443,49.013294);
+		TimeElement e = new TimeElement();
+		System.out.println(e);
 		
-		City c3= new City("3","City", 8.391678,49.014275);
-		ArrayList<City> abc= new ArrayList<City>();
-		
-		All_Cities.addCity(c1);
-		All_Cities.addCity(c2);
-		All_Cities.addCity(c3);
-		abc.add(All_Cities.getCity(0));
-		abc.add(All_Cities.getCity(1));
-		abc.add(All_Cities.getCity(2));
-		Tour tt= new Tour(abc);
-		System.out.println(tt.getCity(2).getId());
-		All_Cities.getCity(2).setID("88");
-		System.out.println(tt.getCity(2).getId());
-		System.out.println(c3.getId());
-		
-	}}
+	}
+}
 
 
     /*	Route route= new Route();

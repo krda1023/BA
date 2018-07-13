@@ -1,6 +1,5 @@
 import java.util.Calendar;
 
-
 public class TimeElement{
 	Calendar start;
 	long startInMilli;
@@ -39,4 +38,9 @@ public class TimeElement{
 		return timeToNextHour;						
 	}
 	
+	public String toString() {
+		 String s="";
+		 s=start.getTime()+"";
+		 return s;
+	 }
 }

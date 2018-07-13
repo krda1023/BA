@@ -1,7 +1,4 @@
-
 import java.util.EventObject;
-
-
 
 public class AtEvent extends EventObject {
 	/**

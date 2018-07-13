@@ -1,9 +1,3 @@
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Scanner;
-
 public class Run {
 		
 	static int count=0;
@@ -93,8 +87,8 @@ public class Run {
        System.out.println("Anzahlanfragen"+Send_Request.anfragencounter);
        System.out.println("Solution:");
        System.out.println(GA.pop.getFittest()); 
-       Date ende= new Date();
-       System.out.print(ende);		
+       TimeElement ende = new TimeElement();
+       System.out.print(ende.start);		
        //log.exit(); 
     }    
 }

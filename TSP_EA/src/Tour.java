@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 
 public class Tour{
@@ -33,12 +32,25 @@ public class Tour{
         tour.set(0, Distanzmatrix.startCity);
        
     }
-
+   
+    public int tourSize() {
+        return tour.size();
+    }
+    
     // Gets a city from the tour
     public City getCity(int tourPosition) {
         return (City)tour.get(tourPosition);
     }
-
+    
+    public boolean containsCity(City city){
+        return tour.contains(city);
+    }
+    
+    public int positionofCity(City city) {    
+    	int position =tour.indexOf(city);
+    	return position;
+    }
+    
     public void deleteCity(int pos) {
     	tour.remove(pos);
     }
@@ -61,39 +73,15 @@ public class Tour{
         }
         return fitness;
     }
-    
-    public double getDuration123Test() {
-    	double duration=GA.toDrivetoIntersection;
-    	double[][] matrix =Distanzmatrix.getDistanzmatrix();
-    	int hour=GA.lastEventTime.getHour();
-    	double ttnh=GA.lastEventTime.getTimeToNextHour();
-    	 for (int cityIndex=1; cityIndex < tourSize(); cityIndex++) { 		
-			 City fromCity = getCity(cityIndex);
-			 City destinationCity;	  							// Check we're not on our tour's last city, if we are set our 
-			 													// tour's final destination city to our starting city
-			 if(cityIndex+1 < tourSize()){
-                
-				 destinationCity = getCity(cityIndex+1);
-             }
-		 
-			 
-             else{    	 
-                 destinationCity = getCity(0);
-             }
-			 
-			
-    	 }
-    	double durationInSec= (double)(duration/1000);
-    	return durationInSec;
-    }
-    
+     
     public double getDuration() {
     	totalduration=0;
     	if(Run.runs==true) {
-	    	int index=1;
+	    	int index;
 	    	double totalDuration =GA.toDrivetoCity+GA.toDrivetoIntersection;
 	    	int hour=GA.lastEventTime.getHour();
 	    	double ttnh=GA.lastEventTime.getTimeToNextHour();
+	    	//Asyym
 	    	if(this.getCity(1).getType()=="Intersection"&&GA.OP_Stop==false) {
 	    		int a=Integer.parseInt(this.getCity(2).getId());
 	    		int h_next;
@@ -121,6 +109,12 @@ public class Tour{
 	    		index=2;
 	    	}
 	    	
+	    	if(this.getCity(1).getType()=="Intersection") {
+	    		index=2;
+	    	}
+	    	else {
+	    		index=1;
+	    	}
 	    	
 	    	//Bedingung noch für letzte Runden, das stimmt noch nicht ganz und auch tour.size nochmal überdenken
 	    	
@@ -200,19 +194,8 @@ public class Tour{
     }
 
     // Get number of cities on our tour
-    public int tourSize() {
-        return tour.size();
-    }
-    
+
     // Check if the tour contains a city
-    public boolean containsCity(City city){
-        return tour.contains(city);
-    }
-    
-    public int positionofCity(City city) {    
-    	int position =tour.indexOf(city);
-    	return position;
-    }
     
     @Override
     public String toString() {

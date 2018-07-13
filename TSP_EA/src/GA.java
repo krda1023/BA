@@ -2,8 +2,6 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.concurrent.SynchronousQueue;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
@@ -12,10 +10,6 @@ import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-
-
-
 
 public class GA implements myListener {
 
@@ -532,14 +526,18 @@ public class GA implements myListener {
     
     //parent1.tour-size-2 damit startpos endpos selbe länge hat wie im array zu verändern, position aber um 2 verschoben
    //bei startpos und endpos wieder draufschlagen dann veränderst die richtigen Positionen
-    public static Tour OrderCrossover(Tour parent1, Tour parent2) {
-    	
+   
+    public static void blockedCities() {
     	if(GA.EventCounter==0) {
     		blockedCities=1;
     	}
-    	if(GA.EventCounter!=0) {			//noch allen hinzufügen
+    	else{			//noch allen hinzufügen
     		blockedCities=2;
     	}
+    }
+    public static Tour OrderCrossover(Tour parent1, Tour parent2) {
+    	
+    	blockedCities();
         Tour child = new Tour();										
         int number1 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		//create first random number
         int number2 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		//create second random number
@@ -579,9 +577,7 @@ public class GA implements myListener {
     }
    
     public static Tour[] Ox2Crossover(Tour parent1, Tour parent2) {	
-    	if(GA.EventCounter==0) {
-    		blockedCities=1;
-    	}
+    	blockedCities();
     	Tour child1=new Tour();
     	Tour child2=new Tour();
     	Tour[] kids= new Tour[2];										// Tour array for returning
@@ -638,7 +634,7 @@ public class GA implements myListener {
     	if(GA.EventCounter==0) {
     		blockedCities=1;
     	}
-    	if(GA.EventCounter!=0) {
+    	else{			//noch allen hinzufügen
     		blockedCities=2;
     	}
     	int cut =(int) (Math.random() *(parent1.tourSize()-blockedCities-1))+blockedCities;		
@@ -708,9 +704,7 @@ public class GA implements myListener {
     }
     
     public static Tour[] PMX (Tour parent1, Tour parent2) { //Muss noch gemacht werden	
-    	if(GA.EventCounter==0) {
-    		blockedCities=1;
-    	}
+    	blockedCities();
     	int number1 =(int) (Math.random() *(parent1.tourSize()-blockedCities));
 		int number2 = (int) (Math.random() *(parent1.tourSize()-blockedCities));
 		Tour kids[]=new Tour[2];
@@ -988,7 +982,8 @@ public class GA implements myListener {
 	 }
 */
  
-	 public static Tour[] CycleC(Tour parent1, Tour parent2) {
+	public static Tour[] CycleC(Tour parent1, Tour parent2) {
+		blockedCities();
 		Tour child1=new Tour();
 	 	Tour child2=new Tour();
 	 	City city1;
@@ -1095,6 +1090,7 @@ public class GA implements myListener {
 	 }
  
     private static void ExchangeMutation(Tour tour) {   	
+    	blockedCities();
     	int tourPos1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities; 			//Create two random positions that should be swapped
         int tourPos2 = (int) ((tour.tourSize() -blockedCities)* Math.random())+blockedCities;
         while(tourPos1==tourPos2){											//If positions are equal, do it again
@@ -1111,6 +1107,7 @@ public class GA implements myListener {
     }
     
     private static void InversionMutation(Tour tour) {  
+    	blockedCities();
     	Tour child= new Tour();
     	int number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;				//Create two random positions that should be swapped
 		int number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
@@ -1144,6 +1141,7 @@ public class GA implements myListener {
     }
     
     private static void DisplacementMutation(Tour tour) {    
+    	blockedCities();
     	Tour child = new Tour();    	
     	int number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;		//Create first random number
     	int number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;		//Create second random number
@@ -1179,6 +1177,7 @@ public class GA implements myListener {
     }
     
     private static void InsertionMutation(Tour tour)    {  	  	
+    	blockedCities();
     	int oldPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;;	//Select a random city
     	int newPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;   //Select a new random position									
     	while(oldPos==newPos) {		
@@ -1202,7 +1201,8 @@ public class GA implements myListener {
     }
 
     private static void MultipleExchangeMutation(Tour tour) {  
-        for(int tourPos1=0; tourPos1 < tour.tourSize(); tourPos1++){		//Loop through tour
+    	blockedCities();
+    	for(int tourPos1=0; tourPos1 < tour.tourSize(); tourPos1++){		//Loop through tour
             if(Math.random() < mutationRate){               				//If a random number is smaller than our selected mutationrate do the mutation
                 int tourPos2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;;    // Get a random position in the tour
                 City city1 = tour.getCity(tourPos1); 						// Get the cities at target position in tour
@@ -1246,7 +1246,6 @@ public class GA implements myListener {
     	return chosen;
     }
 
-    
     public void start() throws Exception {  //FAll 1
     	Route route= new Route();
 		lastEventTime= new TimeElement();

@@ -1,5 +1,3 @@
-
-
 public class City {
 	double[] position;								//array with longiude[0] and latitude[1]
 	public String type;
