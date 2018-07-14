@@ -1279,8 +1279,8 @@ public class GA implements myListener {
 		All_Cities.destinationCities.set(pos2, Intersections.get(Intersections.size()-1));
 		Nodes.set(Nodes.size()-1, Intersections.get(Intersections.size()-1));
 		
-		RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations,best);
-		fireEvent(event);
+	//	RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations,best);
+	//	fireEvent(event);
 		for ( int t =0; t<pop.populationSize();t++) {
 			
 			if(Intersections.get(1).getType()=="Intersection"){
@@ -1401,8 +1401,8 @@ public class GA implements myListener {
 			}
 			Nodes.set(Nodes.size()-1, Intersections.get(Intersections.size()-1));
 			//Infomiere Simulator
-			RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations,best);
-			fireEvent(event);		
+		//	RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations,best);
+			//fireEvent(event);		
 			//Passe Tour und All_Cities an
 			
 			for ( int t =0; t<pop.populationSize();t++) {
@@ -1513,8 +1513,8 @@ public class GA implements myListener {
 			//Ersetze Koordinaten der aktuellen Ziel-City durch Koordinaten aus Intersections
 			int pos = All_Cities.destinationCities.indexOf(best.getCity(2));
 			All_Cities.destinationCities.set(pos, Intersections.get(Intersections.size()-1));
-			RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations,best);
-			fireEvent(event);
+		//	RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations,best);
+		//	fireEvent(event);
 			
 			//Loope alle Touren der Population
 			for ( int t =0; t<pop.populationSize();t++) {
@@ -1819,7 +1819,7 @@ public class GA implements myListener {
 	
 	public void fireEvent(RouteServiceEvent e)
 	{
-		listenerList.get(0).GAdidRequest(e);
+		listenerList.get(0).EAdidRequest(e);
 	}
 	
 }

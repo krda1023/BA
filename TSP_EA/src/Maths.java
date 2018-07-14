@@ -8,6 +8,7 @@ public class Maths {
 	//All 24 factors representing traffic at specific hour
 	static double []Faktoren= {(1/1.2),(1/1.3),(1/1.2),(1/1.1),(1/1),(1/0.9),(1/0.8),(1/0.7),(1/0.8),(1/0.85),(1/0.9),(1/0.95),(1/1),(1/0.9),(1/0.8),(1/0.7),(1/0.75),(1/0.8),(1/0.9),(1/0.95),(1/1),(1/1.05),(1/1.1),(1/1.15)};
 	
+//METHODS:
 	public static double getFaktor(int hour) {
 		return Faktoren[hour];
 	}
@@ -19,7 +20,7 @@ public class Maths {
 	}
 	
 	//EAmmaFunction for simulating duration values
-	public static double goEAmma(double expectedTime, double k, double theta, double shiftDistance) {
+	public static double goGamma(double expectedTime, double k, double theta, double shiftDistance) {
 		boolean accept = false;
 		Random rng = new Random(Calendar.getInstance().getTimeInMillis() + Thread.currentThread().getId());
 	    if (k < 1) {
@@ -65,8 +66,8 @@ public class Maths {
 			 
 			 } while (!accept);
 		 
-		 double EAmmaValue = ((x * theta) + shiftDistance);
-		 double result = expectedTime * EAmmaValue;
+		 double GammaValue = ((x * theta) + shiftDistance);
+		 double result = expectedTime * GammaValue;
 		 return result;
 	    }  
 	}
