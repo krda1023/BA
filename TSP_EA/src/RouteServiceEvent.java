@@ -11,7 +11,7 @@ public class RouteServiceEvent extends EventObject{
 	ArrayList<City> Intersection;
 
 //CONSTRUCTOR:
-	public RouteServiceEvent(GA Opti, ArrayList<City> nodes, ArrayList<City> intersections, double[] durations, Tour best) {
+	public RouteServiceEvent(EA Opti, ArrayList<City> nodes, ArrayList<City> intersections, double[] durations, Tour best) {
 		super(Opti);
 		this.Nodes=nodes;
 		this.Intersection=intersections;

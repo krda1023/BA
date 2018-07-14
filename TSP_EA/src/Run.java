@@ -1,5 +1,5 @@
 // Main class with main method and main loop
-//Initializes GA object "Optimierer" and Salesman object "Guy" and starts the dynamic algorithm process and simulation
+//Initializes EA object "Optimierer" and Salesman object "Guy" and starts the dynamic algorithm process and simulation
 public class Run {
 
 //VARIABLES:
@@ -12,10 +12,10 @@ public class Run {
 //MAIN METHOD:
 	public static void main(String[] args) throws Exception{
 		
-	//Create new GA class object and create new Salesman class Object Guy
+	//Create new EA class object and create new Salesman class Object Guy
 	//start the preperation process: Matrix request, set Selection, Recombination and Mutation Operators
 	//add MyListener to object "Optimierer" , add RouteServiceListener to object "Guy"
-		GA Optimierer= new GA();	
+		EA Optimierer= new EA();	
 		Salesman Guy= new Salesman();
 		//Optimierer.gui_start();
 		Optimierer.Formalitäten();
@@ -24,15 +24,15 @@ public class Run {
 		
 		//Initialize population, do first iteration and save initial duration
 		Optimierer.evolvePopulation(true);
-		double d = GA.pop.getFittest().getDuration();
+		double d = EA.pop.getFittest().getDuration();
 		
 		//Set up Logger for LogFiles
 		//Calculate the first solution by number of iteration (iterations1) or by number of iterations without improved solution (iterations2)
 		MyLogger log= new MyLogger();
      	log.setLogger();
      	
-     	if(GA.iterations1!=0) {
-     		for (int z = 0; z < GA.iterations1; z++) {
+     	if(EA.iterations1!=0) {
+     		for (int z = 0; z < EA.iterations1; z++) {
           		Optimierer.evolvePopulation(false);
            		log.writeInfo(Optimierer.best.getDuration(),Optimierer.best);
            	}
@@ -43,7 +43,7 @@ public class Run {
            int rundenzähler=0;
            do {
         	   Optimierer.evolvePopulation(false);
-         	   best=GA.pop.getFittest();
+         	   best=EA.pop.getFittest();
          	   rundenzähler++;
          	   // System.out.println("Runde: "+rundenzähler+" Beste Duration "+best.getDuration()); 
          	   if(rundenzähler >2) {
@@ -63,7 +63,7 @@ public class Run {
          	   }
          	   lastbest=best;
             }
-            while (counter<GA.iterations2); 
+            while (counter<EA.iterations2); 
      	}
 		
          
@@ -82,15 +82,15 @@ public class Run {
         while(runs==true);
    	
         // Print final results
-     	for(int ff=0; ff<GA.pop.populationSize();ff++) {
-     		System.out.println(GA.pop.getTour(ff));
+     	for(int ff=0; ff<EA.pop.populationSize();ff++) {
+     		System.out.println(EA.pop.getTour(ff));
      	}
         System.out.println(("Initial duration : "+d));
-        System.out.println("Final duration: " + GA.pop.getFittest().getDuration());	
+        System.out.println("Final duration: " + EA.pop.getFittest().getDuration());	
         System.out.println("Anzahl Städte: "+All_Cities.numberOfCities());
         System.out.println("Anzahlanfragen"+Send_Request.anfragencounter);
         System.out.println("Solution:");
-        System.out.println(GA.pop.getFittest()); 
+        System.out.println(EA.pop.getFittest()); 
         TimeElement ende = new TimeElement();
         System.out.print(ende.start);
     }    

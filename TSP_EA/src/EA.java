@@ -393,7 +393,7 @@ public class EA implements myListener {
 	}
 	
 	public static void blockedCities() {
-	    	if(GA.EventCounter==0) {
+	    	if(EA.EventCounter==0) {
 	    		blockedCities=1;
 	    	}
 	    	else{			//noch allen hinzufügen
@@ -538,7 +538,7 @@ public class EA implements myListener {
         int number1 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		//create first random number
         int number2 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		//create second random number
        
-        while(number1==number2)	{										//If random numbers are equal, do it again
+        while(number1==number2)	{										//If random numbers are equal, do it aEAin
     		number1 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		
     		number2 = (int) (Math.random() * (parent1.tourSize()-blockedCities)); 
     		continue;
@@ -579,7 +579,7 @@ public class EA implements myListener {
     	Tour[] kids= new Tour[2];										// Tour array for returning
     	int number1 = (int) (Math.random() *( parent1.tourSize()-blockedCities));	//First random number
     	int number2 = (int) (Math.random() * ( parent1.tourSize()-blockedCities));	//Second random number
-    	while(number1==number2)	{										//If random numbers are equal, do it again	
+    	while(number1==number2)	{										//If random numbers are equal, do it aEAin	
     		number1 = (int) (Math.random() * (parent1.tourSize()-blockedCities));
     		number2 = (int) (Math.random() * (parent1.tourSize()-blockedCities)); 
     		continue;
@@ -627,7 +627,7 @@ public class EA implements myListener {
     
     
     public static Tour[] PMX123(Tour parent1, Tour parent2) {
-    	if(GA.EventCounter==0) {
+    	if(EA.EventCounter==0) {
     		blockedCities=1;
     	}
     	else{			//noch allen hinzufügen
@@ -874,7 +874,7 @@ public class EA implements myListener {
 		return kids;
     }*/
    /* public static Tour[] PMX (Tour parent1, Tour parent2) { //Muss noch gemacht werden	
-    	if(GA.EventCounter==0) {
+    	if(EA.EventCounter==0) {
     		blockedCities=1;
     	}
     	int number1 =(int) (Math.random() *(parent1.tourSize()-blockedCities));
@@ -1090,7 +1090,7 @@ public class EA implements myListener {
     	blockedCities();
     	int tourPos1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities; 			//Create two random positions that should be swapped
         int tourPos2 = (int) ((tour.tourSize() -blockedCities)* Math.random())+blockedCities;
-        while(tourPos1==tourPos2){											//If positions are equal, do it again
+        while(tourPos1==tourPos2){											//If positions are equal, do it aEAin
              tourPos1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;			
              tourPos2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;    
         }       
@@ -1108,7 +1108,7 @@ public class EA implements myListener {
     	Tour child= new Tour();
     	int number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;				//Create two random positions that should be swapped
 		int number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
-    	while(number1==number2) { 		  									//If positions are equal, do it again
+    	while(number1==number2) { 		  									//If positions are equal, do it aEAin
     		number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
     		number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities; 
 		}   	
@@ -1142,7 +1142,7 @@ public class EA implements myListener {
     	Tour child = new Tour();    	
     	int number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;		//Create first random number
     	int number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;		//Create second random number
-    	while(number1==number2) { 		  									//If positions are equal, do it again
+    	while(number1==number2) { 		  									//If positions are equal, do it aEAin
     		number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
     		number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;  
     	}
@@ -1178,7 +1178,7 @@ public class EA implements myListener {
     	int oldPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;;	//Select a random city
     	int newPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;   //Select a new random position									
     	while(oldPos==newPos) {		
-    		oldPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;			//If Position is the same, do again   
+    		oldPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;			//If Position is the same, do aEAin   
     		newPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
         }
     	City citytaken=tour.getCity(oldPos);							//save selected city
@@ -1819,7 +1819,7 @@ public class EA implements myListener {
 	
 	public void fireEvent(RouteServiceEvent e)
 	{
-		listenerList.get(0).GAdidRequest(e);
+		listenerList.get(0).EAdidRequest(e);
 	}
 	
 }

@@ -1,7 +1,7 @@
 import java.util.EventObject;
 
 // class for all events that represent an "arrived" status 
-// the event can be one out of three diffrent types of arriving: "AtCity", "AtIntersection" or "GPS_Singal"
+// the event can be one out of three diffrent types of arriving: "AtCity", "AtIntersection" or "GPS_SinEAl"
 public class AtEvent extends EventObject {
 
 //VARIABLES:

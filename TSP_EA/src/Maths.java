@@ -18,8 +18,8 @@ public class Maths {
 		return erg;
 	}
 	
-	//GammaFunction for simulating duration values
-	public static double goGamma(double expectedTime, double k, double theta, double shiftDistance) {
+	//EAmmaFunction for simulating duration values
+	public static double goEAmma(double expectedTime, double k, double theta, double shiftDistance) {
 		boolean accept = false;
 		Random rng = new Random(Calendar.getInstance().getTimeInMillis() + Thread.currentThread().getId());
 	    if (k < 1) {
@@ -39,8 +39,8 @@ public class Maths {
 	    			accept = true;
 	    			}
 	    		} while (!accept);
-	    	double gammaValue =  ((x * theta) + shiftDistance);
-	    	double result = expectedTime * gammaValue;
+	    	double EAmmaValue =  ((x * theta) + shiftDistance);
+	    	double result = expectedTime * EAmmaValue;
 	    	return result;
 	    } 
 	    else {	
@@ -65,8 +65,8 @@ public class Maths {
 			 
 			 } while (!accept);
 		 
-		 double gammaValue = ((x * theta) + shiftDistance);
-		 double result = expectedTime * gammaValue;
+		 double EAmmaValue = ((x * theta) + shiftDistance);
+		 double result = expectedTime * EAmmaValue;
 		 return result;
 	    }  
 	}

@@ -89,11 +89,11 @@ public class Tour{
     	//Calculation of duration in dynamic environment
     	if(Run.runs==true) {
 	    	int index;
-	    	double totalDuration =GA.toDrivetoCity+GA.toDrivetoIntersection;
-	    	int hour=GA.lastEventTime.getHour();
-	    	double ttnh=GA.lastEventTime.getTimeToNextHour();
+	    	double totalDuration =EA.toDrivetoCity+EA.toDrivetoIntersection;
+	    	int hour=EA.lastEventTime.getHour();
+	    	double ttnh=EA.lastEventTime.getTimeToNextHour();
 	    	// If situation requires a value of the "Intersection" matrix range
-	    	if(this.getCity(1).getType()=="Intersection"&&GA.OP_Stop==false) {
+	    	if(this.getCity(1).getType()=="Intersection"&&EA.OP_Stop==false) {
 	    		//Get ID for selecting correct value in intersection matrix range
 	    		int a=Integer.parseInt(this.getCity(2).getId());
 	    		//toDriveto Calculation
@@ -105,10 +105,10 @@ public class Tour{
 					h_next=hour+1;
 				}
 				//check for hour overlaps and calculate duration by ratios
-				 if(totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a]>ttnh) {
-						double tohour=ttnh-totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];		;									//calculate the time from sum to next hour
-						double hourratio= tohour/totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];									// Calculate ratio of driven way in this section
-						totalDuration+=hourratio*totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a]+(1-hourratio)*totalDuration+Distanzmatrix.allMatrix.get(h_next)[GA.numOfCities][a];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+				 if(totalDuration+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]>ttnh) {
+						double tohour=ttnh-totalDuration+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a];		;									//calculate the time from sum to next hour
+						double hourratio= tohour/totalDuration+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a];									// Calculate ratio of driven way in this section
+						totalDuration+=hourratio*totalDuration+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]+(1-hourratio)*totalDuration+Distanzmatrix.allMatrix.get(h_next)[EA.numOfCities][a];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
 						ttnh+=3600;	
 						hour+=1;
 						if(hour==24) {
@@ -118,7 +118,7 @@ public class Tour{
 					}
 				 //add hour value to totalDuration
 					else {
-						totalDuration+=totalDuration+Distanzmatrix.allMatrix.get(hour)[GA.numOfCities][a];	
+						totalDuration+=totalDuration+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a];	
 					}
 	    	}
 	    	

@@ -199,23 +199,23 @@ public class Test_main {
 		}
 		
 		TimeElement now= new TimeElement();
-		double durationSumZFGA=0;																//Sum of gamma and time factor influenced values looped
-		double[] ZF_GA_duration= new double[gammaDuration.length];										//Array for final values for Simulation, gamma and time factor influenced
+		double durationSumZFEA=0;																//Sum of gamma and time factor influenced values looped
+		double[] ZF_EA_duration= new double[gammaDuration.length];										//Array for final values for Simulation, gamma and time factor influenced
 		int hour= now.getHour();																//actual hour
 		double ttnh=now.getTimeToNextHour();													// Duration to next hour in seconds
 		System.out.println(ttnh);	
 		for(int j=0; j<gammaDuration.length;j++) {											//Loop through Gamma 
 				
-				if(durationSumZFGA+gammaDuration[j]*faktoren.getFaktor(hour)>ttnh) {			//If the sum of the values + the actual value is bigger than the time to the next hour
-					double tohour=ttnh-durationSumZFGA		;									//calculate the time from sum to next hour
+				if(durationSumZFEA+gammaDuration[j]*faktoren.getFaktor(hour)>ttnh) {			//If the sum of the values + the actual value is bigger than the time to the next hour
+					double tohour=ttnh-durationSumZFEA		;									//calculate the time from sum to next hour
 					double ratio= tohour/gammaDuration[j]*faktoren.getFaktor(hour);				// Calculate ratio of driven way in this section
 					
 					
 					
 
-					ZF_GA_duration[j]=ratio*gammaDuration[j]*faktoren.getFaktor(hour)+(1-ratio)*gammaDuration[j]*faktoren.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+					ZF_EA_duration[j]=ratio*gammaDuration[j]*faktoren.getFaktor(hour)+(1-ratio)*gammaDuration[j]*faktoren.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
 					ttnh+=3600;																	// add 3600 seconds to timetonexthour
-					durationSumZFGA+=ZF_GA_duration[j];											//Update Sum 
+					durationSumZFEA+=ZF_EA_duration[j];											//Update Sum 
 					hour+=1;
 					if(hour==24) {
 						hour=0;
@@ -224,16 +224,16 @@ public class Test_main {
 					
 				}
 				else {																			// If actual step is within the same hour
-					ZF_GA_duration[j]=gammaDuration[j]*faktoren.getFaktor(hour);				//multiply value with time factor
-					durationSumZFGA+=ZF_GA_duration[j];		
-					System.out.println("Kein WECHSEL"+ ZF_GA_duration[j]);	//Update Sum
+					ZF_EA_duration[j]=gammaDuration[j]*faktoren.getFaktor(hour);				//multiply value with time factor
+					durationSumZFEA+=ZF_EA_duration[j];		
+					System.out.println("Kein WECHSEL"+ ZF_EA_duration[j]);	//Update Sum
 				}
 			}	
 		
 		for(int f=0;f<duration.length;f++) {
 			System.out.print(duration[f]+"    ");
 			System.out.print(gammaDuration[f]+"    ");
-			System.out.print(ZF_GA_duration[f]+"    ");
+			System.out.print(ZF_EA_duration[f]+"    ");
 			System.out.println();
 			
 			
@@ -241,7 +241,7 @@ public class Test_main {
 		
 		System.out.println(sumD);
 		System.out.println(sumGd);
-		System.out.println(durationSumZFGA);*/
+		System.out.println(durationSumZFEA);*/
 	
 
 

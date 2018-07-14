@@ -882,7 +882,7 @@ public class Send_Request {
 	}
 
 	public static double[][] createsmallMatrix() throws Exception{
-		double[][] erg=new double[GA.numOfCities][GA.numOfCities];
+		double[][] erg=new double[EA.numOfCities][EA.numOfCities];
 		String urlAnfang="https://api.openrouteservice.org/matrix?api_key=58d904a497c67e00015b45fce60fe6750d3e4061a1e3178c1db4f08e&profile=driving-car&locations=";
 		//String urlAnfang = "http://router.project-osrm.org/table/v1/driving/";
 		 String zwischenerg="";
@@ -907,7 +907,7 @@ public class Send_Request {
 	     for (int t=0; t<All_Cities.numberOfCities();t++){
 	    	JSONArray dura_2=dura_1.getJSONArray(t);
 	    	
-	        for (int i = 0; i < GA.numOfCities; i++) {
+	        for (int i = 0; i < EA.numOfCities; i++) {
 	       
 	   	        erg[t][i] = dura_2.getDouble(i);	    	    	
 	   	    }
