@@ -1,33 +1,42 @@
+//Class that represents one element of an individual/Tour
+// Can be of type "City", "Intersection", "GPS" or "Node"
+//"City" and "GPS" have chronological IDs,
+//"Nodes" receive ID through RouteRequest, "Intersection" has ID of corresponding "Node"/"City"
 public class City {
-	double[] position;								//array with longiude[0] and latitude[1]
+//VARIABLES:
+	//Array that holds longitude [0] and latitude [1]
+	double[] position;								
 	public String type;
-	public String id;												//City's ID
-
-	public City(String id,String type, double...position) {				// Constructs a city
+	public String id;
+	
+//CONSTRUCTOR
+	public City(String id,String type, double...position) {
 		super();
 		this.id = id;
 		this.type=type;
 		this.position = position;
 	}
 	
-	public String getId() {																			 //Gets city's id
+//METHODS:
+	public String getId() {
 			return id;
 		}
 	 
-	public void setID(String i) {
-		id=i;
+	public void setID(String s) {
+		id=s;
 	}
 	
-	public double[] getPosition() {																	//Get Position array
-		return position;}
+	public double[] getPosition() {
+		return position;
+	}
 	    
-	public double getLongitude(){																	 // Gets city's longitude coordinate
+	public double getLongitude(){
 	        return position[0];
-	    }
+	}
 	    
-	public double getLatitude(){																	 // Gets city's latitude coordinate
+	public double getLatitude(){
 	        return position[1];
-	    }
+	}
 	 
 	public void setCoordinates(double lon, double lat) {
 		 position[0]=lon;

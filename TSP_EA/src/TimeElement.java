@@ -1,9 +1,12 @@
 import java.util.Calendar;
-
+// Class for for saving and managing time 
 public class TimeElement{
+
+//VARIABLES:
 	Calendar start;
 	long startInMilli;
 	
+//CONSTRUCTOR:
 	public TimeElement(){
 		 this.start=Calendar.getInstance();
 		this.startInMilli= start.getTimeInMillis();
@@ -16,11 +19,14 @@ public class TimeElement{
 		this.startInMilli=start.getTimeInMillis();
 	}
 	
+//METHODS:
+	//Get hour of initialized time
 	@SuppressWarnings("deprecation")
 	public int getHour(){
 		return start.getTime().getHours();
 	}
 	
+	//Get seconds to fill up time of "start" to match the next full hour
 	public double getTimeToNextHour() { 	
 		int year=start.getTime().getYear()+1900;
 		int month=start.getTime().getMonth();
@@ -29,11 +35,7 @@ public class TimeElement{
 		int minute=0;
 		int second=0;
 		Calendar nextHour= start;
-		nextHour.set(year,month,day,hour,minute,second);
-		System.out.println(nextHour.getTime());//??????
-		System.out.println(nextHour.getTimeInMillis());
-		System.out.println(startInMilli);
-								//??????????????????????????????
+		nextHour.set(year,month,day,hour,minute,second);			
 		double timeToNextHour= (nextHour.getTimeInMillis()-startInMilli)/1000;   //In Seconds
 		return timeToNextHour;						
 	}
@@ -43,4 +45,5 @@ public class TimeElement{
 		 s=start.getTime()+"";
 		 return s;
 	 }
+	
 }

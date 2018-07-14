@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
+//Class for managing and sending requests, managing and preparing the data for Evolutionary Algorithm
 public class Send_Request {
 	
 																				//2-dim. array for saving table service response

@@ -2,65 +2,54 @@ import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
+//Class that initiates Route-Request
+// Saves, prepares and manages all returned duration values, Node Ids and Intersection coordinates
 public class Route {
 	
+//VARIABLES:
 	double[]Duration;
 	String[]Nodes;
 	ArrayList<City> Nodes_as_City= new ArrayList<City>();
 	ArrayList<City> intersections= new ArrayList<City>();
-	ArrayList<double[]> allDurations =new ArrayList<double[]>();
 	JSONObject Way;
 
-	public void WayFromTo(Tour best) throws Exception 
-	{
+//METHODS:
+	// Initiates Route Request with Send_Request class
+	// reads returned JSON Object and saves all information in Duration, Node and Intersections
+	// Converts Nodes and Intersections in City Objects
+	public void WayFromTo(Tour best) throws Exception {
+		//Route Request
 		try {
-		
-		Way=Send_Request.createRouteRequest(best);
+			Way=Send_Request.createRouteRequest(best);
 		}
-		catch(Exception e)
-		{
+		catch(Exception e){
 			e.printStackTrace();
 		}
-		JSONArray routes = Way.getJSONArray("routes");			//NOCH FALSCH
-		
+		//find JSON Arrays
+		JSONArray routes = Way.getJSONArray("routes");			
 		JSONObject r1 = routes.getJSONObject(0);
 		JSONArray legs = r1.getJSONArray("legs");
 		JSONObject l1= legs.getJSONObject(0);
 		JSONObject annotation = l1.getJSONObject("annotation");
-		
 		JSONArray nodes=annotation.getJSONArray("nodes");
 		JSONArray duration=annotation.getJSONArray("duration");
-		
 		JSONArray steps= l1.getJSONArray("steps");
 		
 		Nodes= new String[nodes.length()];
 		Duration= new double[duration.length()];
 		
-		
-		
-
-		
-		for(int a=0;a<nodes.length();a++)
-		{
-			if(a==nodes.length()-1)
-			{
+		//Save values of JSON Arrays in Node and Duration
+		for(int a=0;a<nodes.length();a++){
+			if(a==nodes.length()-1){
 			Nodes[a]=String.valueOf(nodes.getLong(a));
-			System.out.println("nodes: "+Nodes[a]);
 			}
-			else
-			{
+			else{
 			Nodes[a]=String.valueOf(nodes.getLong(a));
-			System.out.println("nodes: "+Nodes[a]);
-			System.out.println("duration: "+duration.getDouble(a));
-
 			Duration[a]=duration.getDouble(a);
-			
-			
 			}
 		}
 		
-		
+		//Convert Node Ids in City Objects
 		//Nodes_as_City=Send_Request.getNodes(Nodes);
 		
 		City n1= new City("14795415","Node",8.3903420, 49.0127410);
@@ -82,19 +71,25 @@ public class Route {
 		Nodes_as_City.add(n8);
 		Nodes_as_City.add(n9);
 
-	
-		
+		//Create City objects of type "Interesection" from JSON Array "Intersections" in JSONObject "steps"
+		//Receive longitude and latitude from location in JSONArray
+		//First and last "intersection" JSON Object are type =="City" but keep their coordinates from responses 
+		//-> Corresponding "Cities" in All_Cities will be updated in GA
+		//ID of first and last intersections equals ID of corresponding city object of type "City"
+		//ID of all other "Intersections" equal ID of corresponding city object of type "Node" from Nodes_as_City
 		String id="";
 		for( int step=0;step<steps.length();step++) {
 			JSONObject s1= steps.getJSONObject(step);
 			JSONArray intersects= s1.getJSONArray("intersections");
 			int counter=0;
-		//	System.out.println("Intersects lenghth :"+intersects.length());
+																			//	System.out.println("Intersects lenghth :"+intersects.length());
 			for(int inter=0; inter<intersects.length();inter++) {
 				JSONArray location = intersects.getJSONObject(inter).getJSONArray("location");
 				double [] position= new double[2];
 				position[0]=location.getDouble(0);
 				position[1]=location.getDouble(1);
+				
+				//== first City Object "Intersection"
 				if(inter==0&&step==0) {
 					id=best.getCity(1).getId();
 					City newCity= new City(id,"City",position);
@@ -102,6 +97,8 @@ public class Route {
 					intersections.add(newCity);
 					counter++;
 				}
+				
+				//==last City Object "Intersection"
 				else if(step==steps.length()-1 && inter==intersects.length()-1) {
 					City newCity;
 					if(All_Cities.checkForCities()==1) {
@@ -112,40 +109,24 @@ public class Route {
 						id=best.getCity(2).getId();
 						newCity= new City(id,"City",position);
 					}
-					 //!!!!!!!!!!!!!!!!!!
-					//System.out.println(newCity.id+" "+newCity.type+" "+newCity);
+																		//System.out.println(newCity.id+" "+newCity.type+" "+newCity);
 					intersections.add(newCity);
 					counter++;
 				}
-				else {System.out.println("reached at inters: "+inter);
+				else {
+					//													System.out.println("reached at inters: "+inter);
 					for(int node=1; node<Nodes_as_City.size();node++) {
 					if(Maths.round(position[1],6)==Maths.round(Nodes_as_City.get(node).getLatitude(),6)&&Maths.round(position[0],6)==Maths.round(Nodes_as_City.get(node).getLongitude(),6)) {
-						 id=Nodes_as_City.get(node).getId();
-						
+						 id=Nodes_as_City.get(node).getId();	
 						}
 					}
-					System.out.println("id:" +id);
+																		//System.out.println("id:" +id);
 					City newCity= new City(id,"Intersection",position);//ACHTUNG hier könnt ein fehler sein
-				//	System.out.println(newCity.id+" "+newCity.type+" "+newCity);
-					intersections.add(newCity);  //.....nochmal überdneken, nodeabgleich erforderlich
-				
+																						//	System.out.println(newCity.id+" "+newCity.type+" "+newCity);
+					intersections.add(newCity);  
 				}
 			}
-			
 		}
-		
 	}
-	
-	public ArrayList<City> getNodes_as_City()
-	{
-		//zieh aus JSOn object nodes wenn nodes =null
-		return Nodes_as_City;
-	}
-	
-	public double[]getDuration()
-	{
-		//zieh aus JSOn object duration wenn duration =null
-		return Duration;
-	}
-	
+
 }

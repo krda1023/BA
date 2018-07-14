@@ -14,15 +14,15 @@ public class Salesman implements RouteServiceListener {
 	double shiftDistance;
 	private ArrayList<myListener> listenerList= new ArrayList<myListener>();
 
-	public void addListener(myListener toAdd) {
-		listenerList.add(toAdd);
-	}
-	
 	public Salesman() {
 		this.k=GA.c;
 		this.theta=GA.theta;
 		this.shiftDistance=GA.shiftDistance;
 		
+	}
+	
+	public void addListener(myListener toAdd) {
+		listenerList.add(toAdd);
 	}
 	
 	public void checkForEvents()
@@ -184,5 +184,6 @@ public class Salesman implements RouteServiceListener {
 			}	
 		}
 	}
+
 }
 	

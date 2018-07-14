@@ -1,26 +1,29 @@
 import java.util.Calendar;
 import java.util.Random;
 
+//Class for mathematical methods and all hour factors
 public class Maths {
 	
+//VARIABLES:
+	//All 24 factors representing traffic at specific hour
 	static double []Faktoren= {(1/1.2),(1/1.3),(1/1.2),(1/1.1),(1/1),(1/0.9),(1/0.8),(1/0.7),(1/0.8),(1/0.85),(1/0.9),(1/0.95),(1/1),(1/0.9),(1/0.8),(1/0.7),(1/0.75),(1/0.8),(1/0.9),(1/0.95),(1/1),(1/1.05),(1/1.1),(1/1.15)};
 	
-	public static double getFaktor(int a) {
-		return Faktoren[a];
+	public static double getFaktor(int hour) {
+		return Faktoren[hour];
 	}
-   
-	public  static double round(double wert, double stellen){
-		double erg=Math.round(wert*Math.pow(10,stellen))/Math.pow(10, stellen);;
+
+	// Method for rounding a double value to specific number of decimal places 
+	public  static double round(double value, double decimal){
+		double erg=Math.round(value*Math.pow(10,decimal))/Math.pow(10, decimal);
 		return erg;
 	}
-  
+	
+	//GammaFunction for simulating duration values
 	public static double goGamma(double expectedTime, double k, double theta, double shiftDistance) {
 		boolean accept = false;
-		 Random rng = new Random(Calendar.getInstance().getTimeInMillis() + Thread.currentThread().getId());
+		Random rng = new Random(Calendar.getInstance().getTimeInMillis() + Thread.currentThread().getId());
 	    if (k < 1) {
-	 
 	    	// Weibull algorithm
-	
 	    	double c = (1 / k);
 	    	double d = ((1 - k) * Math.pow(k, (k / (1 - k))));
 	    	double u, v, z, e, x;
@@ -36,17 +39,12 @@ public class Maths {
 	    			accept = true;
 	    			}
 	    		} while (!accept);
-	    	
 	    	double gammaValue =  ((x * theta) + shiftDistance);
 	    	double result = expectedTime * gammaValue;
 	    	return result;
-	    	
 	    } 
-	    
-	    else {
-	    	
-		 // Cheng's algorithm
-		    	
+	    else {	
+		 // Cheng's algorithm   	
 		 double b = (k - Math.log(4));
 		 double c = (k + Math.sqrt(2 * k - 1));
 		 double lam = Math.sqrt(2 * k - 1);
@@ -70,7 +68,6 @@ public class Maths {
 		 double gammaValue = ((x * theta) + shiftDistance);
 		 double result = expectedTime * gammaValue;
 		 return result;
-	 
 	    }  
 	}
 }

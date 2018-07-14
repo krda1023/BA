@@ -1,16 +1,22 @@
 import java.util.EventObject;
 
+// class for all events that represent an "arrived" status 
+// the event can be one out of three diffrent types of arriving: "AtCity", "AtIntersection" or "GPS_Singal"
 public class AtEvent extends EventObject {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
+//VARIABLES:
+	private static final long serialVersionUID = 1L;
+	
+	//String that represents that type of arriving
 	public String status;
+	
+	//Time at which the event occurs in Millis
 	long EventTime;
+	
+	//City object with location coordinates, ID and type
 	City location;
 	
-	
+//CONSTRUCTOR	
 	public AtEvent(Salesman salesman, City loc, long Time) {
 		super(salesman);
 		this.location=loc;
@@ -19,6 +25,7 @@ public class AtEvent extends EventObject {
 		
 	}
 	
+//METHODS:
 	public long getEventTime(){
 		return EventTime;
 	}

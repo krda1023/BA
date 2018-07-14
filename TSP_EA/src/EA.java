@@ -13,7 +13,7 @@ import javax.swing.event.ChangeListener;
 //Main algorithm and optimizer based on evolutionary algorithm
 //Implements Listener and reacts on time depending events created by the simulator
 //Sets properties and parameters, activates the correct operators for the EA
-public class GA implements myListener {
+public class EA implements myListener {
 
 //VARIABLES:			
     //Properties

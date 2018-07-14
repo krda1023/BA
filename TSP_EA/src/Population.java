@@ -1,36 +1,38 @@
+// class that holds all of out individuals/tours
 public class Population {
-	
-    Tour[] tours;														// Holds population of tours
+
+//VARIABLES:
+	//Array that holds all of our tours
+    Tour[] tours;														
     
-    // Construct a population
-    public Population(int populationSize, boolean initialise) {			//Constructor of population
-    	{
-        tours = new Tour[populationSize];
-    	}            
-        if (initialise) {											// If we need to initialise a population of tours do so     
-           
-        	System.out.println(populationSize);
-        	for (int i = 0; i < populationSize; i++) {				  // Loop and create individuals
+//CONSTRUCTOR:
+    // Initializes Tour Array
+    // Initialize==true : Initialize a new population and randomly generate individuals
+    public Population(int populationSize, boolean initialize) {
+        tours = new Tour[populationSize];         
+        if (initialize) {											
+        	for (int i = 0; i < populationSize; i++) {				  
                 Tour newTour = new Tour();
                 newTour.generateIndividual();
-                saveTour(i, newTour);									// save individual
-          
+                saveTour(i, newTour);									     
             }
         }
     }
     
-    
-    public void saveTour(int index, Tour tour) {						// Saves a tour
+//METHODS:
+    //Save a tour at certain position in tours
+    public void saveTour(int index, Tour tour) {
         tours[index] = tour;
     }
     
-    public Tour getTour(int index) {									// Gets a tour from population
+    public Tour getTour(int index) {
         return tours[index];
     }
     
-    public Tour getFittest() {											// Gets the best tour in the population
+    //Returns the fittest and best individual 
+    public Tour getFittest() {
         Tour fittest = tours[0];
-        for (int i = 1; i < populationSize(); i++) {					// Loop through individuals to find fittest
+        for (int i = 1; i < populationSize(); i++) {
             if (fittest.getFitness() <= getTour(i).getFitness()) {
                 fittest = getTour(i);
             }
@@ -38,8 +40,8 @@ public class Population {
         return fittest;
     }
 
-    public int populationSize() {									   // Gets population size
+    public int populationSize() {
     	return tours.length;
     }
 
-    }
+}

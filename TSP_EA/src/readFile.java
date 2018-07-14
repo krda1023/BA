@@ -4,83 +4,64 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
-
+//class that reads our TSP-Instance file
 public class readFile {
 
+//VARIABLES:
 	File file;
 	BufferedReader br;
-	Scanner s ;
+	Scanner s;
 	String path;
-	double[][] erg;
-	
+	double[][] coordinates;
 	int countlines=0;
 	
-	public readFile(String f)
-	{
+//CONSTRUCTOR:
+	public readFile(String f){
 		this.path=f;
 		this.file= new File(f);
 	}
 	
-	public int getNumberofCities()
-	{
+//MEHTODS:
+	//Returns number of lines of the tsp file which contain values
+	public int getNumberofCities(){
 		return countlines;
 	}
 	
-	public double[][] getCoordinates()
-	{
-		return erg;
+	//returns double array with coordiantes
+	public double[][] getAllCoordinates(){
+		return coordinates;
 	}
-		
-	public void readingFile()
-	{
-		try
-		{
+	
+	//reads TSP instance and saves coordinates in double array/
+	public void readingFile(){
+		try{
 			br= new BufferedReader(new FileReader(file));
 			s = new Scanner(file);
 		}
-		catch(FileNotFoundException e)
-		{
+		catch(FileNotFoundException e){
 			System.out.print("File not found");
 		}
 	
-	
-		
-		
 		String line="";
-		
-		try
-		{
-			while((line=br.readLine())!=null)
-			{
+
+		try{
+			while((line=br.readLine())!=null){
 				countlines+=1;
 			}
 		}
-		catch(IOException ioex)
-		{
+		catch(IOException ioex){
 			System.out.print("Error reading file");
 		}
 		
-		erg= new double[countlines][2];
+		coordinates= new double[countlines][2];
 		
-		
-	
-		for(int j=0;j<countlines;j++)
-		{
-		
+		for(int j=0;j<countlines;j++){
 		String b= s.next();
 		String c=s.next();
-		
-		
-		erg[j][0]=Double.parseDouble(b);
-		erg[j][1]=Double.parseDouble(c);
-	
-
-
+		coordinates[j][0]=Double.parseDouble(b);
+		coordinates[j][1]=Double.parseDouble(c);
 		}
 		
 		s.close();
-		
-		
-	
 	}
 }
