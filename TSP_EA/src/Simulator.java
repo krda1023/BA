@@ -1,8 +1,17 @@
 import java.util.ArrayList;
-
+//Simulator that for event-based and time-depending simulation
+//Using Gamma-function for simulating new values
+//checks after every iteration of the EA if it has to fire an event
+//Implements RouteServiceListener with which it receives simulation command and API data
+//Creates three different types of events, based on API data -> "AtCity", "AtIntersection" & "GPS"
 public class Simulator implements RouteServiceListener {
+	
+//VARIABLES:
+	//List for upcoming Events
 	private ArrayList<AtEvent> upcomingEvents = new ArrayList<AtEvent>();
+	//List for past Events
 	private ArrayList<AtEvent> pastEvents = new ArrayList<AtEvent>();
+	//Simulation parameters and data
 	ArrayList<City> Nodes;
 	ArrayList<City> Intersection;
 	Tour best;
@@ -12,8 +21,10 @@ public class Simulator implements RouteServiceListener {
 	double k;
 	double theta;
 	double shiftDistance;
+	//ListenerList
 	private ArrayList<myListener> listenerList= new ArrayList<myListener>();
 
+//CONSTRUCTOR
 	public Simulator() {
 		this.k=EA.c;
 		this.theta=EA.theta;
@@ -21,51 +32,43 @@ public class Simulator implements RouteServiceListener {
 		
 	}
 	
+//METHODS:
 	public void addListener(myListener toAdd) {
 		listenerList.add(toAdd);
 	}
 	
-	public void checkForEvents()
-	{	AtEvent currentEvent = null;
+	//Methods that compares actual time with event time of all events
+	//Fires event in case of time overlaps and moves specific event in the event lists
+	public void checkForEvents(){
+		AtEvent currentEvent = null;
 		long jetzt= System.currentTimeMillis();
 		
-		for(int i=0; i<upcomingEvents.size();i++)
-		{
-			if(jetzt>( upcomingEvents.get(i)).getEventTime())  
-			{
+		for(int i=0; i<upcomingEvents.size();i++){
+			if(jetzt>( upcomingEvents.get(i)).getEventTime()){
 				pastEvents.add(upcomingEvents.get(i));
 				currentEvent=upcomingEvents.get(i);
 				break;
 
 			}
-			else
-			{}
+			else{}
 		}
 		upcomingEvents.remove(currentEvent);
 		try {
 			fireAtEvent(currentEvent);
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
-		}
-		
-	/*	if(getFahrtzeit()>((AtEvent) upcomingEvents.get(0)).getEventTime())
-		{	//fire
-			for(myListener lis: listenerList)
-			{	AtEvent ae= (AtEvent)upcomingEvents.get(0);
-				lis.arrivedAtCity(ae);
-				lis.arrivedAtWP(ae);
-				// übergib event an listener der daruaf reagiert sobald Fahrtzeit größer eventzeit
-			}
-		} */
+		}	
 	}
-	
+
+	//Fires event and activates the correct event handling mehtods in EA
 	public void fireAtEvent(AtEvent e) throws Exception{
 		
-		if(e.getEventType()=="AtCity"){
+		if(e.getEventType()=="City"){
 			listenerList.get(0).atCity(e);
 		}
 		
-		if(e.getEventType()=="AtIntersection"){
+		if(e.getEventType()=="Intersection"){
 			listenerList.get(0).atIntersection(e);
 			
 		}	
@@ -74,15 +77,20 @@ public class Simulator implements RouteServiceListener {
 		}
 	}
 	
+	//Event handling methods for RouteServicEvent
+	//Starts simulation of AtEvents
 	public void EAdidRequest(RouteServiceEvent e) {
 		Nodes=e.Nodes;
 		Intersection= e.Intersection;
 		duration=e.durations;
 		best=e.best;
+		upcomingEvents = new ArrayList<AtEvent>();
+		pastEvents = new ArrayList<AtEvent>();
 		createEvents();
 		
 	}
 	
+	//Creates all atEvents of the current route, "GPS", "AtIntersection" & "atCity
 	public void createEvents() {
 		double[] GammaDuration= new double[duration.length];												//Array for Gamma influenced values
 																	
