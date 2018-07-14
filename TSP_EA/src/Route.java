@@ -74,7 +74,7 @@ public class Route {
 		//Create City objects of type "Interesection" from JSON Array "Intersections" in JSONObject "steps"
 		//Receive longitude and latitude from location in JSONArray
 		//First and last "intersection" JSON Object are type =="City" but keep their coordinates from responses 
-		//-> Corresponding "Cities" in All_Cities will be updated in GA
+		//-> Corresponding "Cities" in All_Cities will be updated in EA
 		//ID of first and last intersections equals ID of corresponding city object of type "City"
 		//ID of all other "Intersections" equal ID of corresponding city object of type "Node" from Nodes_as_City
 		String id="";
