@@ -7,7 +7,7 @@ public class Simulator implements RouteServiceListener {
 	ArrayList<City> Intersection;
 	Tour best;
 	double[] duration;
-	double[] ZF_EA_duration;
+	double[] TF_Gamma_duration;
 	int GPS_frequency=10;
 	double k;
 	double theta;
@@ -84,25 +84,25 @@ public class Simulator implements RouteServiceListener {
 	}
 	
 	public void createEvents() {
-		double[] gammaDuration= new double[duration.length];												//Array for Gamma influenced values
+		double[] GammaDuration= new double[duration.length];												//Array for Gamma influenced values
 																	
 		for(int i=0; i<duration.length;i++) {													//Loop through duration values and use gamma function
-			gammaDuration[i]=Maths.goGamma(duration[i], k, theta, shiftDistance);	
+			GammaDuration[i]=Maths.goGamma(duration[i], k, theta, shiftDistance);	
 		}
 		
 		TimeElement now= new TimeElement();
 		double durationSumZFEA=0;																//Sum of gamma and time factor influenced values looped
-		ZF_EA_duration= new double[gammaDuration.length];										//Array for final values for Simulation, gamma and time factor influenced
+		TF_Gamma_duration= new double[GammaDuration.length];										//Array for final values for Simulation, gamma and time factor influenced
 		int hour= now.getHour();																//actual hour
 		double ttnh=now.getTimeToNextHour();												// Duration to next hour in seconds
-			for(int j=0; j<gammaDuration.length;j++) {											//Loop through Gamma 
+			for(int j=0; j<GammaDuration.length;j++) {											//Loop through Gamma 
 				
-				if(durationSumZFEA+gammaDuration[j]*Maths.getFaktor(hour)>ttnh) {			//If the sum of the values + the actual value is bigger than the time to the next hour
+				if(durationSumZFEA+GammaDuration[j]*Maths.getFaktor(hour)>ttnh) {			//If the sum of the values + the actual value is bigger than the time to the next hour
 					double tohour=ttnh-durationSumZFEA		;									//calculate the time from sum to next hour
-					double ratio= tohour/gammaDuration[j]*Maths.getFaktor(hour);				// Calculate ratio of driven way in this section
-					ZF_EA_duration[j]=ratio*gammaDuration[j]*Maths.getFaktor(hour)+(1-ratio)*gammaDuration[j]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+					double ratio= tohour/GammaDuration[j]*Maths.getFaktor(hour);				// Calculate ratio of driven way in this section
+					TF_Gamma_duration[j]=ratio*GammaDuration[j]*Maths.getFaktor(hour)+(1-ratio)*GammaDuration[j]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
 					ttnh+=3600;																	// add 3600 seconds to timetonexthour
-					durationSumZFEA+=ZF_EA_duration[j];											//Update Sum 
+					durationSumZFEA+=TF_Gamma_duration[j];											//Update Sum 
 					hour+=1;
 					if(hour==24) {
 						hour=0;
@@ -111,9 +111,9 @@ public class Simulator implements RouteServiceListener {
 					
 				}
 				else {																			// If actual step is within the same hour
-					ZF_EA_duration[j]=gammaDuration[j]*Maths.getFaktor(hour);				//multiply value with time factor
-					durationSumZFEA+=ZF_EA_duration[j];		
-					System.out.println("Kein WECHSEL"+ ZF_EA_duration[j]);	//Update Sum
+					TF_Gamma_duration[j]=GammaDuration[j]*Maths.getFaktor(hour);				//multiply value with time factor
+					durationSumZFEA+=TF_Gamma_duration[j];		
+					System.out.println("Kein WECHSEL"+ TF_Gamma_duration[j]);	//Update Sum
 				}
 			}
 			
@@ -128,12 +128,12 @@ public class Simulator implements RouteServiceListener {
 			double sum_d=0;
 			double ratio=0;
 			int positionInDurArray=0;
-			for(int findNode=0;findNode<ZF_EA_duration.length;findNode++) {
-				sum_d+=ZF_EA_duration[findNode]; 
+			for(int findNode=0;findNode<TF_Gamma_duration.length;findNode++) {
+				sum_d+=TF_Gamma_duration[findNode]; 
 				if(sum_d>eventTimeSum) {
 					positionInDurArray=findNode;
 					diffrence=sum_d-eventTimeSum;
-					ratio= 1-(diffrence/ZF_EA_duration[findNode]);
+					ratio= 1-(diffrence/TF_Gamma_duration[findNode]);
 					break;
 				}
 			}
@@ -153,8 +153,8 @@ public class Simulator implements RouteServiceListener {
 		for(int inters=1; inters<Intersection.size();inters++) { 
 			double sumIntD=0;
 			if(inters==Intersection.size()-1) {
-				for(int dur=0;dur<ZF_EA_duration.length;dur++) {
-					sumIntD+=ZF_EA_duration[dur];
+				for(int dur=0;dur<TF_Gamma_duration.length;dur++) {
+					sumIntD+=TF_Gamma_duration[dur];
 				}											//Letztes Event, Intersection last = City "City"
 				AtEvent ev= new AtEvent(this,Intersection.get(inters) ,(long)(now.startInMilli+(sumIntD*1000)));
 				if(Intersection.get(inters).getLatitude()==Distanzmatrix.startCity.getLatitude()&&Intersection.get(inters).getLongitude()==Distanzmatrix.startCity.getLongitude()) {
@@ -171,7 +171,7 @@ public class Simulator implements RouteServiceListener {
 			
 			else {
 				for(int node=0;node<Nodes.size();node++) {
-					sumIntD+=ZF_EA_duration[node];   
+					sumIntD+=TF_Gamma_duration[node];   
 					if(Intersection.get(inters).getId()==Nodes.get(node).getId()) { //Hier hat Intersection noch die ID der korresponiderenden Nodes
 							AtEvent ev= new AtEvent(this,Intersection.get(inters),(long)(now.startInMilli+(sumIntD*1000)));
 							if(All_Cities.checkForCities()==2 &&Intersection.get(inters+1).getType()=="City") {

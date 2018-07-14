@@ -1,5 +1,5 @@
 // Main class with main method and main loop
-//Initializes EA object "Optimierer" and Salesman object "Guy" and starts the dynamic algorithm process and simulation
+//Initializes EA object "Optimierer" and Simulator object "Guy" and starts the dynamic algorithm process and simulation
 public class Run {
 
 //VARIABLES:
@@ -12,11 +12,11 @@ public class Run {
 //MAIN METHOD:
 	public static void main(String[] args) throws Exception{
 		
-	//Create new EA class object and create new Salesman class Object Guy
+	//Create new EA class object and create new Simulator class Object Guy
 	//start the preperation process: Matrix request, set Selection, Recombination and Mutation Operators
 	//add MyListener to object "Optimierer" , add RouteServiceListener to object "Guy"
 		EA Optimierer= new EA();	
-		Salesman Guy= new Salesman();
+		Simulator Guy= new Simulator();
 		//Optimierer.gui_start();
 		Optimierer.Formalitäten();
 		Guy.addListener(Optimierer);

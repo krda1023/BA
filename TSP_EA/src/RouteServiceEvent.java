@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 import java.util.EventObject;
-// Event class for activating the Simulation class "Salesman" after a RouteRequest
+// Event class for activating the Simulation class "Simulator" after a RouteRequest
 public class RouteServiceEvent extends EventObject{
 
 //VARIABLES:

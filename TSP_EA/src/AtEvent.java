@@ -17,7 +17,7 @@ public class AtEvent extends EventObject {
 	City location;
 	
 //CONSTRUCTOR	
-	public AtEvent(Salesman salesman, City loc, long Time) {
+	public AtEvent(Simulator salesman, City loc, long Time) {
 		super(salesman);
 		this.location=loc;
 		this.EventTime=Time;
