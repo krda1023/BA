@@ -16,11 +16,11 @@ public class Run {
 	//start the preperation process: Matrix request, set Selection, Recombination and Mutation Operators
 	//add MyListener to object "Optimierer" , add RouteServiceListener to object "Guy"
 		EA Optimierer= new EA();	
-		Simulator Guy= new Simulator();
+		//Simulator Guy= new Simulator();
 		//Optimierer.gui_start();
 		Optimierer.Formalitäten();
-		Guy.addListener(Optimierer);
-		Optimierer.addRouteServiceListener(Guy);
+		//Guy.addListener(Optimierer);
+		//Optimierer.addRouteServiceListener(Guy);
 		
 		//Initialize population, do first iteration and save initial duration
 		Optimierer.evolvePopulation(true);
@@ -69,17 +69,17 @@ public class Run {
          
        
         //Start dynamic algorithm process
-        Optimierer.start();
+  //      Optimierer.start();
      	
      	//Let Algorithm and Simulation run while runs==true
-        do {
+     //   do {
             TimeElement start = new TimeElement();
             System.out.print(start.start);
             Optimierer.evolvePopulation(false);
-            Guy.checkForEvents();
+         //   Guy.checkForEvents();
           
-        }
-        while(runs==true);
+      //  }
+      //  while(runs==true);
    	
         // Print final results
      	for(int ff=0; ff<EA.pop.populationSize();ff++) {

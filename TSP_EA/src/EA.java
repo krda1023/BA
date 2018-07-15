@@ -25,7 +25,7 @@ public class EA implements myListener {
 	//EA parameters
     static int numOfCities;
 	static int popSize=50;			
-	static int iterations1=10000;
+	static int iterations1=1000;
 	static int iterations2=10000;			
 	static double mutationRate = 0.2;   
     static int tournamentSize = 5;	
@@ -34,11 +34,13 @@ public class EA implements myListener {
 	static double shiftDistance=0;
 	static int blockedCities=2;
 	static Population pop;
+	static Population newPopulation;  
+	int elitismOffset = 0;
 	//Operators
 	static boolean ox2C=false;
 	static boolean ordC=false;
-	static boolean pmxC=false;
-	static boolean cycC=true;
+	static boolean pmxC=true;
+	static boolean cycC=false;
 	static boolean disM=false;
 	static boolean insM=true;
 	static boolean invM=false;
@@ -49,13 +51,13 @@ public class EA implements myListener {
 	ArrayList<City> Nodes;
 	ArrayList<City> Intersections;
 	static double[] durations;
-	static double toDrivetoIntersection;
 	//Eventhandling and duration calculation
 	static int EventCounter=0;
 	Tour best;
 	Tour lastbest;
 	static City lastLocation;
-	static double toDrivetoCity;
+	static double toDrivetoCity=0;
+	static double toDrivetoIntersection=0;
 	static double toDrivetoNode;
 	static TimeElement lastEventTime;
 	private ArrayList<RouteServiceListener> listenerList= new ArrayList<RouteServiceListener>();
@@ -132,10 +134,8 @@ public class EA implements myListener {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				iterations1/=iteration.getValue();
-				
-			}
-			
+				iterations1/=iteration.getValue();		
+			}	
 		}
 		class popListener implements ChangeListener{
 
@@ -402,94 +402,42 @@ public class EA implements myListener {
 	    }
 
 	//Methods for evolutionary algorithm
-	
 	//Evolve population by using recombination, mutation, selection and replacing operators
 	//Initializes first population
     public void evolvePopulation(boolean initilize) {
 	    if(OP_Stop==false) {	
+	    	//If true: Initialize first population and generate individuals
 	    	if(initilize) {
 	    		pop = new Population(popSize, true);
 	    		
 	    	}
-	        Population newPopulation = new Population(popSize, false);     //Create new population, no initialisation      
-	        int elitismOffset = 0;
-	        if (elitism) {																//Keep best tour elitism=true
+	        // initialize new population to save the evolved individuals 
+	    	newPopulation = new Population(popSize, false);          
+	    	//Keep best individual from population if elitism is enabled
+	    	
+	        if (elitism) {																
 	            newPopulation.saveTour(0, pop.getFittest());
 	            elitismOffset = 1;							
 	        }
 	       
-	       
+	       // if 
 	       if(ox2C){
-	    	   for (int z = elitismOffset; z < newPopulation.populationSize(); z++) {   //Loop through every tour of the population
-	    		   if ((z+1)<newPopulation.populationSize()) {							//If more than 2 tours are left, use Ox2-Crossover    		
-	    			   Tour parent1 = tournamentSelection(pop);							//Choose first parent chromosome with tournament selection
-		        		Tour parent2 = tournamentSelection(pop);       					// Choose second parent chromosome with tournament selection
-		        		Tour childs[]= Ox2Crossover(parent1,parent2);					//Receive offsprings in an Tour array
-		        		Tour child1=childs[0];
-		        		Tour child2=childs[1];            
-		        		newPopulation.saveTour(z, child1);    							//Save first offspring
-		        		newPopulation.saveTour((z+1),child2);    						//Save second offspring
-		        		z=z+1;						
-	    		   }        	
-	        	else {																	// If one tour is left, use order crossover
-	          		Tour parent1 = tournamentSelection(pop);							//Choose first parent chromosome with tournament selection
-	                Tour parent2 = tournamentSelection(pop);           				   	// Choose second parent chromosome with tournament selection
-	                Tour child= OrderCrossover(parent1,parent2);						//Receive offspring
-	                newPopulation.saveTour(z, child);                    				// save offspring in new Population
-	        	}      	
-	    		 
-	    	   }
+	    	   String operator="Ox2";
+	    	   this.operate(operator);
 	    	   
 	       }
 	       if(cycC){
-	    	   for (int z = elitismOffset; z < newPopulation.populationSize(); z++) {   	 // Loop through all tours of population
-	    		   if ((z+1)<newPopulation.populationSize()) {       	       				//If more than 2 tours are left, use Cycle-Crossover  
-	    			   Tour parent1 = tournamentSelection(pop);								// Choose second parent chromosome with tournament selection
-	    			   Tour parent2 = tournamentSelection(pop);								// Choose second parent chromosome with tournament selection         
-			           Tour childs[]= CycleC(parent1,parent2);								//Receive offsprings in an Tour array with offsprings         
-			           newPopulation.saveTour(z, childs[0]);        						//Save first offspring in new population
-			           newPopulation.saveTour((z+1),childs[1]);          					//Save second offspring in new population
-			           z=z+1;
-			       	}
-	        	
-	    		   else {																	// If one tour is left, use order crossover
-	             		Tour parent1 = tournamentSelection(pop);							//Choose first parent chromosome with tournament selection
-	                   Tour parent2 = tournamentSelection(pop);           				   	// Choose second parent chromosome with tournament selection
-	                   Tour child= OrderCrossover(parent1,parent2);							//Receive offspring
-	                   newPopulation.saveTour(z, child);                    				// save offspring in new Population
-	           		}
-	    		
-	    	   }
+	    	   String operator="Cycle";
+	    	   this.operate(operator);
 	       }
 	       if(pmxC) {      
-	    	   for (int z = elitismOffset; z < newPopulation.populationSize(); z++) {		// Loop through all tours of population
-	    		   if ((z+1)<newPopulation.populationSize()) {        						//If more than 2 tours are left, use PMX-Crossover  
-	    			   Tour parent1 = tournamentSelection(pop);								//Choose first parent chomosome with tournament selection
-	    			   Tour parent2 = tournamentSelection(pop);	          					//Choose second parent chromosome with tournament selection
-	    			   Tour childs[]= PMX(parent1,parent2);									//Receive Tour array with offsprings            
-	    			   newPopulation.saveTour(z, childs[0]);        						//Save first offspring in new population
-	    			   newPopulation.saveTour((z+1),childs[1]);          					//Save second offspring in new population
-	    			   z=z+1;																
-	    		   }       	
-	    		   else {																	//If one tour is left use order crossover
-	    			   Tour parent1 = tournamentSelection(pop);								//Choose first parent chromosome with tournament selection
-	    			   Tour parent2 = tournamentSelection(pop);     						//Choose second parent chromosome with tournament selection         
-	    			   Tour child= OrderCrossover(parent1,parent2);							//receive offspring
-	    			   newPopulation.saveTour(z, child);                       				//save offspring
-	    		   }
-	    	   }
+	    	   String operator="PMX";
+	    	   this.operate(operator);
 	       }
 	       if(ordC) {       
-	    	   for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {		//Loop through all tours of population
-	               Tour parent1 = tournamentSelection(pop);									//Choose first parent chromosome with tournament selection
-	               Tour parent2 = tournamentSelection(pop);									//Choose second parent chromosome with tournament selection
-	               Tour child = OrderCrossover(parent1, parent2);							//receive offspring
-	               newPopulation.saveTour(i, child);										//Save offspring
-	             
-	    	   }
+	    	   String operator="Ord";
+	    	   this.operate(operator);
 	       }
-	       
-	       
 	       
 	       if(disM) {
 	           for (int i = elitismOffset; i < newPopulation.populationSize(); i++) {        //Loop through all tours of new population and use displacement mutation
@@ -518,185 +466,181 @@ public class EA implements myListener {
 	        	InversionMutation(newPopulation.getTour(i));
 	    	   }
 	       }
-	    /*   for( int af=0; af<newPopulation.populationSize();af++) {
-	    	  System.out.println(newPopulation.getTour(af));
-	       }*/
-	       
 	       best=newPopulation.getFittest();
 	       pop= newPopulation;
     	}
-	    else {
-	    	//Mach nix
-	    }
+	    else {}
+	
     }
     
+    //Run the correct operator
+    public void operate(String Recombination) {
+  	  
+		Tour child1=null;
+		Tour child2=null;
+		int Case=0;
+		if(Recombination=="Cycle") {
+			Case=1;
+		  }
+		else if(Recombination=="PMX") {
+			Case=2;
+		  }
+		else if(Recombination=="Ox2") {
+			Case=3;
+		  }
+		else if(Recombination=="Ord") {
+			Case=4;
+		}
+		for (int z = elitismOffset; z < EA.newPopulation.populationSize(); z++) {   //Loop through every tour of the population
+    		   if ((z+1)<newPopulation.populationSize()) {							//If more than 2 tours are left, use Ox2-Crossover    		
+    			   Tour parent1 = tournamentSelection(pop);							//Choose first parent chromosome with tournament selection
+	        		Tour parent2 = tournamentSelection(pop);       					// Choose second parent chromosome with tournament selection
+	        		switch (Case) {
+						case 1:
+							Tour childs1[]= CycleC(parent1, parent2);
+							child1=childs1[0];
+							child2=childs1[1];
+							break;
+						case 2:
+						Tour childs2[]= PMX(parent1, parent2);
+						child1=childs2[0];
+						child2=childs2[1];
+						case 3:
+							Tour childs3[]=Ox2Crossover(parent1,parent2);
+							child1=childs3[0];
+							child2=childs3[1];
+						case 4:
+							child1 = OrderCrossover(parent1, parent2);
+						default:
+							break;
+					}   
+	        		switch (Case) {
+						case 1: case 2: case 3:
+							newPopulation.saveTour(z, child1);    							//Save first offspring
+			        		newPopulation.saveTour((z+1),child2);    						//Save second offspring
+			        		z=z+1;
+							break;
+						case 4:
+							newPopulation.saveTour(z, child1);
+						default:
+							break;
+					}
+	        		
+	        								
+    		   }        	
+        	else {																	// If one tour is left, use order crossover
+          		Tour parent1 = tournamentSelection(pop);							//Choose first parent chromosome with tournament selection
+                Tour parent2 = tournamentSelection(pop);           				   	// Choose second parent chromosome with tournament selection
+                child1= OrderCrossover(parent1,parent2);						//Receive offspring
+                newPopulation.saveTour(z, child1);                    				// save offspring in new Population
+        	}      	 	
+		}
+	}
+	
+	
     //Recombination operators
     public static Tour OrderCrossover(Tour parent1, Tour parent2) {
-    	
+    	//Check how many city objects have to be locked in the tour
     	blockedCities();
-        Tour child = new Tour();										
-        int number1 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		//create first random number
-        int number2 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		//create second random number
+    
+        Tour child = new Tour();
+        
+        //Get start and end position of substring
+        int number1 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		
+        int number2 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		
        
-        while(number1==number2)	{										//If random numbers are equal, do it aEAin
+        while(number1==number2)	{										
     		number1 = (int) (Math.random() * (parent1.tourSize()-blockedCities));		
     		number2 = (int) (Math.random() * (parent1.tourSize()-blockedCities)); 
     		continue;
     	}
-        int startPos= Math.min(number1, number2)+blockedCities;						//startposition is minimum of the two random numbers
-        int endPos= Math.max(number1, number2)+blockedCities;        					// endposition is the maximum of the two random numbers
+        int startPos= Math.min(number1, number2)+blockedCities;						
+        int endPos= Math.max(number1, number2)+blockedCities;        				     
+        
+        //Set locked cities in child
         for(int bl=0;bl<blockedCities;bl++) {
         	child.setCity(bl, parent1.getCity(bl));
         }
-        for (int i =blockedCities; i < parent1.tourSize(); i++) {					// Loop through parent 1
-            if (i >= startPos && i <= endPos) {							//if i is in the selected substring
-                child.setCity(i, parent1.getCity(i));					// set city in offspring at position i
-            
+        
+        //copy subtring from parent1 to child
+        for (int i =blockedCities; i < parent1.tourSize(); i++) {	
+            if (i >= startPos && i <= endPos) {						
+                child.setCity(i, parent1.getCity(i));            
             } 
         }
-        for (int i = blockedCities; i < parent2.tourSize(); i++) {					// Loop through parent 2
-            if (!child.containsCity(parent2.getCity(i))) {				//If offspring does not cointain actual city of parent2 add to offspring
-                for (int ii = blockedCities; ii < child.tourSize(); ii++) {			//Loop through offspring
-                    if (child.getCity(ii) == null) {					//Find spare position
-                        child.setCity(ii, parent2.getCity(i));			//save city in offspring
+        //Fill up with remaining cities of P2
+        for (int i = blockedCities; i < parent2.tourSize(); i++) {
+            if (!child.containsCity(parent2.getCity(i))) {			
+                for (int ii = blockedCities; ii < child.tourSize(); ii++) {			
+                    if (child.getCity(ii) == null) {					
+                        child.setCity(ii, parent2.getCity(i));			
                         break;
                     }
                 }
             }
         }
-    /*    System.out.println(parent1);
-        System.out.println(parent2);
-        System.out.println(child);
-        System.out.println();
-        System.out.println();*/
         return child;
     }
    
     public static Tour[] Ox2Crossover(Tour parent1, Tour parent2) {	
+    	
     	blockedCities();
+    	
     	Tour child1=new Tour();
     	Tour child2=new Tour();
-    	Tour[] kids= new Tour[2];										// Tour array for returning
-    	int number1 = (int) (Math.random() *( parent1.tourSize()-blockedCities));	//First random number
-    	int number2 = (int) (Math.random() * ( parent1.tourSize()-blockedCities));	//Second random number
-    	while(number1==number2)	{										//If random numbers are equal, do it aEAin	
+    	Tour[] kids= new Tour[2];
+    	
+    	//Get start and end position of substrings
+    	int number1 = (int) (Math.random() *( parent1.tourSize()-blockedCities));	
+    	int number2 = (int) (Math.random() * ( parent1.tourSize()-blockedCities));	
+    	while(number1==number2)	{											
     		number1 = (int) (Math.random() * (parent1.tourSize()-blockedCities));
     		number2 = (int) (Math.random() * (parent1.tourSize()-blockedCities)); 
     		continue;
     	}
-    	   for(int bl=0;bl<blockedCities;bl++) {
+    	int startPos= Math.min(number1, number2)+blockedCities;						
+    	int endPos= Math.max(number1, number2)+blockedCities;
+    	
+    	//Set blocked cities in child
+    	for(int bl=0;bl<blockedCities;bl++) {
            	child1.setCity(bl, parent1.getCity(bl));
            	child2.setCity(bl,parent2.getCity(bl));
-           }
-    	int startPos= Math.min(number1, number2)+blockedCities;						//startposition is minimum of the two random numbers
-    	int endPos= Math.max(number1, number2)+blockedCities;							// endposition is the maximum of the two random numbers
-    	for(int j=blockedCities;j<parent1.tourSize();j++) {   						//Loop through parent1
-    		if(j >= startPos && j <= endPos) {							//if j is in the selected substring
+        }
+    	//Copy substring of parent 1 in child 2 and parent2 in child1						
+    	for(int j=blockedCities;j<parent1.tourSize();j++) {   			
+    		if(j >= startPos && j <= endPos) {							
     			City cityP1=parent1.getCity(j);							
     			City cityP2=parent2.getCity(j);
-    			child1.setCity(j, cityP2);								//set city of parent2 in first offsrping at position j
-    			child2.setCity(j, cityP1);								//set city of parent1 in second offsrping at position j
-    		}
-    	}    	
-    	for(int k=blockedCities;k<parent1.tourSize();k++) {    						//Loop through parent1
-    		if (!child1.containsCity(parent1.getCity(k))) {   			//If first offspring does not cointain actual city of parent1 add to offspring
-                for (int ii = blockedCities; ii < child1.tourSize(); ii++)  {		//Loop through offsrping       
-                    if (child1.getCity(ii) == null)	{		 			//Find spare position                
+    			child1.setCity(j, cityP2);								
+    			child2.setCity(j, cityP1);								
+    			}
+    	}   
+    	//Fill up child1 with remaining cities in parent1, analog with child 2 and parent2
+    	for(int k=blockedCities;k<parent1.tourSize();k++) {    	
+    		if (!child1.containsCity(parent1.getCity(k))) {   		
+    			for (int ii = blockedCities; ii < child1.tourSize(); ii++)  {       
+                    if (child1.getCity(ii) == null)	{		 			                
                     	City city1 = parent1.getCity(k);
-                        child1.setCity(ii, city1);						//Save city of parent1 in offspring
+                        child1.setCity(ii, city1);						
                         break;
                     }
                 }
             }
-    	}
-    	for(int k=blockedCities;k<parent2.tourSize();k++) {							//Loop through parent2
-    		if (!child2.containsCity(parent2.getCity(k))) {				//If second offsrping does not cointain actual city of parent 2 add to offspring
-                for (int ii = 0; ii < child2.tourSize(); ii++) {       	//Loop through second offspring                      
-                    if (child2.getCity(ii) == null) {      				//Find spare position
+    		if (!child2.containsCity(parent2.getCity(k))) {			
+                for (int ii = 0; ii < child2.tourSize(); ii++) {                          
+                    if (child2.getCity(ii) == null) {      			
                     	City city2 = parent2.getCity(k);
-                        child2.setCity(ii, city2);						//Save city of parent2 in offspring
+                        child2.setCity(ii, city2);					
                         break;
                     }
                 }
-            }
-    	}    	
-    	kids[0]=child1;													// Save offsprings in Array
+    		}
+    
+    	}
+    	
+    	kids[0]=child1;											
     	kids[1]=child2;
     	return kids;
-    }
-    
-    
-    public static Tour[] PMX123(Tour parent1, Tour parent2) {
-    	if(EA.EventCounter==0) {
-    		blockedCities=1;
-    	}
-    	else{			//noch allen hinzufügen
-    		blockedCities=2;
-    	}
-    	int cut =(int) (Math.random() *(parent1.tourSize()-blockedCities-1))+blockedCities;		
-    	System.out.println(cut);  
-    	System.out.println("Parent1: "+parent1);  
-		System.out.println("Parent2: "+parent2); 
-		Tour kids[]=new Tour[2];
-		Tour child1=new Tour();
-		Tour child2= new Tour();
-		for(int bl=0;bl<blockedCities;bl++) {
-	       	child1.setCity(bl, parent1.getCity(bl));
-	       	child2.setCity(bl,parent2.getCity(bl));
-	    }
-		for(int i=blockedCities;i<=cut;i++) {
-			City c1= parent1.getCity(i);
-			City c2= parent2.getCity(i);
-			child1.setCity(i, c2);
-			child2.setCity(i, c1);
-			System.out.println("child1 "+child1);
-			System.out.println("child2: "+child2);
-		}
-		System.out.println();
-		for(int j=blockedCities;j<=cut;j++) {					
-			int pos1=parent1.positionofCity(parent2.getCity(j));
-			if(parent1.getCity(j)!=parent2.getCity(j)) {
-				if(pos1>cut&&(child1.containsCity(parent1.getCity(j))==false)) {
-					child1.setCity(pos1,parent1.getCity(j));
-					System.out.println("found child1 "+ child1);
-					System.out.println("at pos1 : "+pos1);
-			}
-			}
-			else {}
-			
-		}
-		
-		for(int k=blockedCities;k<=cut;k++) {					
-			int pos2=parent2.positionofCity(parent1.getCity(k));
-			if(parent2.getCity(k)!=parent1.getCity(k)) {
-				if(pos2>cut&&child2.containsCity(parent2.getCity(k))==false) {
-					child2.setCity(pos2,parent2.getCity(k));
-					System.out.println("found child2 "+child2);
-					System.out.println("at pos2: "+pos2);
-				}
-			}
-			else {}
-			
-		}
-		System.out.println();
-		  for (int ii = blockedCities; ii < child1.tourSize(); ii++) {			//Loop through offspring
-              if (child1.getCity(ii) == null) {					//Find spare position
-                  child1.setCity(ii, parent1.getCity(ii));			//save city in offspring
-                  System.out.println("copy rest child1: " +child1);
-              }
-              if(child2.getCity(ii)==null) {
-            	  child2.setCity(ii,parent2.getCity(ii));
-            	  System.out.println("copy rest child2: "+child2);
-              }
-		  }
-	
-		 
-		System.out.println("child1: "+child1);  
-		System.out.println("child2: "+child2);  
-		System.out.println();
-	  kids[0]=child1;
-	  kids[1]=child2;  
-	  return kids;
     }
     
     public static Tour[] PMX (Tour parent1, Tour parent2) { //Muss noch gemacht werden	
@@ -706,66 +650,45 @@ public class EA implements myListener {
 		Tour kids[]=new Tour[2];
 		Tour child1=new Tour();
 		Tour child2= new Tour();
-		ArrayList<City> conflicts1= new ArrayList<City>();
-		ArrayList<City> conflicts1check= new ArrayList<City>();
-		ArrayList<City> conflicts2= new ArrayList<City>();
-		ArrayList<City> conflicts2check= new ArrayList<City>();
+		
 		while (number1 == number2) {
 			number1 =(int) (Math.random() *(parent1.tourSize()-blockedCities));
 			number2= (int) (Math.random() *(parent1.tourSize()-blockedCities));
 		}
-		int cut1= Math.min(number1, number2)+blockedCities;						//startposition is minimum of the two random numbers
+		int cut1= Math.min(number1, number2)+blockedCities;					
     	int cut2= Math.max(number1, number2)+blockedCities;
-    	System.out.println("cut1: "+cut1);
-		System.out.println("cut2: "+cut2);
-		System.out.println("parent1: "+parent1);
-	
-		System.out.println("parent2: "+parent2);
 		for(int bl=0;bl<blockedCities;bl++) {
 	       	child1.setCity(bl, parent1.getCity(bl));
 	       	child2.setCity(bl,parent2.getCity(bl));
 	    }
-	
-	
-			
-		
 		for(int j=cut1;j<=cut2;j++) {	
 			City c1= parent1.getCity(j);
 			City c2= parent2.getCity(j);
 			child1.setCity(j, c1);
 			child2.setCity(j, c2);
-		
-	
-		} 
-		
+		} 	
 		for(int jj=cut1;jj<=cut2;jj++) {
 			City inter1=parent1.getCity(jj);
 			City inter2=parent2.getCity(jj);
 			int pos1=jj;
 			int pos2=jj;
-			if(child1.containsCity(inter2)==false) {
-				
+			if(child1.containsCity(inter2)==false) {			
 				do {
 					inter2=parent1.getCity(pos2);
-					
 					pos2=parent2.positionofCity(inter2);
 					inter2=parent2.getCity(pos2);
-					
 				}
-				while(child1.containsCity(inter2)==false);
-				child1.setCity(pos2, inter2);
+				while(child1.containsCity(inter2)==true);
+				child1.setCity(pos2, parent2.getCity(jj));
 			}
-			if(child2.containsCity(inter1)==false) {
-				
+			if(child2.containsCity(inter1)==false) {	
 				do {
 					inter1=parent2.getCity(pos1);
-					
 					pos1=parent1.positionofCity(inter1);
 					inter1=parent1.getCity(pos1);
-					
 				}
-				while(child2.containsCity(inter1)==false);
-				child2.setCity(pos1, inter1);
+				while(child2.containsCity(inter1)==true);
+				child2.setCity(pos1, parent1.getCity(jj));
 			}
 		}
 		for(int jjj=blockedCities;jjj<parent1.tourSize();jjj++) {
@@ -779,204 +702,11 @@ public class EA implements myListener {
 				child2.setCity(jjj, c1);
 			}
 		}
-		
-		System.out.println("child1 "+child1);
 		  kids[0]=child1;
 		  kids[1]=child2;  
 		  return kids;
     }
-		/*System.out.println("child2 "+child2);
-		for(int k=cut1;k<=cut2;k++) {	
-			City c1= parent1.getCity(k);
-			City c2= parent2.getCity(k);
-			for(int jj=blockedCities;jj<parent1.tourSize();jj++)
-			{
-				if(jj<cut1||jj>cut2) {
-					if(c2==parent1.getCity(jj)) {
-						conflicts1.add(c2);
-						conflicts1check.add(c2);
-						System.out.println("conflict1 add " + c2);
-					}
-					if(c1==parent2.getCity(jj)) {
-						conflicts2.add(c1);
-						conflicts2check.add(c1);
-						System.out.println("conflict2 add " + c1);
-						}
-				}
-				
-			}
-		} //Bis hier stimmts
-		
-		Tour parent11= parent1;
-		Tour parent12= parent1;
-		Tour parent21=parent2;
-		Tour parent22=parent2;
-		
-		while(conflicts1.isEmpty()==false) {
-			City inter1;						
-			int pos1= parent21.positionofCity(conflicts1.get(0));
-			int start1= parent21.positionofCity(conflicts1.get(0));
-			System.out.println("start1: "+start1);
-			do {			
-				
-				
-				
-				inter1=parent11.getCity(pos1);
-				System.out.println(inter1);
-				pos1=parent21.positionofCity(inter1);
-				System.out.println("pos1: "+pos1);
-			}
-			while(!conflicts1check.contains(parent11.getCity(pos1)));
-			
-			System.out.println("parent11: "+parent11);
-			System.out.println( "parent21: "+parent21);
-			parent21.setCity(start1, parent21.getCity(pos1));
-			parent21.setCity(pos1, conflicts1.get(0));
-			child1.setCity(start1, parent21.getCity(start1));
-			child1.setCity(pos1, parent21.getCity(pos1));
-			System.out.println("parent11 nach vertauschen: "+parent11);
-			System.out.println("parent21 nach vertauschen: "+parent21);
-			System.out.println("child1: "+child1);
-			System.out.println();
-			System.out.println();
-			conflicts1.remove(0);
-		}
-	
-		while(conflicts2.isEmpty()==false) {
-			City inter2;
-			int pos2= parent12.positionofCity(conflicts2.get(0));
-			int start2= parent12.positionofCity(conflicts2.get(0));
-			System.out.println("start2: "+start2);
-			do {			
-				
-				inter2=parent22.getCity(pos2);
-				System.out.println(inter2);
-				pos2=parent12.positionofCity(inter2);
-				System.out.println("pos2: "+pos2);
-			}
-			while(!conflicts2check.contains(parent22.getCity(pos2)));
-			parent12.setCity(start2, parent12.getCity(pos2));
-			parent12.setCity(pos2, conflicts2.get(0));
-			child2.setCity(start2, parent12.getCity(start2));
-			child2.setCity(pos2, parent12.getCity(pos2));
-			System.out.println("parent12: "+parent12);
-			System.out.println("parent22: "+parent22);
-			System.out.println("child2: "+child2);
-			System.out.println();
-			System.out.println();
-			conflicts2.remove(0);
-		}
-		
-		kids[0]=child1;
-		kids[1]=child2;
-		System.out.println("done");
-		System.out.println();
-		return kids;
-    }*/
-   /* public static Tour[] PMX (Tour parent1, Tour parent2) { //Muss noch gemacht werden	
-    	if(EA.EventCounter==0) {
-    		blockedCities=1;
-    	}
-    	int number1 =(int) (Math.random() *(parent1.tourSize()-blockedCities));
-		int number2 = (int) (Math.random() *(parent1.tourSize()-blockedCities));
-		Tour kids[]=new Tour[2];
-		Tour child1=new Tour();
-		Tour child2= new Tour();
-		ArrayList<City> conflicts1= new ArrayList<City>();
-		ArrayList<City> conflicts2= new ArrayList<City>();
-		while (number1 == number2) {
-			number1 =(int) (Math.random() *(parent1.tourSize()-blockedCities));
-			number2= (int) (Math.random() *(parent1.tourSize()-blockedCities));
-		}
-		int cut1= Math.min(number1, number2)+blockedCities;						//startposition is minimum of the two random numbers
-    	int cut2= Math.max(number1, number2)+blockedCities;
-		for(int bl=0;bl<blockedCities;bl++) {
-	       	child1.setCity(bl, parent1.getCity(bl));
-	       	child2.setCity(bl,parent2.getCity(bl));
-	    }
-		for(int i=blockedCities;i<parent1.tourSize();i++) {
-			City c1= parent1.getCity(i);
-			City c2= parent2.getCity(i);
-			child1.setCity(i, c1);
-			child2.setCity(i, c2);
-	
-			
-		}
-		for(int j=cut1;j<=cut2;j++) {	
-			City c1= parent1.getCity(j);
-			City c2= parent2.getCity(j);
-			child1.setCity(j, c2);
-			child2.setCity(j, c1);
-			System.out.println("cut1: "+cut1);
-			System.out.println("cut2: "+cut2);
-			System.out.println("parent1: "+parent1);
-			System.out.println("child1 "+child1);
-			System.out.println("parent2: "+parent2);
-			System.out.println("child2 "+child2);
-		} 
-		for(int j=cut1;j<=cut2;j++) {	
-			City c1= parent1.getCity(j);
-			City c2= parent2.getCity(j);
-			if(child1.containsCity(c2)) {	
-				conflicts1.add(c2);
-				
-			}
-			if(child2.containsCity(c1)) {		
-				conflicts2.add(c1);
-			}
-			child1.setCity(j, c2);
-			child2.setCity(j, c1);
-		}
-		System.out.println("p1: "+parent1);
-		System.out.println("p2: "+parent2);
-		System.out.println("c1: "+child1);
-		System.out.println("c2: "+child2);
-		
-		
-	
-		while(conflicts1.isEmpty()==false) {
-			City inter1;						
-			int pos1= parent2.positionofCity(conflicts1.get(0));
-			int start1= parent2.positionofCity(conflicts1.get(0));
-			do {			
-				
-				
-				inter1=parent1.getCity(pos1);
-				pos1=parent2.positionofCity(inter1);
-			}
-			while(child1.containsCity(parent2.getCity(pos1)));
-			
-			
-			parent2.setCity(start1, parent2.getCity(pos1));
-			parent2.setCity(pos1, conflicts1.get(0));
-			child1.setCity(start1, parent2.getCity(start1));
-			child1.setCity(pos1, parent2.getCity(pos1));
-			conflicts1.remove(0);
-		}
-	
-		while(conflicts2.isEmpty()==false) {
-			City inter2;
-			int pos2= parent1.positionofCity(conflicts2.get(0));
-			int start2= parent1.positionofCity(conflicts2.get(0));
-			do {			
-				
-				inter2=parent2.getCity(pos2);
-				pos2=parent1.positionofCity(inter2);
-			}
-			while(child1.containsCity(parent1.getCity(pos2)));
-			parent1.setCity(start2, parent1.getCity(pos2));
-			parent1.setCity(pos2, conflicts2.get(0));
-			child2.setCity(start2, parent2.getCity(start2));
-			child2.setCity(pos2, parent2.getCity(pos2));
-			conflicts2.remove(0);
-		}
-		
-		System.out.println("done DONE done DONE");
-		kids[0]=child1;
-		kids[1]=child2;
-		return kids;
-	 }
-*/
+
  
 	public static Tour[] CycleC(Tour parent1, Tour parent2) {
 		blockedCities();
@@ -984,310 +714,310 @@ public class EA implements myListener {
 	 	Tour child2=new Tour();
 	 	City city1;
 	 	City city2;
-	 	Tour[] kids= new Tour[2];											// returning array
-	 	int rundenzaehler=0;													// counts cycles
-	 	int position=2;														//actual position of cycle process
-	 	int start=2;														//starting position of cycle process
-	 	ArrayList<City> notvisited= new ArrayList<City>();					//ArrayList to check which cities have not been visited
-	    for(int bl=0;bl<blockedCities;bl++) {
+	 	Tour[] kids= new Tour[2];											
+	 	int cyclecounter=0;													
+	 	//Position within a cycle
+	 	int position=blockedCities;														
+	 	//Start of a cycle
+	 	int start=blockedCities;														
+	 	ArrayList<City> notvisited= new ArrayList<City>();					
+	    //Set blocked cities in child
+	 	for(int bl=0;bl<blockedCities;bl++) {
            	child1.setCity(bl, parent1.getCity(bl));
            	child2.setCity(bl,parent2.getCity(bl));
         }
-	 	for(int a=blockedCities; a<parent1.tourSize();a++) {		 					//Loop through parent1
+	 	//add all cities of parent1 to list 
+	 	for(int a=blockedCities; a<parent1.tourSize();a++) {		 					
 			 City ci= parent1.getCity(a);
-			 notvisited.add(ci);											//add all cities to ArrayList
+			 notvisited.add(ci);											
 		}
-	 	//System.out.println(parent1);
-	 	//System.out.println(parent2);	 	
-	 	while(notvisited.isEmpty()==false) { 								//while ArrayList contains a not visited city
-	 		if(rundenzaehler%2==1) {											//if we have an odd number of cycles
-	 			for(int a=blockedCities; a<parent1.tourSize();a++) {					//Loop through parent1
-					if(notvisited.contains(parent1.getCity(a))) {			//find fist not visited city in parent1
-						start=a;											//Update starting point	
-						position=start;										//update position
+	 	//Do cycles while the list is not empty and 
+	 	//distinguish in operation between odd and straight  numbers of cycle rounds	
+	 	while(notvisited.isEmpty()==false) { 								
+	 		if(cyclecounter%2==1) {											
+	 			for(int a=blockedCities; a<parent1.tourSize();a++) {		
+					if(notvisited.contains(parent1.getCity(a))) {			
+						start=a;												
+						position=start;										
 						break;
 					}
 				
 				}
 	 			do {	 					 				
 	 				city1=parent1.getCity(position);
-	 				child2.setCity(position, city1);						//Add city of parent1 to second offspring
+	 				child2.setCity(position, city1);						
 	 				city2=parent2.getCity(position);
-	 				child1.setCity(position, city2);						//Add city of parent2 to first offspring
-	 				position=parent1.positionofCity(city2);	 				//update current position in parent1
-	 				 if(notvisited.contains(city2)) {	 				  	// remove visited city
+	 				child1.setCity(position, city2);						
+	 				position=parent1.positionofCity(city2);	 				
+	 				 if(notvisited.contains(city2)) {	 				  	
 	 					 notvisited.remove(city2);
 	 				 }
-	 				 if(notvisited.contains(city1)) { 						// remove visited city
+	 				 if(notvisited.contains(city1)) { 						
 	 					 notvisited.remove(city1);
 	 				 }
 	 			}
-	 			while(parent1.getCity(start)!=city2);						//While cycle is not closed
-	 			rundenzaehler++;												//increase cycle counter
+	 			while(parent1.getCity(start)!=city2);						
+	 			cyclecounter++;												
 	 			continue;
 			}
 	 		
-	 		if(rundenzaehler==0) {											//first cycle
+	 		if(cyclecounter==0) {									
 	 			do {			
-	 				city1=parent1.getCity(position);						//Add city of parent1 to fist offspring
+	 				city1=parent1.getCity(position);				
 	 				child1.setCity(position, city1);
-	 				city2=parent2.getCity(position);						//Add city of parent2 to second offspring
+	 				city2=parent2.getCity(position);				
 	 				child2.setCity(position, city2);
-	 				position=parent1.positionofCity(city2);	 				//Update current position in parent1
+	 				position=parent1.positionofCity(city2);	 			
 	 				if(notvisited.contains(city2)) {  				
-	 					notvisited.remove(city2);							//remove visited city from ArrayList
+	 					notvisited.remove(city2);						
 	 				}
-	 				if(notvisited.contains(city1)) {			 			//remove visited city from ArrayList
+	 				if(notvisited.contains(city1)) {			 		
 	 					notvisited.remove(city1);
 	 				 }
-	 			//	System.out.println(child1);
-	 	 			//System.out.println(child2);		
-	 	 			//System.out.println("next position: "+position);
 	 			}
-	 			while(parent1.getCity(start)!=city2);						//While cycle is not closed
-	 			rundenzaehler++;												//increase cycle counter
+	 			while(parent1.getCity(start)!=city2);						
+	 			cyclecounter++;												
 	 			continue;			
 	 		}	
-	 		if(rundenzaehler%2==0&&rundenzaehler!=0) {						//even number of cycles
-	 			for(int a=0; a<parent1.tourSize();a++) { 					// Loop through parent1
-	 				if(notvisited.contains(parent1.getCity(a))) {			//find first not visited city
-	 					start=a;											//update starting point
-	 					position=start;										//update position
-	 					break;
+	 		if(cyclecounter%2==0&&cyclecounter!=0) {						
+	 			for(int a=0; a<parent1.tourSize();a++) { 					
+	 				if(notvisited.contains(parent1.getCity(a))) {			
+	 					start=a;											
+	 					position=start;											 					break;
 	 				}
 	 			
 	 			}
 	 			do {	 			
-	 				city1=parent1.getCity(position);						//Add city of parent1 to fist offspring
+	 				city1=parent1.getCity(position);						
 	 				child1.setCity(position, city1);
-	 				 city2=parent2.getCity(position);						//Add city of parent2 to second offspring
+	 				 city2=parent2.getCity(position);						
 	 				 child2.setCity(position, city2);
-	 				 position=parent1.positionofCity(city2);				//Update current position in parent1
+	 				 position=parent1.positionofCity(city2);				
 	 				 if(notvisited.contains(city2)) {		  				
-	 					 notvisited.remove(city2);							//remove visited city from ArrayList
+	 					 notvisited.remove(city2);							
 	 				 }
-	 				 if(notvisited.contains(city1)){						//remove visited city from ArrayList
+	 				 if(notvisited.contains(city1)){						
 	 					 notvisited.remove(city1);
-	 				 }
-	 				//System.out.println(child1);
-	 	 			//System.out.println(child2);	
+	 				 }	
 	 			}
-	 			while(parent1.getCity(start)!=city2);						//While cycle is not closed
-	 			rundenzaehler++;											//Increase cycle counter
+	 			while(parent1.getCity(start)!=city2);						
+	 			cyclecounter++;											
 	 			
 	 			continue;
 	 		}	 		
 	 	}
-	 	kids[0]=child1;														//Copy offspring in array
+	 	kids[0]=child1;														
 	 	kids[1]=child2;
-	 	//System.out.println("Ende");
-		//System.out.println();
 		return kids;
 	 }
  
+	//Swap two randomly chosen cities
 	//Mutation operators
-    private static void ExchangeMutation(Tour tour) {   	
+    public static void ExchangeMutation(Tour tour) {   	
     	blockedCities();
-    	int tourPos1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities; 			//Create two random positions that should be swapped
+    	int tourPos1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities; 			
         int tourPos2 = (int) ((tour.tourSize() -blockedCities)* Math.random())+blockedCities;
-        while(tourPos1==tourPos2){											//If positions are equal, do it aEAin
+        while(tourPos1==tourPos2){					
              tourPos1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;			
              tourPos2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;    
         }       
-        City city1 = tour.getCity(tourPos1);								//Swap the selected cities
+        City city1 = tour.getCity(tourPos1);								
         City city2 = tour.getCity(tourPos2);
         tour.setCity(tourPos2, city1);
-        tour.setCity(tourPos1, city2);
-        
-                          
-       
+        tour.setCity(tourPos1, city2); 
     }
     
+    //select and copy a substring of tour and paste it mirrored
     private static void InversionMutation(Tour tour) {  
     	blockedCities();
     	Tour child= new Tour();
     	int number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;				//Create two random positions that should be swapped
 		int number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
-    	while(number1==number2) { 		  									//If positions are equal, do it aEAin
+    	while(number1==number2) { 		  							
     		number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
     		number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities; 
 		}   	
-    	int startPos= Math.min(number1, number2);							//startingpoint is the minimum of both random numbers
-		int endPos= Math.max(number1, number2);								//endposition is the maximum of the two random numbers
-    	int b= endPos;														//copy of end position
-    	int d= startPos;													//copy of start position
-    	for(int a=startPos; a<b;a++) {										//Loop through tour from start point to the half of the substring(With decreasing b)
+    	int startPos= Math.min(number1, number2);							
+		int endPos= Math.max(number1, number2);								
+    	int b= endPos;													
+    	int d= startPos;												
+    	for(int a=startPos; a<b;a++) {									
     		City city1= tour.getCity(b);
-    		child.setCity(a,city1);											//save city at current position
-    		b=b-1;															//decrease end position copy
+    		child.setCity(a,city1);											
+    		b=b-1;															
     	}
     	
-    	for(int c=endPos;c>d;c--) {											//Loop through tour from endpoint to half of the substring(with increasing d)
+    	for(int c=endPos;c>d;c--) {											
     		City city1=tour.getCity(d);										
-    		child.setCity(c,city1);											//save city at current position
-    		d=d+1;															//increase start position copy
+    		child.setCity(c,city1);											
+    		d=d+1;															
     	}		
     	
-    	for (int i = blockedCities; i < tour.tourSize(); i++) {							//Loop through tour
-    		 if (!child.containsCity(tour.getCity(i))) {	 				//If offspring does not contain city, add to offspring
-    			 City city1 =tour.getCity(i);
-    			 child.setCity(i, city1);									//save city 
+    	for (int i = blockedCities; i < tour.tourSize(); i++) {				
+    		if (!child.containsCity(tour.getCity(i))) {	 				    			 City city1 =tour.getCity(i);
+    			 child.setCity(i, city1);									 
     		 }
     	}  	
     	tour=child;    		
     }
     
+    //Cut a substring and paste it at random position
     private static void DisplacementMutation(Tour tour) {    
     	blockedCities();
     	Tour child = new Tour();    	
-    	int number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;		//Create first random number
-    	int number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;		//Create second random number
-    	while(number1==number2) { 		  									//If positions are equal, do it aEAin
+    	int number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;	
+    	int number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;	
+    	while(number1==number2) { 		  								
     		number1 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
     		number2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;  
     	}
-    	int startPos= Math.min(number1, number2);							//startingpoint is the minimum of both random numbers
-		int endPos= Math.max(number1, number2);								//endposition is the maximum of the two random numbers
+    	int startPos= Math.min(number1, number2);						
+		int endPos= Math.max(number1, number2);								
     	int insertPos=(int) (Math.random() * (tour.tourSize()-(endPos-startPos)-blockedCities))+blockedCities; 	//create random position for insertion
-    	int zaehler=0;														//counter
-    	for(int i=blockedCities; i<tour.tourSize();i++) { 								//Loop through tour
-    		if(i >= startPos && i <= endPos) { 								//if we are within the substring 
+    	int zaehler=0;														
+    	for(int i=blockedCities; i<tour.tourSize();i++) { 							
+    		if(i >= startPos && i <= endPos) { 								 
     			City city1= tour.getCity(i);
-    			child.setCity(insertPos+zaehler, city1);						//save in offspring at insertposition + counter
-    			zaehler+=1;													//increase counter
+    			child.setCity(insertPos+zaehler, city1);						
+    			zaehler+=1;													
     		}
     	}
-    	zaehler=0;															//reset counter
-    	for(int j=blockedCities;j<tour.tourSize();j++) {   								//Loop through tour
-    		if (!child.containsCity(tour.getCity(j))) {						//If offspring does not contain city
+    	zaehler=0;															
+    	for(int j=blockedCities;j<tour.tourSize();j++) {   					
+    		if (!child.containsCity(tour.getCity(j))) {						
                 for (int ii = 0; ii < child.tourSize(); ii++) {
-                    if (child.getCity(ii) == null) {						//find spare position in offspring
+                    if (child.getCity(ii) == null) {						
                     	City city1 = tour.getCity(j);
-                        child.setCity(ii, city1);							//save city at spare position
+                        child.setCity(ii, city1);							
                         break;
                     }
                 }
             }
     	}
-    	tour=child;
-    
+    	tour=child;  
     }
     
+    //Cut a random city and paste it at random position
     private static void InsertionMutation(Tour tour)    {  	  	
     	blockedCities();
-    	int oldPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;;	//Select a random city
-    	int newPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;   //Select a new random position									
+    	int oldPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;	
+    	int newPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;  									
     	while(oldPos==newPos) {		
-    		oldPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;			//If Position is the same, do aEAin   
+    		oldPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;		   
     		newPos = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;
         }
-    	City citytaken=tour.getCity(oldPos);							//save selected city
-    	if(oldPos<newPos) { 											//shift all cities with a smaller position than newPos one position backwards
+    	City citytaken=tour.getCity(oldPos);						
+    	if(oldPos<newPos) { 										
     		for(int a=(oldPos+1); a<=newPos;a++) {  		
     			City city1=tour.getCity(a);
     			tour.setCity((a-1), city1);
     		}
     	}
-    	if(oldPos>newPos) { 											//shift all cities with a higher position than newPos one position forward
+    	if(oldPos>newPos) { 									
     		for(int b=(oldPos-1);b>=newPos;b--) {		
     			City city1=tour.getCity(b);
     			tour.setCity((b+1), city1);
     		}
     	}
-    	tour.setCity(newPos, citytaken);								// set selected city at new position
+    	tour.setCity(newPos, citytaken);							
     }
 
+    //Loop through tour and depending on mutation rate swap the city of the loop with another random city
     private static void MultipleExchangeMutation(Tour tour) {  
     	blockedCities();
-    	for(int tourPos1=0; tourPos1 < tour.tourSize(); tourPos1++){		//Loop through tour
-            if(Math.random() < mutationRate){               				//If a random number is smaller than our selected mutationrate do the mutation
-                int tourPos2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;;    // Get a random position in the tour
-                City city1 = tour.getCity(tourPos1); 						// Get the cities at target position in tour
+    	for(int tourPos1=0; tourPos1 < tour.tourSize(); tourPos1++){	
+            if(Math.random() < mutationRate){               				
+                int tourPos2 = (int) ((tour.tourSize()-blockedCities) * Math.random())+blockedCities;        
+                City city1 = tour.getCity(tourPos1); 						
                 City city2 = tour.getCity(tourPos2);             
-                tour.setCity(tourPos2, city1);								// Swap them
+                tour.setCity(tourPos2, city1);							
                 tour.setCity(tourPos1, city2);
             }
         }
     }
     
+    //Choose number of random tours (=tournament size) and select the fittest of them
     //Selection operators
-    private static Tour tournamentSelection(Population pop) {				 // Selects candidate tour for crossover   
-        Population tournament = new Population(tournamentSize, false);		 // Create a tournament population
-        for (int i = 0; i < tournamentSize; i++) { 							// For each place in the tournament get a random candidate tour and add it
-            int randomId = (int) (Math.random() * pop.populationSize());	//Save choosen tour in intermediate population
+    private static Tour tournamentSelection(Population pop) {				    
+        Population tournament = new Population(tournamentSize, false);		 
+        for (int i = 0; i < tournamentSize; i++) { 							
+            int randomId = (int) (Math.random() * pop.populationSize());	
             tournament.saveTour(i, pop.getTour(randomId));
         }
-        Tour fittest = tournament.getFittest();								// Get the fittest tour of the selected tours
+        Tour fittest = tournament.getFittest();								
         return fittest;
     }
-																		 
-    private static Tour RWS(Population pop)									// Selects candidate tour for crossover
+	
+    //Roulettewheel selection where the fitness of a tour equals its likelyhood to be chosen
+    private static Tour RWS(Population pop)								
     {	Tour chosen=new Tour();
     	Tour inter=new Tour();
     	double Totalslotsize=0;
     	double slotsize2=0;
-    	for(int i=0;i<pop.populationSize();i++) {							//Loop through population
+    	for(int i=0;i<pop.populationSize();i++) {							
     		inter=pop.getTour(i);
-    		Totalslotsize+=inter.getFitness();								// add Fitness of current tour to total slotsize
+    		Totalslotsize+=inter.getFitness();								
     	} 	
-    	double select=Math.random()*Totalslotsize;							//Randomly select a fitnesslevel within the slotsize
-    	for(int j=0; j<pop.populationSize();j++) {  						//Loop through poulation
+    	double select=Math.random()*Totalslotsize;							
+    	for(int j=0; j<pop.populationSize();j++) {  						
     		inter=pop.getTour(j);
-    		slotsize2+=inter.getFitness();									//add fitness of current tour to slotsize2
-    		if(select<=slotsize2) {											// if our sum of fitness of all checked tours is higher than our selected fitnesslevel, select the current tour
+    		slotsize2+=inter.getFitness();									
+    		if(select<=slotsize2) {											
     			chosen=inter;
     			break;
     		}
     	}
-    	
     	return chosen;
     }
-
+    
+    //Starts the simulation
+    //First Route Request, tour and All_Cities Adaption
+    //sets algorithm to run=true
     //Replacing operators
     
     //Start dynamic algorithm and process
-    public void start() throws Exception {  //FAll 1
+    public void start() throws Exception {
     	Route route= new Route();
 		lastEventTime= new TimeElement();
-		int hour= lastEventTime.getHour();																//current hour
+		int hour= lastEventTime.getHour();
 		double ttnh=lastEventTime.getTimeToNextHour();
 		route.WayFromTo(best);
 		durations=route.Duration;
 		Nodes=route.Nodes_as_City;
 		Intersections=route.intersections;
-		//Passe Start und End IntersectionCity an damit gleichheit mit All_Cities und tour besteht,
-		//sowie start und end node	aus dem gleichen Ziel
-		//Berechne duration für neuen Start und End Node über Approximation
 		
-		
+		//Adaped first and last duration value with duration approximation from first intersection to second node
+		//and penultimate node to last intersection 
+		//replace first and last node with first and last city object in "Intersection"
+		//Set coordinates of cities of the route by using coordinates of first and last "intersection" 
 		
 		double lat_ratio_start=(Nodes.get(1).getLatitude()-Intersections.get(0).getLatitude())/(Nodes.get(1).getLatitude()-Nodes.get(0).getLatitude());	
 		double lon_ratio_start=(Nodes.get(1).getLongitude()-Intersections.get(0).getLongitude())/(Nodes.get(1).getLongitude()-Nodes.get(0).getLongitude());
 		double avg_ratio_start= (lat_ratio_start+lon_ratio_start)/2;  
 		durations[0]=durations[0]*avg_ratio_start;
 		
-		int pos = All_Cities.destinationCities.indexOf(best.getCity(1)); //IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
-		All_Cities.destinationCities.set(pos, Intersections.get(0));
-		Nodes.set(0, Intersections.get(0)); //e.location == City "City"
+		int pos = All_Cities.destinationCities.indexOf(best.getCity(1));
+		All_Cities.getCity(pos).setCoordinates(Intersections.get(0).getLongitude(), Intersections.get(0).getLatitude());
+		Nodes.set(0, Intersections.get(0)); 
 		
 		double lat_ratio_end=(Nodes.get(Nodes.size()-1).getLatitude()-Intersections.get(Intersections.size()-1).getLatitude())/(Nodes.get(Nodes.size()-1).getLatitude()-Nodes.get(Nodes.size()-2).getLatitude());	
 		double lon_ratio_end=(Nodes.get(Nodes.size()-1).getLongitude()-Intersections.get(Intersections.size()-1).getLongitude())/(Nodes.get(Nodes.size()-1).getLongitude()-Nodes.get(Nodes.size()-2).getLongitude());
 		double avg_ratio_end= (lat_ratio_end+lon_ratio_end)/2;
 		durations[durations.length-1]=durations[durations.length-1]*avg_ratio_end;
 		
-		int pos2 = All_Cities.destinationCities.indexOf(best.getCity(2)); //IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
-		All_Cities.destinationCities.set(pos2, Intersections.get(Intersections.size()-1));
+		int pos2 = All_Cities.destinationCities.indexOf(best.getCity(2)); 
+		All_Cities.getCity(pos2).setCoordinates(Intersections.get(0).getLongitude(), Intersections.get(0).getLatitude());
 		Nodes.set(Nodes.size()-1, Intersections.get(Intersections.size()-1));
 		
+		//Inform simulator
 		RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations,best);
 		fireEvent(event);
+		
+		//Adapt all tours in actual population and fittest tour "best"
 		for ( int t =0; t<pop.populationSize();t++) {
-			
 			if(Intersections.get(1).getType()=="Intersection"){
-				//Wenn Intersection auf Strecke, was fast immer der Fall ist, füge diese in Tour an zweiter Position ein
 				pop.getTour(t).addatPosition(1,Intersections.get(1));
 			}
-			//Wenn nicht passe Tour an, dass nächste Stadt aus Route Request aufjedenfall besucht wird
 			else {
 				int delete=pop.getTour(t).positionofCity(best.getCity(2));
 				pop.getTour(t).deleteCity(delete);
@@ -1298,17 +1028,19 @@ public class EA implements myListener {
 		if(Intersections.get(1).getType()=="Intersection") {
 			best.addatPosition(1, Intersections.get(1));
 		}
+		//If the next location will be an intersection, add to All_Cities
 		if(Intersections.get(1).getType()=="Intersection"){
 			All_Cities.addCity(Intersections.get(1));
 			Distanzmatrix.updateAllMatrix();
 		}
 		
-		if(Intersections.get(1).getType()=="City") {  //falls keine Intersection auf der Strecke liegt, außer Start und Zielstadt
+		//If there is no intersection, calculate duration to next city
+		if(Intersections.get(1).getType()=="City") {  
 			for(int n=0; n<Nodes.size()-1;n++) {
 				toDriveto("City",n,hour,ttnh,1);
 			}
 		}
-		
+		//If there is an intersection, calculate duration to next intersection
 		else {
 			int PosinNode=0;
 			for(int a=0; a<Nodes.size();a++) {
@@ -1322,15 +1054,21 @@ public class EA implements myListener {
 			}
 			
 		}
+		//Save actual position and best tour for comparison reasons at the next event
 		lastLocation=Distanzmatrix.startCity;
 		lastbest=best;
+		//Start dynamic algorithm and simulation
 		Run.runs=true;
     }
   
+    //Event-handling method for arriving at a "City"
+    // Do route request, adapt data, inform simulator, adapt tours and All_Cities
+    //do matrix update, do toDriveto calculation
     //Event-handling and event-related methods
     @Override
 	public void atCity(AtEvent e){
-		toDrivetoNode=0;
+	    //reset toDriveto values
+    	toDrivetoNode=0;
 		toDrivetoIntersection=0;
 		toDrivetoCity=0;
 		EventCounter++;
@@ -1338,23 +1076,24 @@ public class EA implements myListener {
 		lastEventTime= new TimeElement(e.getEventTime());			
 		int hour= lastEventTime.getHour();																//current hour
 		double ttnh=lastEventTime.getTimeToNextHour();
+		Tour lastRequest=null;
 		
-		//Wenn Event erreicht mit String theEnd != null -> Beende Run und Simulation
+		//Turn of dynamic algorithm when we are back at our starting city
 		if(e.status=="Erste Stadt wieder erreicht") {
 			Run.runs=false;
 		}
-		
-		else {
-			//Wenn wir noch nicht bei der letzen Stadt(Cn nicht starting city) ankommen
-			Tour letzterRequest=null;
-			if(All_Cities.checkForCities()==1) {
+		//Do the route request and save data
+		else {	
+			//if we arrive at the last "City"
+			if(All_Cities.checkForCities()==1||(All_Cities.checkForCities()==2&&best.getCity(0).getType()=="City")) {
 				ArrayList <City> abc= new ArrayList<City>();
-				abc.add(best.getCity(0));			//Damit in WayFromTo referenzierung nicht geändert werden muss
+				//adding best(0) just for referencing purpose in Wayfromto
+				abc.add(best.getCity(0));			
 				abc.add(best.getCity(1));
 				abc.add(Distanzmatrix.startCity);
-				letzterRequest= new Tour (abc);
+				lastRequest= new Tour (abc);
 				try {
-					route.WayFromTo(letzterRequest);
+					route.WayFromTo(lastRequest);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -1369,50 +1108,42 @@ public class EA implements myListener {
 			durations=route.Duration;
 			Nodes=route.Nodes_as_City;
 			Intersections=route.intersections;
-			//Passe Start und End IntersectionCity an damit gleichheit mit All_Cities und tour besteht,
-			//sowie start und end node	aus dem gleichen Ziel
-			//Berechne duration für neuen Start und End Node über Approximation
+			
+			//Adaped first and last duration value with duration approximation from first intersection to second node
+			//and penultimate node to last intersection 
+			//replace first and last node with first and last city object in "Intersection"
+			//Set coordinates of destination city of the route by using coordinates of last "intersection" 
 			double lat_ratio_start=(Nodes.get(1).getLatitude()-Intersections.get(0).getLatitude())/(Nodes.get(1).getLatitude()-Nodes.get(0).getLatitude());	
 			double lon_ratio_start=(Nodes.get(1).getLongitude()-Intersections.get(0).getLongitude())/(Nodes.get(1).getLongitude()-Nodes.get(0).getLongitude());
 			double avg_ratio_start= (lat_ratio_start+lon_ratio_start)/2;  
 			durations[0]=durations[0]*avg_ratio_start;
-			if(All_Cities.checkForCities()==1) {
-				int pos = All_Cities.destinationCities.indexOf(letzterRequest.getCity(1)); //IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
-				All_Cities.getCity(pos).setCoordinates(Intersections.get(0).getLongitude(), Intersections.get(0).getLatitude());
-			}//??????????????????????????????????????????????????????????????????????
-			else {
-				int pos = All_Cities.destinationCities.indexOf(best.getCity(1)); //IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
-				All_Cities.getCity(pos).setCoordinates(Intersections.get(0).getLongitude(), Intersections.get(0).getLatitude());
-				
-			}
-			Nodes.set(0, Intersections.get(0)); //e.location == City "City"
 			
 			double lat_ratio_end=(Nodes.get(Nodes.size()-1).getLatitude()-Intersections.get(Intersections.size()-1).getLatitude())/(Nodes.get(Nodes.size()-1).getLatitude()-Nodes.get(Nodes.size()-2).getLatitude());	
 			double lon_ratio_end=(Nodes.get(Nodes.size()-1).getLongitude()-Intersections.get(Intersections.size()-1).getLongitude())/(Nodes.get(Nodes.size()-1).getLongitude()-Nodes.get(Nodes.size()-2).getLongitude());
 			double avg_ratio_end= (lat_ratio_end+lon_ratio_end)/2;
-			durations[durations.length-1]=durations[durations.length-1]*avg_ratio_end;
-			if(All_Cities.checkForCities()==1) {
-
+			durations[durations.length-1]=durations[durations.length-1]*avg_ratio_end;			
+			if(All_Cities.checkForCities()==1||(All_Cities.checkForCities()==2&&best.getCity(0).getType()=="City")) {
 				All_Cities.startCity.setCoordinates(Intersections.get(Intersections.size()-1).getLongitude(), Intersections.get(Intersections.size()-1).getLatitude());
 			}
 			else {
-				int pos = All_Cities.destinationCities.indexOf(best.getCity(2)); //IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
+				int pos = All_Cities.destinationCities.indexOf(best.getCity(2));
 				All_Cities.getCity(pos).setCoordinates(Intersections.get(Intersections.size()-1).getLongitude(), Intersections.get(Intersections.size()-1).getLatitude());		
 			}
+			Nodes.set(0, Intersections.get(0)); 
 			Nodes.set(Nodes.size()-1, Intersections.get(Intersections.size()-1));
-			//Infomiere Simulator
+			
+			//Inform simulator
 			RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations,best);
 			fireEvent(event);		
-			//Passe Tour und All_Cities an
-			
+			//Adapt all tours in actual population and fittest tour "best"
 			for ( int t =0; t<pop.populationSize();t++) {
-				//Lösche letzten Standort aus Touren
+				//Delete last location
 				pop.getTour(t).deleteCity(0);
+				//add city object "intersection" if available
 				if(Intersections.get(1).getType()=="Intersection"){
-					//Wenn Intersection auf Strecke, was fast immer der Fall ist, füge diese in Tour an zweiter Position ein
 					pop.getTour(t).addatPosition(1,Intersections.get(1));
 				}
-				//Wenn nicht passe Tour an, dass nächste Stadt aus Route Request aufjedenfall besucht wird
+				//if no "intersection" available set next city in best as next destination in all tours
 				else {
 					if(All_Cities.checkForCities()>1) {
 					int delete=pop.getTour(t).positionofCity(best.getCity(2));
@@ -1421,13 +1152,15 @@ public class EA implements myListener {
 					}
 				}
 			}
+			//Do the same with Tour "best
 			best.deleteCity(0);
 			if(Intersections.get(1).getType()=="Intersection") {
 				best.addatPosition(1, Intersections.get(1));
 			}
-			//Lösche letzten Standort aus All_Cities
+			
+			//delete last location in All_Cities
 			All_Cities.deleteCity(lastLocation);
-			//Füge Intersection in All_Cities eins und führe Distanzmatrixupdate durch
+			//Insert next "intersection" if available and do a matrix update for next intersection
 			if(Intersections.get(1).getType()=="Intersection"){
 				All_Cities.addCity(Intersections.get(1));
 				if(e.status==null||All_Cities.checkForCities()>2) {
@@ -1438,55 +1171,52 @@ public class EA implements myListener {
 						e1.printStackTrace();
 					}
 				}
-			}
-				
-				//e.location= letzte IntersectionListe [letzter Eintrag]
-				
-				
-				
-				// TO DRIVE TO CITY
-				
-			if(All_Cities.checkForCities()<=2||Intersections.get(1).getType()=="City") {  //FALL 3 , 4 & Sonderfall
+			}		
+			
+			// toDriveto values calculation
+			
+			//Case 3,4 and extra case   ??? NOCHMAL ÜBERPRÜFEN
+			if(OP_Stop==true||Intersections.get(1).getType()=="City") { 
 				for(int n=0; n<Nodes.size()-1;n++) {
 					toDriveto("City",n,hour,ttnh,1);
 				}
-			}
-				
-				//TO DRIVE TO INTERSECTION
-				
-				else {
-					int PosinNode=0;
-					for(int a=0; a<Nodes.size();a++) {
-						if(Nodes.get(a).getId()==Intersections.get(1).getId()) {
-							break;
-						}
-						PosinNode++;
+			}	
+			//Case 1,2
+			else { 
+				int PosinNode=0;
+				for(int a=0; a<Nodes.size();a++) {
+					if(Nodes.get(a).getId()==Intersections.get(1).getId()) {
+						break;
 					}
-					for(int n=0;n<PosinNode;n++) {
-						toDriveto("Intersection",n,hour,ttnh,1);
-					}
+					PosinNode++;
 				}
+				for(int n=0;n<PosinNode;n++) {
+					toDriveto("Intersection",n,hour,ttnh,1);
+				}
+			}
 		}
-		//Speichere neue lastLocation
+		//Save actual position and best tour for comparison reasons at the next event
 		lastLocation=e.location;  
 		lastbest=best;
 	}
 
+    //Event-handling method for arriving at a "City"
+    //Distinguish change or no change in solution since last intersection/city
+    //If there is a change: Do route request, adapt data, inform simulator,
+    //adapt tours and All_Cities,do matrix request, do toDriveto calculation
+    //If there is no change : /adapt tours and All_Cities,do matrix request, do toDriveto calculation
 	@Override
-	//Asym. Matrix Request
-	public void atIntersection(AtEvent e) {  // ZWei Fälle: Nächste Stadt hat sich geändert oder nicht, ja -> new route reuquest
+	public void atIntersection(AtEvent e) {  
 		EventCounter++;
 		toDrivetoIntersection=0;
 		toDrivetoCity=0;
 		toDrivetoNode=0;
 		lastEventTime= new TimeElement(e.getEventTime());			
-		int hour= lastEventTime.getHour();																//current hour
+		int hour= lastEventTime.getHour();																
 		double ttnh=lastEventTime.getTimeToNextHour();
-		//Stoppe Algorithmus, da sich an Abfolge nichts mehr ändern kann
-		
-		//FallWechsel in Lösung und mehr als eine Stadt in All_Cities/Touren -> Behandle Event wie/ähnlich AtCity Methode
-		if(All_Cities.checkForCities()>1 && lastbest.getCity(2)!=best.getCity(2)) {  //WECHSEL IN BESTE LÖSUNG SEIT LETZTEM EVENT
-			//Neuer RouteRequest und Speicherung der Werte
+
+		//if there is a change in solution since the last event location
+		if(All_Cities.checkForCities()>1 && lastbest.getCity(2)!=best.getCity(2)) {  
 			Route route= new Route();
 			try {
 				route.WayFromTo(best);
@@ -1497,34 +1227,39 @@ public class EA implements myListener {
 			Nodes=route.Nodes_as_City;
 			Intersections=route.intersections;
 			
-			//Berechne Duration für neuen Start- & End-Node
-			//GLEICHES FRAGE WIE BEI ALLCITIES
-			//??????????????????????????????????????????????????? IST DAS BEI START STADT ÜBERHAUPT NÖTIG oder nur in start() beim ersten Mal?
+			//Adaped first and last duration value with duration approximation from first intersection to second node
+			//and penultimate node to last intersection 
+			//replace first and last node with first and last city object in "Intersection"
+			//Set coordinates of destination city of the route by using coordinates of last "intersection" 
 			double lat_ratio_start=(Nodes.get(1).getLatitude()-Intersections.get(0).getLatitude())/(Nodes.get(1).getLatitude()-Nodes.get(0).getLatitude());	
 			double lon_ratio_start=(Nodes.get(1).getLongitude()-Intersections.get(0).getLongitude())/(Nodes.get(1).getLongitude()-Nodes.get(0).getLongitude());
 			double avg_ratio_start= (lat_ratio_start+lon_ratio_start)/2;  
 			durations[0]=durations[0]*avg_ratio_start;
-			//Positionsersetzung weggelassen!?
+			
 			double lat_ratio_end=(Nodes.get(Nodes.size()-1).getLatitude()-Intersections.get(Intersections.size()-1).getLatitude())/(Nodes.get(Nodes.size()-1).getLatitude()-Nodes.get(Nodes.size()-2).getLatitude());	
 			double lon_ratio_end=(Nodes.get(Nodes.size()-1).getLongitude()-Intersections.get(Intersections.size()-1).getLongitude())/(Nodes.get(Nodes.size()-1).getLongitude()-Nodes.get(Nodes.size()-2).getLongitude());
 			double avg_ratio_end= (lat_ratio_end+lon_ratio_end)/2;
 			durations[durations.length-1]=durations[durations.length-1]*avg_ratio_end;
 			
-			//Ersetze Koordinaten der aktuellen Ziel-City durch Koordinaten aus Intersections
 			int pos = All_Cities.destinationCities.indexOf(best.getCity(2));
-			All_Cities.destinationCities.set(pos, Intersections.get(Intersections.size()-1));
+			All_Cities.getCity(pos).setCoordinates(Intersections.get(Intersections.size()-1).getLongitude(), Intersections.get(Intersections.size()-1).getLatitude());
+			
+			Nodes.set(0, Intersections.get(0)); 
+			Nodes.set(Nodes.size()-1, Intersections.get(Intersections.size()-1));
+			
+			//Inform simulator
 			RouteServiceEvent event= new RouteServiceEvent(this, Nodes,Intersections, durations,best);
 			fireEvent(event);
 			
-			//Loope alle Touren der Population
+			//Adapt all tours in actual population and fittest tour "best"
 			for ( int t =0; t<pop.populationSize();t++) {
-				//Lösche letzten Standort aus Touren
+				//Delete last location
 				pop.getTour(t).deleteCity(0);
 				if(Intersections.get(1).getType()=="Intersection"){
-					//Wenn Intersection auf Strecke, was fast immer der Fall ist, füge diese in Tour an zweiter Position ein
+					//add city object "intersection" if available
 					pop.getTour(t).addatPosition(1,Intersections.get(1));
 				}
-				//Wenn nicht passe Tour an, dass nächste Stadt aus Route Request aufjedenfall besucht wird
+				//add city object "intersection" if available
 				else {
 					int delete=pop.getTour(t).positionofCity(best.getCity(2));
 					pop.getTour(t).deleteCity(delete);
@@ -1535,9 +1270,9 @@ public class EA implements myListener {
 			if(Intersections.get(1).getType()=="Intersection") {
 				best.addatPosition(1, Intersections.get(1));
 			}
-			//Lösche letzten Standort aus All_Cities
+			//Do the same with Tour "best
 			All_Cities.deleteCity(lastLocation);
-			//Füge Intersection in All_Cities ein und führe Distanzmatrixupdate durch
+			//Insert next "intersection" if available and do a matrix update for next intersection
 			if(Intersections.get(1).getType()=="Intersection"){
 				All_Cities.addCity(Intersections.get(1));
 				try {
@@ -1547,12 +1282,14 @@ public class EA implements myListener {
 				}
 				
 			}
-			if(Intersections.get(1).getType()=="City") {  // Sonderfall: Kein Type="Intersection" vorhanden
+			// toDriveto values calculation
+			//case 2,3,4
+			if(Intersections.get(1).getType()=="City") { 
 				for(int n=0; n<Nodes.size()-1;n++) {
 					toDriveto("City",n,hour,ttnh,1);
 				}
 			}
-			
+			//case: 1
 			else {
 				int PosinNode=0;
 				for(int a=0; a<Nodes.size();a++) {
@@ -1571,34 +1308,37 @@ public class EA implements myListener {
 			
 			
 			
-		}//
-		else{			// Kein Wechsel in bester Lösung seit letztem Standort
+		}
+		//No channge in best solution since last intersection/city
+		else{			
+			//Stopp evolve Population because there is no other solution possible anymore
 			if(e.status=="Operatoren-Stop") {
 				OP_Stop=true;
 			}
+			//adapt all tours of population
 			int PosinInter=Intersections.indexOf(e.location);
-			
 			for ( int t =0; t<pop.populationSize();t++) {
-				//Lösche letzten Standort aus Touren
+				//delete last location
 				pop.getTour(t).deleteCity(0);
 				if(Intersections.get(PosinInter+1).getType()=="Intersection"){
-					//Wenn Intersection auf Strecke, was fast immer der Fall ist, füge diese in Tour an zweiter Position ein
+					//add city object "intersection" if available
 					pop.getTour(t).addatPosition(1,Intersections.get(PosinInter+1));
 				}
-				//Wenn nicht passe Tour an, dass nächste Stadt aus Route Request aufjedenfall besucht wird
+				//add city object "intersection" if available
 				else {
 					int delete=pop.getTour(t).positionofCity(best.getCity(2));
 					pop.getTour(t).deleteCity(delete);
 					pop.getTour(t).addatPosition(1, best.getCity(2));
 				}
 			}
+			//do the same with best tour
 			best.deleteCity(0);
 			if(Intersections.get(PosinInter+1).getType()=="Intersection") {
 				best.addatPosition(1, Intersections.get(PosinInter+1));
 			}
-		
+			//adapt All_Cities
 			All_Cities.deleteCity(lastLocation);
-			//Füge Intersection in All_Cities eins und führe Distanzmatrixupdate durch
+			//Insert next "intersection" if available and do a matrix update for next intersection
 			if(Intersections.get(PosinInter+1).getType()=="Intersection"){
 				All_Cities.addCity(Intersections.get(PosinInter+1));
 				if(All_Cities.checkForCities()>=2 &&e.location!=Intersections.get(Intersections.size()-2)) {		//Nur Update wenn All_cities größer gleich 2 und nicht vorletzter Node (==echter letzter Node)
@@ -1610,8 +1350,8 @@ public class EA implements myListener {
 				}
 			}	
 			
-			//TO DRIVE TO INTERSECTION
-			
+			//toDriveto calculation
+			//case 2,3,4
 			if(All_Cities.checkForCities()<2||Intersections.get(PosinInter+1).getType()=="City") {  //FALL 2 -> Wenn letzte echte Intersection ereicht ist
 				int PosinNode=0;
 				for(int a=0; a<Nodes.size();a++) {
@@ -1624,7 +1364,7 @@ public class EA implements myListener {
 					toDriveto("City",n,hour,ttnh,1);
 				}
 			}
-			
+			//case: 1
 			else {
 				int PosinNode1=0;
 				for(int a=0; a<Nodes.size();a++) {
@@ -1635,7 +1375,7 @@ public class EA implements myListener {
 				}
 				int PosinNode2=0;
 				for(int n=0; n<Nodes.size()-1;n++) {
-					if(Nodes.get(n).getId()==Intersections.get(PosinInter+1).getId()) {		//Sobald Node gefunden der gleich der ersten Intersection ist, stoppe
+					if(Nodes.get(n).getId()==Intersections.get(PosinInter+1).getId()) {	
 						break;
 					}
 					PosinNode2++;
@@ -1650,7 +1390,10 @@ public class EA implements myListener {
 		lastLocation=e.location;
 		
 	}
-
+	//Event-handling method for GPS events
+	//Localizes position and allocates the 2 nodes we are in between
+	//adapts tours in population and All_Cities
+	//calculates duration to next node and then to next intersection/city
 	@Override
 	public void GPS_Signal(AtEvent e)  {
 		int GPSinNode=0;
@@ -1662,7 +1405,8 @@ public class EA implements myListener {
 		int hour= lastEventTime.getHour();																//current hour
 		double ttnh=lastEventTime.getTimeToNextHour();
 		
-		//Finde GPS-Position innerhalb zweier Nodes
+		//Allocate the nodes we are in between through spanning a rectangle with coordinates and 
+		//analyze if we are located in this rectangle
 		for( int i=0; i<Nodes.size();i++) {	
 			double maxLat=0;
 			double minLat=0;
@@ -1677,70 +1421,62 @@ public class EA implements myListener {
 			if(e.getLatitude()<=maxLat&&e.getLatitude()>=minLat&&e.getLongitude()<=maxLon&&e.getLongitude()>=minLon) {
 				break;
 			}
-			GPSinNode++;  //Speichere Node-Position "hinter" GPS Punkt; GPS+1= "davor"
+			GPSinNode++;  
 		}
-		
-		//Passe Tour an -> Lösche letzte Location/Position 0
-		//-> Füge an Position 0 GPS aus Event ein
+		//Adapt tours, delete last location and add actual GPS position
 		for ( int t =0; t<pop.populationSize();t++) {
-			//Lösche letzten Standort aus Touren
 			pop.getTour(t).deleteCity(0);
 			pop.getTour(t).addatPosition(0,e.location);
 		}
+		
+		//do same with best
 		best.deleteCity(0);
 		best.addatPosition(0, e.location);
-		All_Cities.deleteCity(lastLocation); //Lösche letzte Location
-		All_Cities.addCity(e.location);		//Füge GPS-Location aus Event hinzu
-
-		 //TO DRIVE TO NODE
-
-			double latratio= (Nodes.get(GPSinNode+1).getLatitude()-e.getLatitude())/(Nodes.get(GPSinNode+1).getLatitude()-Nodes.get(GPSinNode).getLatitude());
-			double lonratio=(Nodes.get(GPSinNode+1).getLongitude()-e.getLongitude())/(Nodes.get(GPSinNode+1).getLongitude()-Nodes.get(GPSinNode).getLongitude());
-			double ratio= (latratio+lonratio)/2;
-			
-			toDriveto("Node",GPSinNode,hour,ttnh,ratio);
-				
-				
-			//BIS HIER MUSS IMMER GEMACHT WERDEN; DANN UNTERSCHEIDUNG NACH FALL
-			
-			if(OP_Stop==false&&All_Cities.checkForIntersection()>0)	{
-				 			//FALL 1 -> toDrivetoIntersection: Wenn noch Wegänderung an Intersection eintreten kann und wir nicht an der letzten Intersection der aktuellen Route befinden
-				int nextIntersection=0;
-				for(int l=1; l<Intersections.size();l++) {
-					for(int k=GPSinNode+1;k<Nodes.size();k++) {  //Beginne ab nächstem Node
-						if(Nodes.get(k).getId()==Intersections.get(l).getId()) { 
-							nextIntersection=k;  //at position k in Nodes
-							break;	
-						}
-					
-					}
-					if(nextIntersection!=0) {
-						break;
-					}
-						
-				}
-				toDrivetoIntersection=toDrivetoNode;
-			
-				for(int j=GPSinNode+1;j<nextIntersection;j++) { 
-					
-					toDriveto("Intersection",j,hour,ttnh,1);
-				}
-			}
-			//Info: GPS-Signal zwischen vorletztem und letztem Node abgedeckt, da Positon des letzten Nodes=GPS+1=duration.lenght -> nicht mehr in schleife enthalten
-				else {						//FALL 2,3,4
-					toDrivetoCity=toDrivetoNode;
-						for(int m= GPSinNode+1;m<durations.length;m++) {
-							toDriveto("City",m,hour,ttnh,1);					
-					}
-				}
-			
-			
-				
-	
-		lastLocation=e.location;
 		
+		//Delete last location and add actual GPS position in All_Cities
+		All_Cities.deleteCity(lastLocation); 
+		All_Cities.addCity(e.location);		
+
+		 //Calculate duration to next Node (position in ArrayList=GPSinNode+1)
+		double latratio= (Nodes.get(GPSinNode+1).getLatitude()-e.getLatitude())/(Nodes.get(GPSinNode+1).getLatitude()-Nodes.get(GPSinNode).getLatitude());
+		double lonratio=(Nodes.get(GPSinNode+1).getLongitude()-e.getLongitude())/(Nodes.get(GPSinNode+1).getLongitude()-Nodes.get(GPSinNode).getLongitude());
+		double ratio= (latratio+lonratio)/2;
+		toDriveto("Node",GPSinNode,hour,ttnh,ratio);	
+		
+		//toDriveto calculation
+		//case 1
+		if(OP_Stop==false&&All_Cities.checkForIntersection()>0)	{
+			int nextIntersection=0;
+			for(int l=1; l<Intersections.size();l++) {
+				for(int k=GPSinNode+1;k<Nodes.size();k++) {
+					if(Nodes.get(k).getId()==Intersections.get(l).getId()) { 
+						nextIntersection=k;  
+						break;	
+					}			
+				}
+				if(nextIntersection!=0) {
+					break;
+				}				
+			}
+			toDrivetoIntersection=toDrivetoNode;
+			for(int j=GPSinNode+1;j<nextIntersection;j++) { 
+				toDriveto("Intersection",j,hour,ttnh,1);
+			}
+		}
+		// case 2,3,4	
+		else {	
+			toDrivetoCity=toDrivetoNode;
+			for(int m= GPSinNode+1;m<durations.length;m++) {
+				toDriveto("City",m,hour,ttnh,1);					
+			}
+		}
+		lastLocation=e.location;
 	}
     
+	//Method to calculate the duration from the acutal position to the next destination
+	//next destination could be an intersection or city
+	//Considers daytime through hour depending factor multiplication
+	//toDriveto is always involved to allocate total distance with Tour.getDuration()
 	public static void toDriveto(String Location,int durationPosition, int hour, double ttnh,double ratio) { //Wenn kein Node, ratio das übergeben wird ist irrelevant
     	if(Location=="City") {
     		int h_next;
@@ -1812,11 +1548,11 @@ public class EA implements myListener {
 			}
      	}
     }
-	
+	//adds listener to listener list
 	public void addRouteServiceListener(RouteServiceListener toAdd) {
 		listenerList.add(toAdd);
 	}
-	
+	//activates listener method in simulator class
 	public void fireEvent(RouteServiceEvent e)
 	{
 		listenerList.get(0).EAdidRequest(e);

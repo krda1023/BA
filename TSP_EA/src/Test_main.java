@@ -14,12 +14,131 @@ public class Test_main {
 		return erg;
 	}
 	public static void main(String[]args) throws Exception {
-		TimeElement e = new TimeElement();
-		System.out.println(e);
+		City lastlocation = new City("20", "GPS",8.3903420, 49.0127410);
+		City c0= new City("0", "City", 8.390409,49.013296);
+		City c1= new City("1", "City", 8.391630,49.014276);
+		City c2= new City("2", "City", 8.334120,49.014376);
+		All_Cities.addCity(c0);
+		All_Cities.addCity(c1);
+		All_Cities.addCity(c2);
+		All_Cities.addCity(lastlocation);
+
+		ArrayList<City>Nodes= new ArrayList<City>();
+		int GPSinNode=0;
 		
+		double toDrivetoIntersection=0;
+		double toDrivetoCity=0;
+		double toDrivetoNode=0;
+		TimeElement lastEventTime= new TimeElement();
+		int hour= lastEventTime.getHour();																//current hour
+		double ttnh=lastEventTime.getTimeToNextHour();
+		City n1= new City("14795415","Node",8.3903420, 49.0127410);
+		City n2= new City("25947870","Node", 8.3904210,49.0134581);
+		City n3= new City("4935288158","Node", 8.3904480,49.0137314);
+		City n4= new City("4935288181","Node", 8.3904717,49.0139720);
+		City n5= new City("1719671859","Node",8.3905241,49.0144687);
+		City n6= new City("14795418","Node", 8.3905318,49.0145414);
+		City n7= new City("25948133","Node", 8.3916510,49.0144975);
+		City n8= new City("1719671856","Node", 8.3916443,49.0144270);
+		City n9= new City("4224766861","Node", 8.3916187,49.0141004);
+		Nodes.add(n1);
+		Nodes.add(n2);
+		Nodes.add(n3);
+		Nodes.add(n4);
+		Nodes.add(n5);
+		Nodes.add(n6);
+		Nodes.add(n7);
+		Nodes.add(n8);
+		Nodes.add(n9);
+		ArrayList<City>Intersections= new ArrayList<City>();
+		City i1= new City("0", "City", 8.390403,49.013296);
+		City i2= new City("25947870", "Intersection", 8.390421,49.013458);
+		City i3= new City("14795418", "Intersection", 8.390532,49.014541);
+		City i4= new City("25948133", "Intersection", 8.391651,49.014498);
+		City i5= new City("1", "City", 8.391632,49.014276);
+		Intersections.add(i1);
+		Intersections.add(i2);
+		Intersections.add(i3);
+		Intersections.add(i4);
+		Intersections.add(i5);
+		ArrayList<City>beste=new ArrayList<City>();
+		beste.add(lastlocation);
+		beste.add(c0);
+		beste.add(c1);
+		beste.add(c2);
+		Tour best= new Tour(beste);
+		System.out.println("best: "+best);
+		System.out.println("Start operation");
+		double durations[]= {204.84,46.6,42,85.3,144.2,27.4,81.1,122.3};
+		double lat_ratio_start=(Nodes.get(1).getLatitude()-Intersections.get(0).getLatitude())/(Nodes.get(1).getLatitude()-Nodes.get(0).getLatitude());	
+		double lon_ratio_start=(Nodes.get(1).getLongitude()-Intersections.get(0).getLongitude())/(Nodes.get(1).getLongitude()-Nodes.get(0).getLongitude());
+		double avg_ratio_start= (lat_ratio_start+lon_ratio_start)/2;  
+		durations[0]=durations[0]*avg_ratio_start;
+		
+		double lat_ratio_end=(Nodes.get(Nodes.size()-1).getLatitude()-Intersections.get(Intersections.size()-1).getLatitude())/(Nodes.get(Nodes.size()-1).getLatitude()-Nodes.get(Nodes.size()-2).getLatitude());	
+		double lon_ratio_end=(Nodes.get(Nodes.size()-1).getLongitude()-Intersections.get(Intersections.size()-1).getLongitude())/(Nodes.get(Nodes.size()-1).getLongitude()-Nodes.get(Nodes.size()-2).getLongitude());
+		double avg_ratio_end= (lat_ratio_end+lon_ratio_end)/2;
+		durations[durations.length-1]=durations[durations.length-1]*avg_ratio_end;			
+		
+		int pos = All_Cities.destinationCities.indexOf(best.getCity(2));
+		All_Cities.getCity(pos).setCoordinates(Intersections.get(Intersections.size()-1).getLongitude(), Intersections.get(Intersections.size()-1).getLatitude());		
+		
+		Nodes.set(0, Intersections.get(0)); 
+		Nodes.set(Nodes.size()-1, Intersections.get(Intersections.size()-1));
+		
+		best.deleteCity(0);
+		if(Intersections.get(1).getType()=="Intersection") {
+			best.addatPosition(1, Intersections.get(1));
+		}
+		
+		//delete last location in All_Cities
+		All_Cities.deleteCity(lastlocation);
+		//Insert next "intersection" if available and do a matrix update for next intersection
+		if(Intersections.get(1).getType()=="Intersection"){
+			All_Cities.addCity(Intersections.get(1));
+			int PosinNode=0;
+			for(int a=0; a<Nodes.size();a++) {
+				if(Nodes.get(a).getId()==Intersections.get(1).getId()) {
+					break;
+				}
+				PosinNode++;
+			}
+			for(int n=0;n<PosinNode;n++) {
+				if(toDrivetoIntersection+durations[n]*Maths.getFaktor(hour)>ttnh) {
+		    		int h_next;
+					if(hour==23) {
+						h_next=0;
+					}
+					else {
+						h_next=hour+1;
+					}
+		    		double tohour=ttnh-durations[n]*Maths.getFaktor(hour);		;									//calculate the time from sum to next hour
+					double hourratio= tohour/durations[n]*Maths.getFaktor(hour);									// Calculate ratio of driven way in this section
+					toDrivetoIntersection+=hourratio*durations[n]*Maths.getFaktor(hour)+(1-hourratio)*durations[n]*Maths.getFaktor(h_next);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+					ttnh+=3600;	
+					hour+=1;
+					if(hour==24) {
+						hour=0;
+					}
+				
+				}
+				else {
+					toDrivetoIntersection+=durations[n]*Maths.getFaktor(hour);
+				}
+			}
+		System.out.println("best: "+best);
+		System.out.println("todrivetointersection: "+toDrivetoIntersection);
+
+		for(int f=0;f<durations.length;f++) {
+			System.out.print(durations[f]+" ");
+		}
+		System.out.println();
+		for(int g=0;g<All_Cities.numberOfCities();g++) {
+			System.out.println(All_Cities.getCity(g));
+		}
 	}
 }
-
+}
 
     /*	Route route= new Route();
     	double toDrivetoIntersection=0;
