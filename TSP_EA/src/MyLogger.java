@@ -27,20 +27,19 @@ public class MyLogger {
 			DateFormat df= new SimpleDateFormat("dd-MM-yyyy HH-mm-ss");
 			String s =df.format(d);
 			// Creating FileHandler
-			fileHandler = new FileHandler("./logfile "+s+".log");
+			fileHandler = new FileHandler(".logfile "+s+".log");
 			
 			// Creating SimpleFormatter
 			simpleFormatter = new SimpleFormatter();
 			
-			// Assigning handler to logger
-			LOGGER.addHandler(fileHandler);
 			
-			// Logging message of Level info (this should be publish in the default format i.e. XMLFormat)
-			LOGGER.info("Finnest message: Logger with DEFAULT FORMATTER");
+			
+	
 			
 			// Setting formatter to the handler
 			fileHandler.setFormatter(simpleFormatter);
-			
+			// Assigning handler to logger
+						LOGGER.addHandler(fileHandler);
 			// Setting Level to ALL
 			fileHandler.setLevel(Level.ALL);
 			LOGGER.setLevel(Level.ALL);
@@ -53,12 +52,29 @@ public class MyLogger {
 		}
 	}
 	
+	
+	
 	public Logger getLogger() {
 		return LOGGER;
 	}
 	
-	public void writeInfo(Object o, Object p) {
-		LOGGER.info(String.valueOf(o)+"     "+String.valueOf(p));
+	public void writeInfo(String s) {
+		LOGGER.info(s);
 	}
-
+	public void writeWarning(String s) {
+		LOGGER.warning(s);
+		
+	}
+	public void writeConfig(String s) {
+		LOGGER.config(s);
+		
+	}
+	public void writeFine(String s) {
+		LOGGER.fine(s);
+		
+	}
+	public void writeFinest(String s) {
+		LOGGER.finest(s);
+		
+	}
 }

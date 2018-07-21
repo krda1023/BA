@@ -48,28 +48,24 @@ public class Route {
 			Duration[a]=duration.getDouble(a);
 			}
 		}
+		System.out.println();
+		System.out.print("durations without adaption:");
+		for (int a=0; a<Duration.length;a++) {
+			System.out.print(" "+Duration[a]);
+			
+		}
+		System.out.println();
+		System.out.println();
+		//ID durch 1000 /10000 oder so teilen, bereiche definieren
+		//Switch case , case nummer referenziert auf richtige xml Datei;
+		//Durchiterieren bis ID gefunden, done.
+		
+		
+		
 		
 		//Convert Node Ids in City Objects
-		//Nodes_as_City=Send_Request.getNodes(Nodes);
+		Nodes_as_City=Send_Request.getNodes(Nodes);
 		
-		City n1= new City("14795415","Node",8.3903420, 49.0127410);
-		City n2= new City("25947870","Node", 8.3904210,49.0134581);
-		City n3= new City("4935288158","Node", 8.3904480,49.0137314);
-		City n4= new City("4935288181","Node", 8.3904717,49.0139720);
-		City n5= new City("1719671859","Node",8.3905241,49.0144687);
-		City n6= new City("14795418","Node", 8.3905318,49.0145414);
-		City n7= new City("25948133","Node", 8.3916510,49.0144975);
-		City n8= new City("1719671856","Node", 8.3916443,49.0144270);
-		City n9= new City("4224766861","Node", 8.3916187,49.0141004);
-		Nodes_as_City.add(n1);
-		Nodes_as_City.add(n2);
-		Nodes_as_City.add(n3);
-		Nodes_as_City.add(n4);
-		Nodes_as_City.add(n5);
-		Nodes_as_City.add(n6);
-		Nodes_as_City.add(n7);
-		Nodes_as_City.add(n8);
-		Nodes_as_City.add(n9);
 
 		//Create City objects of type "Interesection" from JSON Array "Intersections" in JSONObject "steps"
 		//Receive longitude and latitude from location in JSONArray
@@ -91,7 +87,12 @@ public class Route {
 				
 				//== first City Object "Intersection"
 				if(inter==0&&step==0) {
-					id=best.getCity(1).getId();
+					if(Run.runs==true) {
+						id=best.getCity(1).getId();
+					}
+					else {
+						id=best.getCity(0).getId();
+					}
 					City newCity= new City(id,"City",position);
 					//System.out.println(newCity.id+" "+newCity.type+" "+newCity);
 					intersections.add(newCity);
@@ -102,11 +103,16 @@ public class Route {
 				else if(step==steps.length()-1 && inter==intersects.length()-1) {
 					City newCity;
 					if(All_Cities.checkForCities()==1) {
-						id=All_Cities.startCity.id;
+						id="0";
 						newCity= new City(id,"City",position);
 					}
 					else {
+						if(Run.runs==true) {
 						id=best.getCity(2).getId();
+						}
+						else {
+							id=best.getCity(1).getId();
+						}
 						newCity= new City(id,"City",position);
 					}
 																		//System.out.println(newCity.id+" "+newCity.type+" "+newCity);

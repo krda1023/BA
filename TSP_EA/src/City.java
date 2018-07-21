@@ -16,6 +16,11 @@ public class City {
 		this.type=type;
 		this.position = position;
 	}
+	public City ( City c) {
+		this.position=c.position;
+		this.type=c.type;
+		this.id=c.id;
+	}
 	
 //METHODS:
 	public String getId() {

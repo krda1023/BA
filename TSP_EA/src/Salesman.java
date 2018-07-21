@@ -146,8 +146,8 @@ public class Salesman implements RouteServiceListener {
 			double newlat= (lat2-lat1)*ratio+lat1;
 			double newlon=(lon2-lon1)*ratio+lon1;
 			City GPS = new City(Integer.toString(events),"GPS",newlon,newlat);
-			AtEvent ev= new AtEvent(this,GPS,now.startInMilli+(long)(eventTimeSum*1000));
-			upcomingEvents.add(ev);
+			//AtEvent ev= new AtEvent(this,GPS,now.startInMilli+(long)(eventTimeSum*1000));
+		//	upcomingEvents.add(ev);
 		}
 		
 		for(int inters=1; inters<Intersection.size();inters++) { 
@@ -156,16 +156,16 @@ public class Salesman implements RouteServiceListener {
 				for(int dur=0;dur<ZF_EA_duration.length;dur++) {
 					sumIntD+=ZF_EA_duration[dur];
 				}											//Letztes Event, Intersection last = City "City"
-				AtEvent ev= new AtEvent(this,Intersection.get(inters) ,(long)(now.startInMilli+(sumIntD*1000)));
+			//	AtEvent ev= new AtEvent(this,Intersection.get(inters) ,(long)(now.startInMilli+(sumIntD*1000)));
 				if(Intersection.get(inters).getLatitude()==Distanzmatrix.startCity.getLatitude()&&Intersection.get(inters).getLongitude()==Distanzmatrix.startCity.getLongitude()) {
-					ev.status="Erste Stadt wieder erreicht";
+	//				ev.status="Erste Stadt wieder erreicht";
 				}
 			
 				
 				else if(All_Cities.checkForCities()==1) {
-					ev.status="Letze Stadt erreicht";
+		//			ev.status="Letze Stadt erreicht";
 				}
-				upcomingEvents.add(ev);
+		//		upcomingEvents.add(ev);
 				break;
 			}
 			
@@ -173,11 +173,11 @@ public class Salesman implements RouteServiceListener {
 				for(int node=0;node<Nodes.size();node++) {
 					sumIntD+=ZF_EA_duration[node];   
 					if(Intersection.get(inters).getId()==Nodes.get(node).getId()) { //Hier hat Intersection noch die ID der korresponiderenden Nodes
-							AtEvent ev= new AtEvent(this,Intersection.get(inters),(long)(now.startInMilli+(sumIntD*1000)));
+		//					AtEvent ev= new AtEvent(this,Intersection.get(inters),(long)(now.startInMilli+(sumIntD*1000)));
 							if(All_Cities.checkForCities()==2 &&Intersection.get(inters+1).getType()=="City") {
-								ev.status="Operatoren-Stop";
+				//				ev.status="Operatoren-Stop";
 							}
-							upcomingEvents.add(ev);
+			//				upcomingEvents.add(ev);
 							break;	
 					}	
 				}

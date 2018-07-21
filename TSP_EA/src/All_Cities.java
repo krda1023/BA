@@ -26,7 +26,7 @@ public class All_Cities {
 	}
 	// Returns City object at specific position in destinationCities
 	public static City getCity(int index){
-	        return (City)destinationCities.get(index);
+	        return destinationCities.get(index);
 	}
 	    
 	// Get the number of City objects in destinationCities

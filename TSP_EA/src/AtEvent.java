@@ -38,4 +38,9 @@ public class AtEvent extends EventObject {
 	public double getLatitude() {
 		return location.position[1];
 	}
+	public String toString() {
+		 String s="";
+		 s="EventTime: "+EventTime+" ID: "+location.id+" ,Type: "+location.getType()+" Lon: "+location.getLongitude()+" Lat: "+location.getLatitude();
+		 return s;
+	 }
 }

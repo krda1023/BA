@@ -16,11 +16,12 @@ public class Simulator implements RouteServiceListener {
 	ArrayList<City> Intersection;
 	Tour best;
 	double[] duration;
-	double[] TF_Gamma_duration;
-	int GPS_frequency=10;
+	double[] GammaDuration;
+	int GPS_frequency=8;
 	double k;
 	double theta;
 	double shiftDistance;
+	TimeElement now= new TimeElement();
 	//ListenerList
 	private ArrayList<myListener> listenerList= new ArrayList<myListener>();
 
@@ -41,30 +42,34 @@ public class Simulator implements RouteServiceListener {
 	//Fires event in case of time overlaps and moves specific event in the event lists
 	public void checkForEvents(){
 		AtEvent currentEvent = null;
+		boolean timeOverlaps=false;
 		long now= System.currentTimeMillis();
 		
 		for(int i=0; i<upcomingEvents.size();i++){
 			if(now>( upcomingEvents.get(i)).getEventTime()){
 				pastEvents.add(upcomingEvents.get(i));
 				currentEvent=upcomingEvents.get(i);
+				timeOverlaps=true;
 				break;
 
 			}
 			else{}
 		}
-		upcomingEvents.remove(currentEvent);
-		try {
-			fireAtEvent(currentEvent);
-		} 
-		catch (Exception e) {
-			e.printStackTrace();
-		}	
+		if(timeOverlaps==true) {
+			upcomingEvents.remove(currentEvent);
+			try {
+				fireAtEvent(currentEvent);
+			} 
+			catch (Exception e) {
+				e.printStackTrace();
+			}	
+		}
 	}
 
 	//Fires event and activates the correct event handling mehtods in EA
 	public void fireAtEvent(AtEvent e) throws Exception{
 		
-		if(e.getEventType()=="City"){
+		if(e.getEventType().equals("City")){
 			listenerList.get(0).atCity(e);
 		}
 		
@@ -86,61 +91,88 @@ public class Simulator implements RouteServiceListener {
 		best=e.best;
 		upcomingEvents = new ArrayList<AtEvent>();
 		pastEvents = new ArrayList<AtEvent>();
+		now=e.eTime;
 		createEvents();
 		
 	}
 	
 	//Creates all atEvents of the current route, "GPS", "AtIntersection" & "atCity
 	public void createEvents() {
-		double[] GammaDuration= new double[duration.length];											
+												
 		//Use Gamma function on each value of duration															
-		for(int i=0; i<duration.length;i++) {													
-			GammaDuration[i]=Maths.goGamma(duration[i], k, theta, shiftDistance);	
-		}
-		
 		//ToDriveto Calculation with duration[] values and hour-depending factor
-		TimeElement now= new TimeElement();
+		GammaDuration= new double[duration.length];
+		int h_next=0;			
+		int hour= now.getHour();	
 		double durationSumZFEA=0;															
-		TF_Gamma_duration= new double[GammaDuration.length];										
-		int hour= now.getHour();															
+		if(hour==23) {
+			 h_next=0;
+		}
+		else {
+			 h_next=hour+1;
+		}	
 		double ttnh=now.getTimeToNextHour();											
-		for(int j=0; j<GammaDuration.length;j++) {														
-				if(durationSumZFEA+GammaDuration[j]*Maths.getFaktor(hour)>ttnh) {			
+		for(int j=0; j<duration.length;j++) {														
+				if(durationSumZFEA+duration[j]*Maths.getGammaFaktor(hour)>ttnh) {			
 					double tohour=ttnh-durationSumZFEA		;									
-					double ratio= tohour/GammaDuration[j]*Maths.getFaktor(hour);				
-					TF_Gamma_duration[j]=ratio*GammaDuration[j]*Maths.getFaktor(hour)+(1-ratio)*GammaDuration[j]*Maths.getFaktor(hour+1);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+					double ratio= tohour/GammaDuration[j]*Maths.getGammaFaktor(hour);				
+					GammaDuration[j]=ratio*duration[j]*Maths.getGammaFaktor(hour)+(1-ratio)*duration[j]*Maths.getGammaFaktor(h_next);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
 					ttnh+=3600;																	
-					durationSumZFEA+=TF_Gamma_duration[j];											 
+					durationSumZFEA+=GammaDuration[j];
+					Maths.round(GammaDuration[j], 3);
+				
 					hour+=1;
 					if(hour==24) {
 						hour=0;
-					}
-					System.out.println("WECHSEL");													
-					
+					}		
 				}
-				else {																		
-					TF_Gamma_duration[j]=GammaDuration[j]*Maths.getFaktor(hour);				
-					durationSumZFEA+=TF_Gamma_duration[j];		
-					System.out.println("Kein WECHSEL"+ TF_Gamma_duration[j]);	//Update Sum
+				else {			
+					
+					GammaDuration[j]=duration[j]*Maths.getGammaFaktor(hour);
+					GammaDuration[j]=Maths.round(GammaDuration[j], 3);
+					durationSumZFEA+=GammaDuration[j];				
 				}
 			}
+		System.out.print("durations:");
+		for (int a=0; a<duration.length;a++) {
+			System.out.print(" "+duration[a]);
 			
+		}
+		System.out.println();
+		System.out.println();
+		System.out.print("Gammadurations:");
+		for (int a=0; a<GammaDuration.length;a++) {
+			System.out.print(" "+GammaDuration[a]);
+			
+		}
+		System.out.println();
+		System.out.println();
+		System.out.print("Nodes:");
+		for (int a=0; a<Nodes.size();a++) {
+			System.out.print(" "+Nodes.get(a));
+			
+		}
+		System.out.println();System.out.println();
+		System.out.println("gammaFaktor"+ Maths.getGammaFaktor(hour)+"HOURFAC: "+ Maths.getFaktor(hour)+" Create Events: "+System.currentTimeMillis());	
+ // Bezug neu !!!!!
 		//Create GPS Event every 5 Seconds
 		//Get coordinates through approximation: Localize the two nodes you're in between through comparison of sum of event time with sum of duration values
-		int numberofGPSEvents= (int)durationSumZFEA/GPS_frequency;
+	
+		int numberofGPSEvents= (int)(durationSumZFEA/GPS_frequency);
 		double eventTimeSum=0;
 		for(int events=0; events<numberofGPSEvents;events++) {
-			eventTimeSum+=5;
+			eventTimeSum+=GPS_frequency;
 			double diffrence=0;
 			double sum_d=0;
 			double ratio=0;
 			int positionInDurArray=0;
-			for(int findNode=0;findNode<TF_Gamma_duration.length;findNode++) {
-				sum_d+=TF_Gamma_duration[findNode]; 
+			for(int findNode=1;findNode<GammaDuration.length;findNode++) {
+				sum_d+=GammaDuration[findNode-1]; 
 				if(sum_d>eventTimeSum) {
-					positionInDurArray=findNode;
+					positionInDurArray=findNode-1;
 					diffrence=sum_d-eventTimeSum;
-					ratio= 1-(diffrence/TF_Gamma_duration[findNode]);
+					ratio= 1-(diffrence/GammaDuration[findNode-1]);
+					
 					break;
 				}
 			}
@@ -149,10 +181,12 @@ public class Simulator implements RouteServiceListener {
 			double lon1=Nodes.get(positionInDurArray).getLongitude();
 			double lat2=Nodes.get(positionInDurArray+1).getLatitude();
 			double lon2=Nodes.get(positionInDurArray+1).getLongitude();
-			double newlat= (lat2-lat1)*ratio+lat1;
-			double newlon=(lon2-lon1)*ratio+lon1;
-			City GPS = new City(Integer.toString(events),"GPS",newlon,newlat);
+			
+			double newlat= Maths.round((lat2-lat1)*ratio+lat1, 7);
+			double newlon=Maths.round((lon2-lon1)*ratio+lon1, 7);
+			City GPS = new City("G"+Integer.toString(events),"GPS",newlon,newlat);
 			AtEvent ev= new AtEvent(this,GPS,now.startInMilli+(long)(eventTimeSum*1000));
+		
 			upcomingEvents.add(ev);
 		}
 		//Create an atCity event for last city object in ArrayList Intersections
@@ -161,38 +195,66 @@ public class Simulator implements RouteServiceListener {
 		for(int inters=1; inters<Intersection.size();inters++) { 
 			double sumIntD=0;
 			if(inters==Intersection.size()-1) {
-				for(int dur=0;dur<TF_Gamma_duration.length;dur++) {
-					sumIntD+=TF_Gamma_duration[dur];
+				for(int dur=0;dur<GammaDuration.length;dur++) {
+					sumIntD+=GammaDuration[dur];
 				}
 				AtEvent ev= new AtEvent(this,Intersection.get(inters) ,(long)(now.startInMilli+(sumIntD*1000)));
 				//add status if we reached the start city
-				if(Intersection.get(inters).getLatitude()==Distanzmatrix.startCity.getLatitude()&&Intersection.get(inters).getLongitude()==Distanzmatrix.startCity.getLongitude()) {
+				if(All_Cities.checkForCities()==1) {
 					ev.status="Erste Stadt wieder erreicht";
 				}
 				//add status if we reached last city
-				else if(All_Cities.checkForCities()==1) {
-					ev.status="Letze Stadt erreicht";
+				else if(All_Cities.checkForCities()==2) {
+					ev.status="Letzte Stadt erreicht";
 				}
+			//	System.out.println(ev);
 				upcomingEvents.add(ev);
 				break;
 			}
 			//Create Intersection events
 			else {
-				for(int node=0;node<Nodes.size();node++) {
-					sumIntD+=TF_Gamma_duration[node];   
-					if(Intersection.get(inters).getId()==Nodes.get(node).getId()) { //Hier hat Intersection noch die ID der korresponiderenden Nodes
+				for(int node=1;node<Nodes.size();node++) {
+					sumIntD+=GammaDuration[node-1];   
+					
+					if(Intersection.get(inters).getId()==Nodes.get(node).getId()) { 
+						
 							AtEvent ev= new AtEvent(this,Intersection.get(inters),(long)(now.startInMilli+(sumIntD*1000)));
 							//add status if we reached last Intersection of route to penultimate city
-							if(All_Cities.checkForCities()==2 &&Intersection.get(inters+1).getType()=="City") {
+							
+							if(All_Cities.checkForCities()==3 &&Intersection.get(inters+1).getType()=="City") {
+								System.out.println("eached");
 								ev.status="Operatoren-Stop";
 							}
-							upcomingEvents.add(ev);
+						
+							addEventinList(ev);
 							break;	
 					}	
 				}
 			}	
 		}
+	
+		for(int ff=0;ff<upcomingEvents.size();ff++) {
+			System.out.println(upcomingEvents.get(ff));
+		}
 	}
 
+	public void addEventinList(AtEvent e) {
+		if(upcomingEvents.isEmpty()) {
+			upcomingEvents.add(e);
+		}
+		else {
+			for (int i = 0; i < upcomingEvents.size(); i++){
+				if(upcomingEvents.get(i).getEventTime() > e.getEventTime()){
+					upcomingEvents.add(i,e);
+					break;
+				}
+				else if(i==upcomingEvents.size()-1) {
+					upcomingEvents.add(e);
+					break;
+				}
+
+			}
+		}
+	}
 }
 	

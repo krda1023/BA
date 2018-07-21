@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.concurrent.SynchronousQueue;
 //Class that initiates Matrix-Request and saves and manages all returned duration values 
 //No objects required because of static class variables
 public class Distanzmatrix {
@@ -21,7 +22,7 @@ public class Distanzmatrix {
 	// and add to All_Cities class
 	public static void createAll_Cities (){		
 			double[][] zwischenmatrix;
-			String s= "C:\\Users\\BADai\\git\\BA\\TSP_EA\\src\\TSP-Instanz-Karlsruhe";
+			String s= "C:\\Users\\BADai\\git\\BA\\TSP_EA\\src\\testing";
 			readFile rf= new readFile(s);
 			rf.readingFile();
 			CreatingnumOfCities=rf.getNumberofCities();		
@@ -30,7 +31,7 @@ public class Distanzmatrix {
 				City neueStaedte = new City(Integer.toString(a),"City",zwischenmatrix[a][1],zwischenmatrix[a][0]);			//Wechsel von Position Latitude -> Longitude
 				All_Cities.addCity(neueStaedte);
 			}
-			startCity=All_Cities.getCity(0);	
+			startCity=new City(All_Cities.getCity(0));	
 	}
 	
 	//First table service request with Send_Request class
@@ -39,8 +40,8 @@ public class Distanzmatrix {
 	public static void createDurationMatrix() {
 			matrix= new double[CreatingnumOfCities+1][CreatingnumOfCities+1]; 
 			try {		
-		        
-		        matrix=Send_Request.createBasicMatrix();
+		        //matrix=Maths.getBeispielMatrix();
+		       matrix=Send_Request.createBasicMatrix();
 			} 
 			catch (Exception e) {
 				e.printStackTrace();
@@ -69,7 +70,8 @@ public class Distanzmatrix {
 	// Add hour value to each of the 24 matrixes
 	public static void updateAllMatrix() throws Exception {
 		double faktor;
-		double[]IntersectionMatrix=Send_Request.IntersectionMatrix(All_Cities.getCity(All_Cities.numberOfCities()-1));
+		double[]IntersectionMatrix=Send_Request.IntersectionMatrix(EA.best.getCity(1));
+		
 		for(int i=0;i<matrix.length-1;i++) {
 			matrix[matrix.length-1][i]=IntersectionMatrix[i];
 		}
@@ -78,6 +80,12 @@ public class Distanzmatrix {
 			for(int j=0;j<matrix.length-1;j++) {		
 					allMatrix.get(i)[matrix.length-1][j]=IntersectionMatrix[j]*faktor;
 			}		
+		}
+		for(int i=0; i<matrix.length;i++) {
+			for(int j=0;j<matrix.length;j++) {		
+					System.out.print(matrix[i][j]+" ");;
+			}	
+			System.out.println();
 		}
 	}
 

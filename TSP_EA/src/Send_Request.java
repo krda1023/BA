@@ -3,7 +3,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
+
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -20,11 +28,11 @@ public class Send_Request {
 		
 	public static  StringBuffer gogo(String gesamt) throws Exception{									//sends URL and gets response in Stringbuffer
 		URL obj = new URL(gesamt);
-		System.out.println(gesamt);//create new URL Object
+	
 	    HttpURLConnection con = (HttpURLConnection) obj.openConnection();						//open a http connection
 	    con.setRequestMethod("GET");															
-	    con.setRequestProperty("User-Agent", "Mozilla/5.0");
-	    // int responseCode = con.getResponseCode();
+	  
+	  
 	    BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));	//Create BufferedReader with an InputstreamReader to read InputStream of URL Connection
 	    String inputLine;
 	    StringBuffer response = new StringBuffer();
@@ -39,8 +47,16 @@ public class Send_Request {
 	public static JSONObject createRouteRequest(Tour fittest) throws Exception{	
 		JSONObject Way;		//Creates String with URL, applies gogo and saves response in an JSONObejct
 		String gesamt= "https://w-bdlab-s1.hs-karlsruhe.de/osrm/route/v1/driving/";						//Fixed URL Start
-		City From=fittest.getCity(1);	//??? Korrekt wenn Tour angepasst bei ankunft: C->C
-		City To=fittest.getCity(2);		//???Korrekt???
+		City From;
+		City To;
+		if(Run.runs==true) {
+		From=fittest.getCity(1);	//??? Korrekt wenn Tour angepasst bei ankunft: C->C
+		To=fittest.getCity(2);
+		}
+		else{
+			From=fittest.getCity(0);
+			To=fittest.getCity(1);
+		}
 		double x1=From.getLongitude();															//Longitude of departing city
 		double y1=From.getLatitude();															//Latitude of departing city
 		double x2=To.getLongitude();															//Longitude of destination city
@@ -55,40 +71,53 @@ public class Send_Request {
 	//Muss noch getestet werden
 	public static ArrayList<City> getNodes(String[]nodes) throws Exception{		//Muss wahrscheinlich String übergeben werden da Zahl zu groß								//Gets geo-coordinates for all received OSM nodes
 		ArrayList<City> Nodes= new ArrayList<City>();																//Contains all nodes that has to be converted
+		
+		
 		for(int i=0;i<nodes.length;i++){												
-			String url="http://www.openstreetmap.org/api/0.6/node/";								//Fixed URL start
-			System.out.println(nodes[i]);
-			url+=nodes[i];																		//add node id
-			StringBuffer response = gogo(url); 													//Open HTTP Connection and send URL
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();				
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document document = builder.parse(response.toString());
-			document.getDocumentElement().normalize();
-			NodeList nList = document.getElementsByTagName("node");
-			Node node= nList.item(0);
-			Element el= (Element) node;
-			String ID =(el.getAttribute("id"));
-			
-			String LONG=(el.getAttribute("lon"));
-			String LAT=(el.getAttribute("lat"));
-			double[]pos=new double[2];
-			pos[0]=Double.parseDouble(LONG);
-			pos[1]=Double.parseDouble(LAT);
-			City newWP= new City(ID,"Node",pos);
-			Nodes.add(newWP);
+			String url="https://w-bdlab-s1.hs-karlsruhe.de/osm/api/0.6/node/";
+			url+=nodes[i];
+			  try
+		        {
+		            // Turn the string into a URL object
+		            URL urlObject = new URL(url);
+		            // Open the stream (which returns an InputStream):
+		            InputStream in = urlObject.openStream();
+
+		            /** Now parse the data (the stream) that we received back ***/
+
+		            // Create an XML reader
+		            @SuppressWarnings("deprecation")
+					XMLReader xr = XMLReaderFactory.createXMLReader();
+
+		            // Tell that XML reader to use our special Google Handler
+		            OSMHandler ourSpecialHandler = new OSMHandler();
+		            xr.setContentHandler(ourSpecialHandler);
+
+		            // We have an InputStream, but let's just wrap it in
+		            // an InputSource (the SAX parser likes it that way)
+		            InputSource inSource = new InputSource(in);
+
+		            // And parse it!
+		            xr.parse(inSource);
+		            Nodes.add(ourSpecialHandler.getNode());
+
+		        }
+		        catch(IOException ioe)
+		        {
+		            ioe.printStackTrace();
+		        }
+		        catch(SAXException se)
+		        {
+		            se.printStackTrace();
+		        }
 		}
 		return Nodes;
 	}
 	
 	public static double[] IntersectionMatrix(City Intersection) throws Exception{								//Gets all distances from upcoming WP Node to all cities
-		int numOfCities;
-		if(All_Cities.getCity(All_Cities.numberOfCities()-2).getType()=="Intersection") {
-			numOfCities=All_Cities.numberOfCities()-2;   //Falls wir an Intersection Matrixanfrage starten
-		}
-		else {
-			numOfCities=All_Cities.numberOfCities()-1; 	//Falls wir an City Matrixanfrage starten
-		}
-		double[] erg=new double[numOfCities];
+		int numOfCities=All_Cities.checkForCities();
+		
+		double[] erg=new double[Distanzmatrix.CreatingnumOfCities];
 		int numberOfCases;
 		if(numOfCities%99==0){
 		 numberOfCases= numOfCities/99;	
@@ -125,10 +154,11 @@ public class Send_Request {
 			     JSONObject jobj= new JSONObject(response.toString());
 			     JSONArray dura_1 = jobj.getJSONArray("durations");
 			     int z=1;//Überspringe 0 wert am anfang;
-			   
+			    
 			     JSONArray dura_2=dura_1.getJSONArray(0);
-			     for (int positionzeile=((asym-1)*99);positionzeile<numOfCities;positionzeile++){
-			    	 int toCityID=Integer.parseInt(All_Cities.getCity(positionzeile).getId());				   	   			    	    	
+			     for (int positionzeile=((asym-1)*99);positionzeile<numOfCities;positionzeile++){//numofCities könnte falsch sein
+			    	 int toCityID=Integer.parseInt(All_Cities.getCity(positionzeile).getId());	
+			    	
 			    	 erg[toCityID] = dura_2.getDouble(z);
 			    	 z++;				    	    	
 			     }			   	    				    	
@@ -210,13 +240,7 @@ public class Send_Request {
 					numberSplittedMatrix+=x*2;
 				}
 			}
-		}
-		
-		System.out.println("numOfCities: "+numOfCities);
-		System.out.println("Anzahl Sym Matrix: "+numberSymmMatrix);
-		System.out.println("Plitt to add: "+SplittedtoAdd);
-		System.out.println("Anzahl Splitt Matrix: "+numberSplittedMatrix);
-		System.out.println("Number of Cases "+numberOfCases);
+		}		
 		
 		//Symmetrische Matrizen
 		int IFzähler=0;
