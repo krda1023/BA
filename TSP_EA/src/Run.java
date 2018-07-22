@@ -15,12 +15,13 @@ public class Run {
 
 //MAIN METHOD:
 	public static void main(String[] args) throws Exception{
+	
 		
 	//Create new EA class object and create new Simulator class Object Salesman
 	//start the preperation process: Matrix request, set Selection, Recombination and Mutation Operators
 	//add MyListener to object "Optimierer" , add RouteServiceListener to object "Salesman"
-		MyLogger log= new MyLogger();
-		log.setLogger();
+//		MyLogger log= new MyLogger();
+//		log.setLogger();
 		EA Optimierer= new EA();	
 		Simulator Salesman= new Simulator();
 		//Optimierer.gui_start();
@@ -32,7 +33,7 @@ public class Run {
 		//Initialize population, do first iteration and save initial duration
 		Optimierer.evolvePopulation(true);
 		best=EA.pop.getFittest();
-		System.out.println("HALLLLLLOOO"+best.getDuration());
+		
 		double d=best.getDuration();
 	/*	for(int a=0;a<EA.pop.populationSize();a++) {
 			log.writeConfig("Tour "+String.valueOf(a)+" : "+EA.pop.getTour(a).toString());
@@ -96,16 +97,16 @@ public class Run {
         	   if(best.getFitness()>lastbest.getFitness()) {
        			   counter=0;	
        			   
-       			log.writeInfo("VERBESSERT!! : Iteration: "+String.valueOf(rundenzähler)+" Best duration: "+String.valueOf(best.getDuration())+"  Lastbest duration: "+String.valueOf(lastbest.getDuration()));
-    			 log.writeFinest("Lastbest: "+lastbest.toString());
-           	log.writeFinest("Best: "+best.toString());
+//       			log.writeInfo("VERBESSERT!! : Iteration: "+String.valueOf(rundenzähler)+" Best duration: "+String.valueOf(best.getDuration())+"  Lastbest duration: "+String.valueOf(lastbest.getDuration()));
+//    			 log.writeFinest("Lastbest: "+lastbest.toString());
+//           	log.writeFinest("Best: "+best.toString());
              		 
          			 
          		   }
          		   else if (best.getFitness()<lastbest.getFitness()) {////////WAS IST MIT DIESEM VERGLEICH
-         			  log.writeWarning("MISTAKE?!?!?: Iteration: "+String.valueOf(rundenzähler)+" Best duration: "+String.valueOf(best.getDuration())+"  Lastbest duration: "+String.valueOf(lastbest.getDuration()));
-                 		log.writeFinest("Lastbest: "+lastbest.toString());
-                 		log.writeFinest("Best: "+best.toString());
+//         			  log.writeWarning("MISTAKE?!?!?: Iteration: "+String.valueOf(rundenzähler)+" Best duration: "+String.valueOf(best.getDuration())+"  Lastbest duration: "+String.valueOf(lastbest.getDuration()));
+//                 		log.writeFinest("Lastbest: "+lastbest.toString());
+//                 		log.writeFinest("Best: "+best.toString());
          		   }
          	   else{
          		  counter++;  
@@ -114,7 +115,7 @@ public class Run {
            		//log.writeFinest("Lastbest: "+lastbest.toString());
            		//log.writeFinest("Best: "+best.toString());
            	  if(best.checkforOrderDiffrence(lastbest)) {
-     			  log.writeWarning("change in Order obwohl gleiche duration");
+//     			  log.writeWarning("change in Order obwohl gleiche duration");
     		   }
          		   
          	   }
@@ -125,11 +126,11 @@ public class Run {
          	  }
            
             while (counter<EA.iterations2); 
-           System.out.println("done after round:" +rundenzähler);
+         
            
      	}
  	for(int a=0;a<EA.pop.populationSize();a++) {
-		log.writeConfig("Tour "+String.valueOf(a)+" : "+EA.pop.getTour(a).toString());
+//		log.writeConfig("Tour "+String.valueOf(a)+" : "+EA.pop.getTour(a).toString());
 	}
  	  Optimierer.start();
          
@@ -138,12 +139,13 @@ public class Run {
       
      	
      	//Let Algorithm and Simulation run while runs==true
-     	do {
+    	do {
             Optimierer.evolvePopulation(false);
             Salesman.checkForEvents();
+           
           
 		}
-        while(runs==true);
+       while(runs==true);
    	
         // Print final results
         

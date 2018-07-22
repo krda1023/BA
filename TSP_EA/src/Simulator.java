@@ -133,6 +133,7 @@ public class Simulator implements RouteServiceListener {
 					durationSumZFEA+=GammaDuration[j];				
 				}
 			}
+		System.out.println("durations sum:ZFEA "+durationSumZFEA);
 		System.out.print("durations:");
 		for (int a=0; a<duration.length;a++) {
 			System.out.print(" "+duration[a]);
@@ -153,7 +154,7 @@ public class Simulator implements RouteServiceListener {
 			
 		}
 		System.out.println();System.out.println();
-		System.out.println("gammaFaktor"+ Maths.getGammaFaktor(hour)+"HOURFAC: "+ Maths.getFaktor(hour)+" Create Events: "+System.currentTimeMillis());	
+		System.out.println("gammaFaktor "+ Maths.getGammaFaktor(hour)+" HOURFACtor : "+ Maths.getFaktor(hour));	
  // Bezug neu !!!!!
 		//Create GPS Event every 5 Seconds
 		//Get coordinates through approximation: Localize the two nodes you're in between through comparison of sum of event time with sum of duration values

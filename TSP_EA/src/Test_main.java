@@ -15,6 +15,183 @@ public class Test_main {
 		return erg;
 	}
 	public static void main(String[]args) throws Exception {
+	
+		
+		/* public double getDuration() {
+		    	totalduration=0;
+		    	EA.IntersectionValue=0;
+		    	EA.allsymmValue=0;
+			
+		    	//Calculation of duration in dynamic environment
+		    	if(Run.runs==true) {
+		    		int hour= EA.lastEventTime.getHour();
+		        	long nexthour=EA.lastEventTime.timeAtNextHour;
+		        	long sumMilli=EA.lastEventTime.startInMilli;
+		        	int h_next;
+		    		int index=1;
+			    	
+			    	totalduration =EA.toDrivetoCity+EA.toDrivetoIntersection;
+			    	
+			    	
+			    	sumMilli+=totalduration*1000;
+			    	
+			    	if(sumMilli>nexthour) { //Annahme nich größer als 60 min;
+			    		hour++;
+			    		nexthour+=3600000;	
+			    	}	
+			    	if(hour==24) {
+						hour=0;
+					}
+			    	if(hour==23) {
+						h_next=0;
+					}
+					else {
+						h_next=hour+1;
+					}
+			    	/*System.out.println(this);
+			    	System.out.print("tDtC: "+EA.toDrivetoCity+" ");
+			    	System.out.print("tdtI: "+EA.toDrivetoIntersection+" ");
+			    //	System.out.print("  ttnh: "+ttnh+ " hour : "+ hour);
+			    	
+			    	// If situation requires a value of the "Intersection" matrix range
+			    	if(EA.OP_Stop==false&&this.getCity(1).getType()=="Intersection") {
+			    		//Get ID for selecting correct value in intersection matrix range
+			    		int a=Integer.parseInt(this.getCity(2).getId());
+			    		//toDriveto Calculation
+						//check for hour overlaps and calculate duration by ratios
+						 if(sumMilli+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]*1000>nexthour) {
+		 						long houroverlaps=(long)(sumMilli+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]*1000-nexthour);						//	System.out.print(" tohour: "+tohour);
+		 						double houroverlapsratio= Maths.round(houroverlaps/(Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]*1000),5);									// Calculate ratio of driven way in this sectio						//System.out.print(" hourratio: "+hourratio);
+		    					totalduration+=(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]+(houroverlapsratio)*Distanzmatrix.allMatrix.get(h_next)[EA.numOfCities][a];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+		    					EA.IntersectionValue=totalduration+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a];	
+		    					sumMilli+=(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]*1000+(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(h_next)[EA.numOfCities][a];
+		    					nexthour+=3600000;
+								hour+=1;
+								if(hour==24) {
+									hour=0;
+								}
+								if(hour==23) {
+									h_next=0;
+								}
+								else {
+									h_next=hour+1;
+								}
+							
+							}
+						 //add hour value to totalduration
+							else {
+								
+								totalduration+=Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a];	
+								EA.IntersectionValue+=Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a];	
+								sumMilli+=Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]*1000;	
+							
+							}
+						
+			    	}
+			    	if(EA.lastCityvisited==false) {
+			    	//Set index for calculation of duration of remaining cities
+			    	if(this.getCity(1).getType()=="Intersection") {
+			    		index=2;
+			    	}
+			    	else if(this.getCity(1).getType()=="City") {
+			    		index=1;
+			    	}
+			    
+			    	
+			    	//Calculation hour depending duration of remaining cities
+			    	// and back to city we've started from
+			    	for (int cityIndex=index; cityIndex < tourSize(); cityIndex++) { 		//city index noch falsch
+					
+			    		City fromCity = getCity(cityIndex);
+						 City destinationCity;	
+						 if(cityIndex+1 < tourSize()){   
+							 destinationCity = getCity(cityIndex+1);
+			            } 
+			            else{    	 
+			                destinationCity = Distanzmatrix.startCity;
+			            }
+							
+						int a = Integer.parseInt(fromCity.getId());
+						int b = Integer.parseInt(destinationCity.getId());
+						
+						int checkrounds = (Distanzmatrix.allMatrix.get(hour)[a][b]*1000)%3600000;
+						// hour-depending calculation of duration
+						if(sumMilli+Distanzmatrix.allMatrix.get(hour)[a][b]*1000>nexthour) {
+							long houroverlaps=(long)(sumMilli+Distanzmatrix.allMatrix.get(hour)[a][b]*1000-nexthour);						//	System.out.print(" tohour: "+tohour);
+							double houroverlapsratio= Maths.round(houroverlaps/(Distanzmatrix.allMatrix.get(hour)[a][b]*1000),5);									// Calculate ratio of driven way in this sectio						//System.out.print(" hourratio: "+hourratio);
+							totalduration+=(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(hour)[a][b]+(houroverlapsratio)*Distanzmatrix.allMatrix.get(h_next)[a][b];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+							sumMilli+=(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(hour)[a][b]*1000+(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(h_next)[a][b];
+							nexthour+=3600000;
+							hour+=1;
+							EA.allsymmValue+=Distanzmatrix.allMatrix.get(hour)[a][b];	
+			
+							if(hour==24) {
+								hour=0;
+							}
+							if(hour==23) {
+								h_next=0;
+							}
+							else {
+								h_next=hour+1;
+							}
+						
+						}
+						else {
+							
+							totalduration+=Distanzmatrix.allMatrix.get(hour)[a][b];	
+							sumMilli+=Distanzmatrix.allMatrix.get(hour)[a][b]*1000;	
+							EA.allsymmValue+=Distanzmatrix.allMatrix.get(hour)[a][b];	
+						}
+						
+			    	}
+			    	}
+			    	totalduration=Maths.round(totalduration, 3);
+			    	return totalduration;
+		    	}
+		    	//HIER FEHLT NOCH ZEITABHÄNGIGKEIT
+		    	//Calculation of duration in static environment, just city objects of type "City"
+		    	else {
+		    		double[][] matrix =Distanzmatrix.matrix;
+		   		 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) { 		
+		   			 City fromCity = getCity(cityIndex);
+		   			 City destinationCity;	  	
+		   			 if(cityIndex+1 < tourSize()){
+		                   
+		   				 destinationCity = getCity(cityIndex+1);
+		   			 }
+		                else{    	 
+		                    destinationCity = Distanzmatrix.startCity;
+		                } 
+		   			 int a = Integer.parseInt(fromCity.getId());
+		   			 int b = Integer.parseInt(destinationCity.getId());
+		   			 totalduration+=matrix[a][b];	
+		   		 }
+		   	totalduration= Maths.round(totalduration,3);
+		   	return totalduration;  	
+		    	}
+		    }
+
+		*/
+		double a=54.2;
+		double hour= 3600;
+		double x= 54.32+3600;		
+				if(x/a<=1) {	//DIESEM MIT DRATIONS VALUE
+					System.out.println("no overlaps");
+				}
+				else {
+					double overlaps=x-a;
+					if(overlaps%hour==0) {		///DIESEN ABGLEICH MIT 3600
+					System.out.println("aRounds:"+( (int)(overlaps/hour)));
+					}
+					else {
+						System.out.println("bRounds"+ (int)((overlaps/hour)+1));
+					}
+				}
+			
+		
+	}}
+		
+/*
 		TimeElement t= new TimeElement(System.currentTimeMillis()-1000);
 		
 		System.out.println(t.getHour());
@@ -188,7 +365,7 @@ public class Test_main {
 		System.out.println();
 		for(int g=0;g<All_Cities.numberOfCities();g++) {
 			System.out.println(All_Cities.getCity(g));
-		}*/
+		}
 	
 		
 		double[][] arr= {{0.0,206.3,325.4,453.5,269.8,245.8,319.7,321.2,284.6,418.2,630.6,828.2,0.0,206.3,325.4,453.5,269.8,245.8,319.7,321.2,284.6,418.2,630.6,828.2,552.6,582.1,758.4,607.2,604.1,433.8,817.3,853.6,732.6,866.2,721.3,703.7,987.9,1027.9,637.0,398.9,497.6,437.0,241.7,418.2,525.4,550.8,704.4,224.3,281.8,236.8,293.0,316.8,132.7,294.1,360.2,392.3,274.0,267.9,350.4,310.9,284.0,284.0,410.5,437.7,372.9,321.4,607.3,658.5,998.2,1030.2,1220.9,871.2,1014.7,918.1,848.2,1633.3,1418.3,1579.2,623.2,374.4,773.4,0.0},

@@ -5,11 +5,13 @@ public class TimeElement{
 //VARIABLES:
 	Calendar start;
 	long startInMilli;
+	long timeAtNextHour;
 	
 //CONSTRUCTOR:
 	public TimeElement(){
 		 this.start=Calendar.getInstance();
 		this.startInMilli= start.getTimeInMillis();
+		getMilliatNextHour();
 	}
 	
 	public TimeElement(long timeinMilli) {
@@ -18,6 +20,7 @@ public class TimeElement{
 		 
 		 this.start=cal;
 		this.startInMilli=start.getTimeInMillis();
+		getMilliatNextHour();
 	}
 	
 //METHODS:
@@ -27,7 +30,7 @@ public class TimeElement{
 		return start.getTime().getHours();
 		
 	}
-	public long getMilliatNextHour() { 	
+	public void getMilliatNextHour() { 	
 		int year=start.getTime().getYear()+1900;
 		int month=start.getTime().getMonth();
 		int day= start.getTime().getDate();
@@ -35,9 +38,11 @@ public class TimeElement{
 		int minute=0;
 		int second=0;
 		Calendar nextHour= Calendar.getInstance();
-		nextHour.set(year,month,day,hour,minute,second);			
-		long timeAtNextHour= nextHour.getTimeInMillis();  
-		return timeAtNextHour;						
+		nextHour.set(year,month,day,hour,minute,second);	
+		
+		timeAtNextHour= nextHour.getTimeInMillis();  
+		
+								
 	}
 	//Get seconds to fill up time of "start" to match the next full hour
 	public double getTimeToNextHour() { 	

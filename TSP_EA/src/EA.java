@@ -27,12 +27,12 @@ public class EA implements myListener {
 	int k;
 	//EA parameters
     static int numOfCities;
-	static int popSize=10;			
-	static int iterations1=3;
+	static int popSize=25;			
+	static int iterations1=1000;
 	static int iterations2=100000;
 	static long timeStop=0;
-	static double mutationRate =0.1;
-	static double crossoverRate = 0.5;
+	static double mutationRate =1;
+	static double crossoverRate = 1;
 	static int mü =5;
 	static double generationGap=0;
     static int tournamentSize = 1;	
@@ -43,7 +43,7 @@ public class EA implements myListener {
 	static int elitismoffset=0;
 	static Population pop;
 	static Population newOffsprings;  
-	
+	static boolean dynamicP=false;
 	//Operators
 	static boolean ox2C=false;
 	static boolean ordC=false;
@@ -73,8 +73,7 @@ public class EA implements myListener {
 	private ArrayList<RouteServiceListener> listenerList= new ArrayList<RouteServiceListener>();
 	
 	
-	static boolean citycountercheck=false;
-	static boolean checking=false;
+	
 	
 //METHODS:
 	//Methods for setting properties
@@ -557,8 +556,8 @@ public class EA implements myListener {
 	    	       //REINSERTION
 	    	       //Haben check for duplicates und orderdiffrence, saveALl ist positionszuweisung falsch. 
 	    	
-  	    		
-	    	       /*
+  	    	/*	
+	    	       
 	    	       newOffsprings.eliminateDuplicates();
 	    	       if(newOffsprings.checkforNull()>=pop.populationSize()) {
 	    	    	   for(int pp=0;pp<pop.populationSize();pp++) {
@@ -623,20 +622,19 @@ public class EA implements myListener {
 	    	    		   
 	    	       }
 	    	       
-	    	       ;*/
-	      
-    	    	
 	    	    		
-	    	       pop=newOffsprings;
+	    	       
 	    	
 	    	    }
 	    	    else {
 	    	    	//System.out.println("OP STOP!!");
+	    	    }*/
+	    	       
 	    	    }
-	    	       best= pop.getFittest();
+	    	    pop=newOffsprings  ;
+	    	    best= pop.getFittest();
 	    	
-	    	    
-	    	    	
+	    	  
 	    	 		
 			}
 	    	 
@@ -1173,6 +1171,7 @@ public class EA implements myListener {
     
     //Start dynamic algorithm and process
     public void start() throws Exception {
+    	dynamicP=true;
     	Route route= new Route();
 		lastEventTime= new TimeElement();
 		System.out.println("START DYNAMIC PROCESS: "+lastEventTime);
@@ -1268,16 +1267,21 @@ public class EA implements myListener {
 		lastbest=new Tour(best);
 		
 		//Start dynamic algorithm and simulation
-		Run.runs=true;
+		
 		/*for(int xx=0; xx<Distanzmatrix.matrix.length;xx++) {
 			for(int yy=0; yy<Distanzmatrix.matrix.length;yy++) {
 				System.out.print(Distanzmatrix.matrix[xx][yy]+ " ");
 			}
 			System.out.println();
 		}*/
+		Run.runs=true;
+		System.out.println("Best at Start: "+best.getDuration()+" "+best);
+		System.out.println("tDtN: "+toDrivetoNode+" tDtI: "+ toDrivetoIntersection+" tDtC: "+toDrivetoCity+" IntersectionValue "+best.IntersectionValue+" SymmValue: "+best.allsymmValue);
+		System.out.println();
 		
-//		System.out.println("Best at start(): "+best.getDuration()+" "+best);
-//		System.out.println("tDtN: "+toDrivetoNode+" tDtI: "+ toDrivetoIntersection+" tDtC: "+toDrivetoCity);
+		for(int i=0;i<pop.populationSize();i++) {
+			System.out.println(pop.getTour(i));
+		}
     }
    
   
@@ -1287,9 +1291,9 @@ public class EA implements myListener {
     //Event-handling and event-related methods
     @Override
 	public void atCity(AtEvent e){
-//    	System.out.println("Arrived at City");
-//    	System.out.println(e);
-//    	System.out.println("Time atCity:" +new TimeElement(e.getEventTime()));
+   	System.out.println("Arrived at City");
+    	System.out.println(e);
+    	System.out.println("Time atCity:" +new TimeElement(e.getEventTime()));
 	    //reset toDriveto values
     	toDrivetoNode=0;
 		toDrivetoIntersection=0;
@@ -1433,9 +1437,9 @@ public class EA implements myListener {
 		//Save actual position and best tour for comparison reasons at the next event
 		lastLocation=e.location;  
 		lastbest=new Tour(best);
-//		System.out.println("Best at City: "+best.getDuration()+" "+best);
-//		System.out.println("tDtN: "+toDrivetoNode+" tDtI: "+ toDrivetoIntersection+" tDtC: "+toDrivetoCity);
-	
+		System.out.println("Best at City: "+best.getDuration()+" "+best);
+		System.out.println("tDtN: "+toDrivetoNode+" tDtI: "+ toDrivetoIntersection+" tDtC: "+toDrivetoCity+" IntersectionValue "+best.IntersectionValue+" SymmValue: "+best.allsymmValue);
+		System.out.println();
     }
     //Event-handling method for arriving at a "City"
     //Distinguish change or no change in solution since last intersection/city
@@ -1444,9 +1448,9 @@ public class EA implements myListener {
     //If there is no change : /adapt tours and All_Cities,do matrix request, do toDriveto calculation
 	@Override
 	public void atIntersection(AtEvent e) { 
-//		System.out.println("Arrived at Intersection");
-//		System.out.println(e);
-//    	System.out.println("Time at Intersection:" +new TimeElement(e.getEventTime()));
+	System.out.println("Arrived at Intersection");
+	System.out.println(e);
+   	System.out.println("Time at Intersection:" +new TimeElement(e.getEventTime()));
 		EventCounter++;
 		toDrivetoIntersection=0;
 		toDrivetoCity=0;
@@ -1458,6 +1462,7 @@ public class EA implements myListener {
 		
 		//if there is a change in solution since the last event location
 		if(All_Cities.checkForCities()>1 && !(lastbest.getCity(2).getId().equals(best.getCity(2).getId()))) {  //EQUAL
+			System.out.println("ROUTENWECHSEL");
 			Route route= new Route();
 			try {
 				route.WayFromTo(best);
@@ -1670,9 +1675,9 @@ public class EA implements myListener {
 		
 		lastbest=new Tour (best);//AUFPASSEN
 		lastLocation=e.location;
-//		System.out.println("Best at Intersection: "+best.getDuration()+" "+best);
-//		System.out.println("tDtN: "+toDrivetoNode+" tDtI: "+ toDrivetoIntersection+" tDtC: "+toDrivetoCity);
-		
+		System.out.println("Best at Intersection: "+best.getDuration()+" "+best);
+		System.out.println("tDtN: "+toDrivetoNode+" tDtI: "+ toDrivetoIntersection+" tDtC: "+toDrivetoCity+" IntersectionValue "+best.IntersectionValue+" SymmValue: "+best.allsymmValue);
+		System.out.println();
 	}
 	//Event-handling method for GPS events
 	//Localizes position and allocates the 2 nodes we are in between
@@ -1680,9 +1685,9 @@ public class EA implements myListener {
 	//calculates duration to next node and then to next intersection/city
 	@Override
 	public void GPS_Signal(AtEvent e)  {
-//		System.out.println("Arrived at GPS");
-//		System.out.println(e);
-////		System.out.println("Time at GPS:" +new TimeElement(e.getEventTime()));
+	System.out.println("Arrived at GPS");
+	System.out.println(e);
+		System.out.println("Time at GPS:" +new TimeElement(e.getEventTime()));
 		int GPSinNode=0;
 		EventCounter++;
 		toDrivetoIntersection=0;
@@ -1738,7 +1743,7 @@ public class EA implements myListener {
 		double lonratio=(Nodes.get(GPSinNode+1).getLongitude()-e.getLongitude())/(Nodes.get(GPSinNode+1).getLongitude()-Nodes.get(GPSinNode).getLongitude());
 		double ratio= (latratio+lonratio)/2;
 		toDriveto("Node",GPSinNode,0,ratio);	
-//		System.out.println("Ratio of GPS within Nodes: "+ratio);
+		System.out.println();
 		//toDriveto calculation
 		//case 1
 		GPSinNode++;
@@ -1764,10 +1769,11 @@ public class EA implements myListener {
 			toDrivetoCity+=toDrivetoNode;
 			toDriveto("City",GPSinNode+1,durations.length,1);					
 		}
-//		System.out.println();
+		System.out.println();
 		lastLocation=e.location;
-//		System.out.println("Best at GPS: "+best.getDuration()+" "+best);
-//		System.out.println("tDtN: "+toDrivetoNode+" tDtI: "+ toDrivetoIntersection+" tDtC: "+toDrivetoCity);
+		System.out.println("Best at GPS: "+best.getDuration()+" "+best);
+		System.out.println("tDtN: "+toDrivetoNode+" tDtI: "+ toDrivetoIntersection+" tDtC: "+toDrivetoCity+" IntersectionValue "+best.IntersectionValue+" SymmValue: "+best.allsymmValue);
+		System.out.println();
 	}
     
 	//Method to calculate the duration from the acutal position to the next destination
@@ -1780,11 +1786,9 @@ public class EA implements myListener {
     		int hour= lastEventTime.getHour();
     	;
     		long sumDurTF=lastEventTime.startInMilli+(long)toDrivetoNode*1000;
-	    	long nexthour=lastEventTime.getMilliatNextHour();
+	    	long nexthour=lastEventTime.timeAtNextHour;
 	    	int h_next;
-//	    	System.out.println("City: sumDurTF: "+sumDurTF);
-//	    	System.out.println(("City: nexthour: "+nexthour));
-//	    	System.out.println();
+
     		if(sumDurTF>nexthour) {
     			hour++;
     			nexthour+=3600000;	
@@ -1802,12 +1806,11 @@ public class EA implements myListener {
 	    	for(int a=start; a<end;a++) {
 	    		if(sumDurTF+durations[a]*1000*Maths.getFaktor(hour)>nexthour) {
 					long houroverlaps=(long)(sumDurTF+durations[a]*Maths.getFaktor(hour)*1000-nexthour);		;									//calculate the time from sum to next hour
-					double houroverlapsratio= Maths.round(houroverlaps/durations[a]*Maths.getFaktor(hour)*1000,5);									// Calculate ratio of driven way in this section
+					double houroverlapsratio= Maths.round(houroverlaps/(durations[a]*Maths.getFaktor(hour)*1000),5);									// Calculate ratio of driven way in this section
 					toDrivetoCity+=(1-houroverlapsratio)*durations[a]*Maths.getFaktor(hour)+(houroverlapsratio)*durations[a]*Maths.getFaktor(h_next);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
 					sumDurTF+=(1-houroverlapsratio)*durations[a]*1000*Maths.getFaktor(hour)+(houroverlapsratio)*durations[a]*1000*Maths.getFaktor(h_next);
 					nexthour+=3600000;	
-					System.out.println(" OL!!!-ToDrivetoCity: "+toDrivetoCity);
-					System.out.println("City: sumDurTF: "+sumDurTF);
+				
 					hour+=1;
 					if(hour==24) {
 						hour=0;
@@ -1824,8 +1827,7 @@ public class EA implements myListener {
 	    			
 	    			toDrivetoCity+=durations[a]*Maths.getFaktor(hour);
 	    			sumDurTF+=durations[a]*Maths.getFaktor(hour)*1000;
-	    			System.out.println("No OL-ToDrivetoCity: "+toDrivetoCity);
-	    			System.out.println("City: sumDurTF: "+sumDurTF);
+	    			
 	    		}
 	    		
     		//System.out.println("tDtC: "+toDrivetoCity);
@@ -1836,10 +1838,9 @@ public class EA implements myListener {
 //    		System.out.println();
 	    	int hour= lastEventTime.getHour();
 	    	long sumDurTF=lastEventTime.startInMilli+(long)toDrivetoNode*1000;
-	    	long nexthour=lastEventTime.getMilliatNextHour();
+	    	long nexthour=lastEventTime.timeAtNextHour;
 //	    	System.out.println("Intersection: sumDurTF: "+sumDurTF);
-//	    	System.out.println("Intersection: nexthour: "+nexthour);
-	    	System.out.println();
+	    
 	    	int h_next;
     		if(sumDurTF>nexthour) {
     			hour++;
@@ -1859,11 +1860,10 @@ public class EA implements myListener {
 
     	    		if(sumDurTF+durations[b]*1000*Maths.getFaktor(hour)>nexthour) {
     					long houroverlaps=(long)(sumDurTF+durations[b]*Maths.getFaktor(hour)*1000-nexthour);											//calculate the time from sum to next hour
-    					double houroverlapsratio= Maths.round(houroverlaps/durations[b]*Maths.getFaktor(hour)*1000,5);									// Calculate ratio of driven way in this section
+    					double houroverlapsratio= Maths.round(houroverlaps/(durations[b]*Maths.getFaktor(hour)*1000),5);									// Calculate ratio of driven way in this section
     					toDrivetoIntersection+=(1-houroverlapsratio)*durations[b]*Maths.getFaktor(hour)+(houroverlapsratio)*durations[b]*Maths.getFaktor(h_next);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
     					sumDurTF+=(1-houroverlapsratio)*durations[b]*1000*Maths.getFaktor(hour)+(houroverlapsratio)*durations[b]*1000*Maths.getFaktor(h_next);
-    					System.out.println("OL !!!-ToDrivetoIntersection: "+toDrivetoIntersection);
-    					System.out.println("Intersection: sumDurTF: "+sumDurTF);
+    					
     					nexthour+=3600000;	
     					hour+=1;
     					
@@ -1882,23 +1882,20 @@ public class EA implements myListener {
     	    			
     	    			toDrivetoIntersection+=durations[b]*Maths.getFaktor(hour);
     	    			sumDurTF+=durations[b]*Maths.getFaktor(hour)*1000;
-//    	    			System.out.println("No OL-ToDrivetoIntersection: "+toDrivetoIntersection);
-//    	    			System.out.println("Intersection: sumDurTF: "+sumDurTF);
+//    	    			;
     	    			
     	    		}
 	    	
-	    	//System.out.println("tDtI: "+toDrivetoIntersection);
+	    	
     			}
 	    	toDrivetoIntersection=Maths.round(toDrivetoIntersection, 3);
     	}
      	else if(Location=="Node") {
      		int hour= lastEventTime.getHour();
-//     		System.out.println();
-	    	long nexthour=lastEventTime.getMilliatNextHour();
+//     		
+	    	long nexthour=lastEventTime.timeAtNextHour;
 	    	long sumDurTF=lastEventTime.startInMilli;
-//	    	System.out.println("GPS:sumDurTF: "+sumDurTF);
-//	    	System.out.println("GPS:nexthour: "+nexthour);
-//	    	System.out.println();
+//	    	
 	    	
 	    	int h_next;
 			if(hour==23) {
@@ -1908,23 +1905,22 @@ public class EA implements myListener {
 				h_next=hour+1;
 				
 			}	    	
-//			System.out.println("hour: "+hour);
-    		//System.out.println("h_next: "+h_next);
+//			
 			if(sumDurTF+durations[start]*ratio*1000*Maths.getFaktor(hour)>nexthour) {
 				long houroverlaps=(long)(sumDurTF+durations[start]*ratio*Maths.getFaktor(hour)*1000-nexthour);		;									//calculate the time from sum to next hour
-				double houroverlapsratio= Maths.round(houroverlaps/durations[start]*ratio*Maths.getFaktor(hour)*1000,5);									// Calculate ratio of driven way in this section
+				double houroverlapsratio= Maths.round(houroverlaps/(durations[start]*ratio*Maths.getFaktor(hour)*1000),5);									// Calculate ratio of driven way in this section
 				toDrivetoNode+=(1-houroverlapsratio)*durations[start]*ratio*Maths.getFaktor(hour)+(houroverlapsratio)*durations[start]*Maths.getFaktor(h_next);		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
-			//	System.out.println(" OL!!!-ToDrivetoNode: "+toDrivetoNode);
+			
 				
     			
 			}	
     		else {
     			toDrivetoNode+=durations[start]*ratio*Maths.getFaktor(hour);
-    			//System.out.println("No OL-ToDrivetoNode: "+toDrivetoNode);
+    			
     			
     		}
 			toDrivetoNode=Maths.round(toDrivetoNode, 3);
-	    	//System.out.println("tdtn: "+toDrivetoNode);
+	    	
      	}
     	
     }
