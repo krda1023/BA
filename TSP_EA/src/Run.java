@@ -79,7 +79,7 @@ public class Run {
      	
      		}
      	}
-     
+    
      else {
      	int counter =0;
         int rundenzähler=0;
@@ -95,6 +95,7 @@ public class Run {
           	 
         	   if(best.getFitness()>lastbest.getFitness()) {
        			   counter=0;	
+       			   System.out.println(best.getDuration()+" "+best);
        			   
 //       			log.writeInfo("VERBESSERT!! : Iteration: "+String.valueOf(rundenzähler)+" Best duration: "+String.valueOf(best.getDuration())+"  Lastbest duration: "+String.valueOf(lastbest.getDuration()));
 //    			 log.writeFinest("Lastbest: "+lastbest.toString());
@@ -109,7 +110,10 @@ public class Run {
          		   }
          	   else{
          		  counter++;  
-         		 
+         		  if(counter%1000==0) {
+         			System.out.println(counter);  
+         		  }
+         	   }
          	//	 log.writeInfo("GLEICH: Iteration: "+String.valueOf(rundenzähler)+" Best duration: "+String.valueOf(best.getDuration())+"  Lastbest duration: "+String.valueOf(lastbest.getDuration()));
            		//log.writeFinest("Lastbest: "+lastbest.toString());
            		//log.writeFinest("Best: "+best.toString());
@@ -122,11 +126,11 @@ public class Run {
             }
          	  
          	
-         	  }
+         	  
            
             while (counter<EA.iterations2); 
          
-           
+             
      	}
  	for(int a=0;a<EA.pop.populationSize();a++) {
 //		log.writeConfig("Tour "+String.valueOf(a)+" : "+EA.pop.getTour(a).toString());
@@ -158,8 +162,10 @@ public class Run {
     
         System.out.println("Solution:");
         System.out.println(EA.pop.getFittest()); 
+        System.out.println(EA.pop.getFittest().getDuration());
         TimeElement ende = new TimeElement();
-//        System.out.print(ende);
+        System.out.print(ende);
     }    
 }
+
 		

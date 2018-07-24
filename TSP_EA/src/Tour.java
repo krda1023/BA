@@ -256,24 +256,57 @@ public class Tour {
     	}
     	//HIER FEHLT NOCH ZEITABHÄNGIGKEIT
     	//Calculation of duration in static environment, just city objects of type "City"
+    	
     	else {
-    		double[][] matrix =Distanzmatrix.matrix;
-   		 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) { 		
-   			 City fromCity = getCity(cityIndex);
-   			 City destinationCity;	  	
-   			 if(cityIndex+1 < tourSize()){
+    		TimeElement now = new TimeElement();
+    		int hour= now.getHour();
+        	long nexthour=now.timeAtNextHour;
+        	long sumMilli=now.startInMilli;
+        	int h_next;
+    		if(hour==23) {
+				h_next=0;
+			}
+			else {
+				h_next=hour+1;
+			}
+   		 	for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) { 		
+   		 		City fromCity = getCity(cityIndex);
+   		 		City destinationCity;	  	
+   		 		if(cityIndex+1 < tourSize()){
                    
-   				 destinationCity = getCity(cityIndex+1);
-   			 }
+   		 			destinationCity = getCity(cityIndex+1);
+   		 		}
                 else{    	 
                     destinationCity = Distanzmatrix.startCity;
                 } 
-   			 int a = Integer.parseInt(fromCity.getId());
-   			 int b = Integer.parseInt(destinationCity.getId());
-   			 totalduration+=matrix[a][b];	
-   		 }
-   	totalduration= Maths.round(totalduration,3);
-   	return totalduration;  	
+   		 		int a = Integer.parseInt(fromCity.getId());
+   		 		int b = Integer.parseInt(destinationCity.getId());
+   		 		if(sumMilli+Distanzmatrix.allMatrix.get(hour)[a][b]*1000>nexthour) {
+					long houroverlaps=(long)(sumMilli+Distanzmatrix.allMatrix.get(hour)[a][b]*1000-nexthour);						//	System.out.print(" tohour: "+tohour);
+					double houroverlapsratio= Maths.round(houroverlaps/(Distanzmatrix.allMatrix.get(hour)[a][b]*1000),5);									// Calculate ratio of driven way in this sectio						//System.out.print(" hourratio: "+hourratio);
+					allsymmValue+=(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(hour)[a][b]+(houroverlapsratio)*Distanzmatrix.allMatrix.get(h_next)[a][b];
+					totalduration+=(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(hour)[a][b]+(houroverlapsratio)*Distanzmatrix.allMatrix.get(h_next)[a][b];	//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
+					sumMilli+=(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(hour)[a][b]*1000+(houroverlapsratio)*Distanzmatrix.allMatrix.get(h_next)[a][b];
+					nexthour+=3600000;
+					hour+=1;
+					if(hour==24) {
+						hour=0;
+					}
+					if(hour==23) {
+						h_next=0;
+					}
+					else {
+						h_next=hour+1;
+					}
+   		 		}
+   		 		else {
+					allsymmValue+=Distanzmatrix.allMatrix.get(hour)[a][b];
+					totalduration+=Distanzmatrix.allMatrix.get(hour)[a][b];	
+					sumMilli+=Distanzmatrix.allMatrix.get(hour)[a][b]*1000;	
+   		 		}
+   		 	}
+   		 	totalduration= Maths.round(totalduration,3);
+   		 	return totalduration;  	
     	}
     }
 

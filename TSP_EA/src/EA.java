@@ -31,8 +31,8 @@ public class EA implements myListener {
 	//EA parameters
     static int numOfCities;
 	static int popSize=10;			
-	static int iterations1=10;
-	static int iterations2=100000;
+	static int iterations1=1000;
+	static int iterations2=0;
 	static long timeStop=0;
 	static double mutationRate =1;
 	static double crossoverRate = 1;
@@ -55,12 +55,12 @@ public class EA implements myListener {
 	static boolean cycC=true;
 			
 	static boolean disM=false;
-	static boolean insM=false;
-	static boolean invM=true;
+	static boolean insM=true;
+	static boolean invM=false;
 	static boolean excM=false;
 	static boolean mexM=false;
-	static boolean RWS=true;
-	static boolean TMS=false;
+	static boolean RWS=false;
+	static boolean TMS=true;
 	static boolean elitism=true;
 	//API request data
 	ArrayList<City> Nodes;
