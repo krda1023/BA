@@ -43,6 +43,17 @@ public class All_Cities {
 		}
 		return checkcounter;
 	}
+    public static int PositionofCity(City city){
+        int pos=-1;
+      	for( int c=0;c<numberOfCities();c++) {
+      			if(city.getId()==getCity(c).getId()) {
+      				pos=c;
+      				break;
+      			
+      		}
+          }
+      	return pos;
+      }
 	//Check how many City objects of Type="Intersection" destinationCities contains
 	public static int checkForIntersection() {
 		int checkcounter=0;

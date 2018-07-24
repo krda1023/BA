@@ -8,7 +8,7 @@ public class Simulator implements RouteServiceListener {
 	
 //VARIABLES:
 	//List for upcoming Events
-	private ArrayList<AtEvent> upcomingEvents = new ArrayList<AtEvent>();
+	public static ArrayList<AtEvent> upcomingEvents = new ArrayList<AtEvent>();
 	//List for past Events
 	private ArrayList<AtEvent> pastEvents = new ArrayList<AtEvent>();
 	//Simulation parameters and data
@@ -132,30 +132,9 @@ public class Simulator implements RouteServiceListener {
 					GammaDuration[j]=Maths.round(GammaDuration[j], 3);
 					durationSumZFEA+=GammaDuration[j];				
 				}
+				
 			}
-		System.out.println("durations sum:ZFEA "+durationSumZFEA);
-		System.out.print("durations:");
-		for (int a=0; a<duration.length;a++) {
-			System.out.print(" "+duration[a]);
-			
-		}
-		System.out.println();
-		System.out.println();
-		System.out.print("Gammadurations:");
-		for (int a=0; a<GammaDuration.length;a++) {
-			System.out.print(" "+GammaDuration[a]);
-			
-		}
-		System.out.println();
-		System.out.println();
-		System.out.print("Nodes:");
-		for (int a=0; a<Nodes.size();a++) {
-			System.out.print(" "+Nodes.get(a));
-			
-		}
-		System.out.println();System.out.println();
-		System.out.println("gammaFaktor "+ Maths.getGammaFaktor(hour)+" HOURFACtor : "+ Maths.getFaktor(hour));	
- // Bezug neu !!!!!
+		
 		//Create GPS Event every 5 Seconds
 		//Get coordinates through approximation: Localize the two nodes you're in between through comparison of sum of event time with sum of duration values
 	
@@ -208,7 +187,7 @@ public class Simulator implements RouteServiceListener {
 				else if(All_Cities.checkForCities()==2) {
 					ev.status="Letzte Stadt erreicht";
 				}
-			//	System.out.println(ev);
+			
 				upcomingEvents.add(ev);
 				break;
 			}
@@ -223,7 +202,6 @@ public class Simulator implements RouteServiceListener {
 							//add status if we reached last Intersection of route to penultimate city
 							
 							if(All_Cities.checkForCities()==3 &&Intersection.get(inters+1).getType()=="City") {
-								System.out.println("eached");
 								ev.status="Operatoren-Stop";
 							}
 						

@@ -20,8 +20,7 @@ public class Run {
 	//Create new EA class object and create new Simulator class Object Salesman
 	//start the preperation process: Matrix request, set Selection, Recombination and Mutation Operators
 	//add MyListener to object "Optimierer" , add RouteServiceListener to object "Salesman"
-//		MyLogger log= new MyLogger();
-//		log.setLogger();
+	
 		EA Optimierer= new EA();	
 		Simulator Salesman= new Simulator();
 		//Optimierer.gui_start();
@@ -77,10 +76,10 @@ public class Run {
           		//log.writeFinest("Lastbest: "+lastbest.toString());
           		//log.writeFinest("Best: "+best.toString());
           		}*/
-     		
+     	
      		}
      	}
-     	
+     
      else {
      	int counter =0;
         int rundenzähler=0;

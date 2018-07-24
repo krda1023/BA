@@ -58,7 +58,7 @@ public class City {
 		
 	public String toString() {
 		  String str;
-		  str="ID:"+this.id+" "+this.getLongitude()+" "+this.getLatitude();
+		  str="ID:"+this.id+" ( "+this.getLongitude()+" "+this.getLatitude()+" )";
 		  return str;
 	  }
 
