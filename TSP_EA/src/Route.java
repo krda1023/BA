@@ -46,16 +46,11 @@ public class Route {
 			else{
 			Nodes[a]=String.valueOf(nodes.getLong(a));
 			Duration[a]=duration.getDouble(a);
+			System.out.println(duration.getDouble(a));
 			}
 		}
-		System.out.println();
-		System.out.print("durations without adaption:");
-		for (int a=0; a<Duration.length;a++) {
-			System.out.print(" "+Duration[a]);
-			
-		}
-		System.out.println();
-		System.out.println();
+
+		
 		//ID durch 1000 /10000 oder so teilen, bereiche definieren
 		//Switch case , case nummer referenziert auf richtige xml Datei;
 		//Durchiterieren bis ID gefunden, done.

@@ -47,8 +47,7 @@ public class Tour {
         int startcitypos= tour.indexOf(All_Cities.getCity(0));
         tour.set(startcitypos, tour.get(0));
         tour.set(0, All_Cities.getCity(0));
-        System.out.println(this);
-        
+       
     }
    
     //Get size of the tour
@@ -120,7 +119,7 @@ public class Tour {
     // Gets the tours fitness
     public double getFitness() {
         if (fitness == 0) {
-        	fitness = 1/(double)getDuration();
+        	fitness = 10000/(double)getDuration();
         
         }
         return fitness;

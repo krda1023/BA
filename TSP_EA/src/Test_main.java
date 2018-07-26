@@ -5,6 +5,9 @@ import java.util.Date;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.io.IOException;
+
 import javax.swing.*;
 import javax.swing.JFrame;
 import javax.swing.plaf.synth.SynthStyle;
@@ -15,7 +18,39 @@ public class Test_main {
 		return erg;
 	}
 	public static void main(String[]args) throws Exception {
-	
+		 {
+			    String file = "log.csv";
+			        try
+			        {
+			        FileWriter fw = new FileWriter(file);
+			        PrintWriter pw = new PrintWriter(fw, true);        
+			 
+			        pw.append("24/03/2011");
+			        pw.append(",");
+			        pw.append("Error: 451");
+			        pw.append(",");
+			        pw.println("User: Alex");
+			 
+			        pw.append("27/03/2011");
+			        pw.append(",");
+			        pw.append("Error: 404");
+			        pw.append(",");
+			        pw.println("User: John");
+			 
+			        pw.append("01/04/2011");
+			        pw.append(",");
+			        pw.append("Error: 501");
+			        pw.append(",");
+			        pw.println("User: Sophia");
+			        pw.close();
+			        }
+			        catch (IOException ioe)
+			        {
+			        System.out.println(ioe);        
+			        }
+			    }
+	}
+}
 		
 		/* public double getDuration() {
 		    	totalduration=0;
@@ -49,9 +84,9 @@ public class Test_main {
 						h_next=hour+1;
 					}
 			    	/*System.out.println(this);
-			    	System.out.print("tDtC: "+EA.toDrivetoCity+" ");
-			    	System.out.print("tdtI: "+EA.toDrivetoIntersection+" ");
-			    //	System.out.print("  ttnh: "+ttnh+ " hour : "+ hour);
+			    	System.out.append("tDtC: "+EA.toDrivetoCity+" ");
+			    	System.out.append("tdtI: "+EA.toDrivetoIntersection+" ");
+			    //	System.out.append("  ttnh: "+ttnh+ " hour : "+ hour);
 			    	
 			    	// If situation requires a value of the "Intersection" matrix range
 			    	if(EA.OP_Stop==false&&this.getCity(1).getType()=="Intersection") {
@@ -60,8 +95,8 @@ public class Test_main {
 			    		//toDriveto Calculation
 						//check for hour overlaps and calculate duration by ratios
 						 if(sumMilli+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]*1000>nexthour) {
-		 						long houroverlaps=(long)(sumMilli+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]*1000-nexthour);						//	System.out.print(" tohour: "+tohour);
-		 						double houroverlapsratio= Maths.round(houroverlaps/(Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]*1000),5);									// Calculate ratio of driven way in this sectio						//System.out.print(" hourratio: "+hourratio);
+		 						long houroverlaps=(long)(sumMilli+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]*1000-nexthour);						//	System.out.append(" tohour: "+tohour);
+		 						double houroverlapsratio= Maths.round(houroverlaps/(Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]*1000),5);									// Calculate ratio of driven way in this sectio						//System.out.append(" hourratio: "+hourratio);
 		    					totalduration+=(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]+(houroverlapsratio)*Distanzmatrix.allMatrix.get(h_next)[EA.numOfCities][a];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
 		    					EA.IntersectionValue=totalduration+Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a];	
 		    					sumMilli+=(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(hour)[EA.numOfCities][a]*1000+(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(h_next)[EA.numOfCities][a];
@@ -117,8 +152,8 @@ public class Test_main {
 						int checkrounds = (Distanzmatrix.allMatrix.get(hour)[a][b]*1000)%3600000;
 						// hour-depending calculation of duration
 						if(sumMilli+Distanzmatrix.allMatrix.get(hour)[a][b]*1000>nexthour) {
-							long houroverlaps=(long)(sumMilli+Distanzmatrix.allMatrix.get(hour)[a][b]*1000-nexthour);						//	System.out.print(" tohour: "+tohour);
-							double houroverlapsratio= Maths.round(houroverlaps/(Distanzmatrix.allMatrix.get(hour)[a][b]*1000),5);									// Calculate ratio of driven way in this sectio						//System.out.print(" hourratio: "+hourratio);
+							long houroverlaps=(long)(sumMilli+Distanzmatrix.allMatrix.get(hour)[a][b]*1000-nexthour);						//	System.out.append(" tohour: "+tohour);
+							double houroverlapsratio= Maths.round(houroverlaps/(Distanzmatrix.allMatrix.get(hour)[a][b]*1000),5);									// Calculate ratio of driven way in this sectio						//System.out.append(" hourratio: "+hourratio);
 							totalduration+=(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(hour)[a][b]+(houroverlapsratio)*Distanzmatrix.allMatrix.get(h_next)[a][b];		//multiply ratio with value*factor of past hour and the reverse ratio with the value*factor of upcoming hour
 							sumMilli+=(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(hour)[a][b]*1000+(1-houroverlapsratio)*Distanzmatrix.allMatrix.get(h_next)[a][b];
 							nexthour+=3600000;
@@ -172,24 +207,7 @@ public class Test_main {
 		    }
 
 		*/
-		double a=54.2;
-		double hour= 3600;
-		double x= 54.32+3600;		
-				if(x/a<=1) {	//DIESEM MIT DRATIONS VALUE
-					System.out.println("no overlaps");
-				}
-				else {
-					double overlaps=x-a;
-					if(overlaps%hour==0) {		///DIESEN ABGLEICH MIT 3600
-					System.out.println("aRounds:"+( (int)(overlaps/hour)));
-					}
-					else {
-						System.out.println("bRounds"+ (int)((overlaps/hour)+1));
-					}
-				}
-			
-		
-	}}
+
 		
 /*
 		TimeElement t= new TimeElement(System.currentTimeMillis()-1000);
@@ -360,7 +378,7 @@ public class Test_main {
 		System.out.println("todrivetointersection: "+toDrivetoIntersection);
 
 		for(int f=0;f<durations.length;f++) {
-			System.out.print(durations[f]+" ");
+			System.out.append(durations[f]+" ");
 		}
 		System.out.println();
 		for(int g=0;g<All_Cities.numberOfCities();g++) {
@@ -573,15 +591,15 @@ public class Test_main {
 			}
 		}
 		for(int as=0;as<Intersections.size();as++) {
-			System.out.print("I"+as+": "+Intersections.get(as).getId()+ " "+Intersections.get(as).getType()+Intersections.get(as).getLongitude()+ " "+Intersections.get(as).getLatitude()+"     ");
+			System.out.append("I"+as+": "+Intersections.get(as).getId()+ " "+Intersections.get(as).getType()+Intersections.get(as).getLongitude()+ " "+Intersections.get(as).getLatitude()+"     ");
 		}
 		System.out.println();
 		for(int as=0;as<Nodes.size();as++) {
-			System.out.print("N"+as+": "+Nodes.get(as).getId()+ " "+Nodes.get(as).getType()+Nodes.get(as).getLongitude()+ " "+Nodes.get(as).getLatitude()+"     ");
+			System.out.append("N"+as+": "+Nodes.get(as).getId()+ " "+Nodes.get(as).getType()+Nodes.get(as).getLongitude()+ " "+Nodes.get(as).getLatitude()+"     ");
 		}
 		System.out.println();
 		for(int as=0;as<durations.length;as++) {
-			System.out.print("dur"+as+": "+durations[as]+ " ");
+			System.out.append("dur"+as+": "+durations[as]+ " ");
 		}
 		System.out.println("to drive to Intersection "+toDrivetoIntersection);
     }
@@ -662,9 +680,9 @@ public class Test_main {
 			}	
 		
 		for(int f=0;f<duration.length;f++) {
-			System.out.print(duration[f]+"    ");
-			System.out.print(gammaDuration[f]+"    ");
-			System.out.print(ZF_EA_duration[f]+"    ");
+			System.out.append(duration[f]+"    ");
+			System.out.append(gammaDuration[f]+"    ");
+			System.out.append(ZF_EA_duration[f]+"    ");
 			System.out.println();
 			
 			

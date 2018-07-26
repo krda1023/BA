@@ -58,9 +58,10 @@ public class TimeElement{
 		return timeToNextHour;						
 	}
 	
+	@SuppressWarnings("deprecation")
 	public String toString() {
 		 String s="";
-		 s=start.getTime()+"";
+		 s=String.valueOf(start.getTime().getDate())+"_"+String.valueOf(start.getTime().getMonth())+"_"+String.valueOf(start.getTime().getYear()+1900)+"___"+String.valueOf(start.getTime().getHours())+"_"+String.valueOf(start.getTime().getMinutes()+"_"+String.valueOf(start.getTime().getSeconds()));
 		 return s;
 	 }
 	

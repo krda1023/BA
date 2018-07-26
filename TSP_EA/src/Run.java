@@ -1,6 +1,10 @@
+import com.opencsv.CSVWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.io.*;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
+
 
 // Main class with main method and main loop
 //Initializes EA object "Optimierer" and Simulator object "Salesman" and starts the dynamic algorithm process and simulation
@@ -15,12 +19,17 @@ public class Run {
 
 //MAIN METHOD:
 	public static void main(String[] args) throws Exception{
-	
-		
+	TimeElement el= new TimeElement();
+	String nameCSV="./"+el.toString()+".csv";
+	ArrayList<String[]> CSVdata= new ArrayList<String[]>();
+	String[] header= new String[] {"Iteration","totalduration","Fitness","Time","best Tour"};
+	CSVdata.add(header);
 	//Create new EA class object and create new Simulator class Object Salesman
 	//start the preperation process: Matrix request, set Selection, Recombination and Mutation Operators
 	//add MyListener to object "Optimierer" , add RouteServiceListener to object "Salesman"
-	
+		 PrintWriter pw = new PrintWriter(new File(nameCSV));
+		 pw.close();
+		
 		EA Optimierer= new EA();	
 		Simulator Salesman= new Simulator();
 		//Optimierer.gui_start();
@@ -46,17 +55,20 @@ public class Run {
 	
      
 //		log.writeInfo("time factor with gamma function: "+Maths.GammaFaktoren[0]+" "+Maths.GammaFaktoren[1]+" "+Maths.GammaFaktoren[2]+" "+)......;
-     	
+		 long now1 = System.currentTimeMillis();
      if(EA.timeStop!=0) {
     	 TimeElement now= new TimeElement();
     	 long stop = now.startInMilli+EA.timeStop;
     	 do {
     		 
     		  Optimierer.evolvePopulation(false);
+    		
         	   best=EA.pop.getFittest();
+        	   
     	 }
     	 while(System.currentTimeMillis()<=stop);
      }
+    
      else if(EA.iterations1!=0) {
      		for (int z = 0; z < EA.iterations1; z++) {
           		if(z>1) {
@@ -67,6 +79,12 @@ public class Run {
     	    	}
           		*/
      			Optimierer.evolvePopulation(false);
+     			best=EA.best;
+     			long last=now1;
+     			 now1 = System.currentTimeMillis();
+     			
+     			String[] dataset= new String[] {String.valueOf(z),String.valueOf(Maths.round(best.getDuration(),0)),String.valueOf(best.getFitness()),String.valueOf(now1-last),best.toString()};
+     			CSVdata.add(dataset);
      		/*	for(int a=0; a<EA.pop.populationSize();a++) {
     	    	//	log.writeInfo("Nummer: "+String.valueOf(a)+ " "+EA.pop.getTour(a).toString());
     	    	}*/
@@ -132,9 +150,7 @@ public class Run {
          
              
      	}
- 	for(int a=0;a<EA.pop.populationSize();a++) {
-//		log.writeConfig("Tour "+String.valueOf(a)+" : "+EA.pop.getTour(a).toString());
-	}
+/*
  	  Optimierer.start();
          
        
@@ -149,7 +165,7 @@ public class Run {
           
 		}
        while(runs==true);
-   	
+   	*/
         // Print final results
         
  	
@@ -165,7 +181,28 @@ public class Run {
         System.out.println(EA.pop.getFittest().getDuration());
         TimeElement ende = new TimeElement();
         System.out.print(ende);
+        try (
+        		Writer writer = Files.newBufferedWriter(Paths.get(nameCSV));
+        	     CSVWriter csvWriter = new CSVWriter(writer,
+        	                    CSVWriter.DEFAULT_SEPARATOR,
+        	                    CSVWriter.NO_QUOTE_CHARACTER,
+        	                    CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+        	                    CSVWriter.DEFAULT_LINE_END);
+        	        ) 
+        	{
+        	          for(String[] s: CSVdata) {
+
+        	            csvWriter.writeNext(s);
+        	            
+        	       
+        	        }
+        	}
     }    
 }
+
+
+
+
+
 
 		

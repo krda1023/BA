@@ -212,9 +212,9 @@ public class Simulator implements RouteServiceListener {
 			}	
 		}
 	
-		for(int ff=0;ff<upcomingEvents.size();ff++) {
+		/*for(int ff=0;ff<upcomingEvents.size();ff++) {
 			System.out.println(upcomingEvents.get(ff));
-		}
+		}*/
 	}
 
 	public void addEventinList(AtEvent e) {
